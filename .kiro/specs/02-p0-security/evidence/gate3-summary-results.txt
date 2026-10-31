@@ -1,0 +1,33 @@
+== P0 tests ==
+== full suite ==
+   | junit tests=215 failures=11 errors=0 skipped=0
+   | failing: 11 total, 0 outside tests.test_supervisor
+   |   tests.test_supervisor.TestSupervisor::test_sets_next_worker_from_route
+   |   tests.test_supervisor.TestSupervisor::test_includes_messages_for_observability
+   |   tests.test_supervisor.TestSupervisor::test_message_contains_routing_info
+   |   tests.test_supervisor.TestSafetyCutoff::test_cutoff_adds_error_message
+   |   tests.test_supervisor.TestSafetyCutoff::test_cutoff_preserves_existing_errors
+   |   tests.test_supervisor.TestSafetyCutoff::test_below_cutoff_continues_normally
+   |   tests.test_supervisor.TestSupervisorRouteIntegration::test_supervisor_sets_next_worker_matching_route
+   |   tests.test_supervisor.TestSupervisorRouteIntegration::test_full_pipeline_simulation
+   |   tests.test_supervisor.TestFunctionSignatures::test_llm_route_is_sync
+   |   tests.test_supervisor.TestFunctionSignatures::test_supervisor_imports_cjistate
+   |   tests.test_supervisor.TestFunctionSignatures::test_llm_route_exists
+== collector import ==
+   | collector.api OK FastAPI
+== static ==
+   | file                                                ruff      mypy  bandit medium+ (before -> after)
+   | agents\ingestion_worker.py                      6 -> 4      0 -> 0    {} -> {}
+   | agents\supervisor.py                            5 -> 5      0 -> 0    {} -> {}
+   | collector\api.py                               17 -> 17     2 -> 1    {'B608': 1} -> {}
+   | config.py                                       0 -> 0      0 -> 0    {} -> {}
+   | mcp_servers\journey_data_server.py             14 -> 13     4 -> 3    {'B608': 9} -> {}
+   | mcp_servers\report_server.py                   11 -> 11     1 -> 1    {'B113': 1} -> {'B113': 1}
+   | snippets\verify_tracker.py                      3 -> 3      1 -> 1    {'B113': 1} -> {'B113': 1}
+   | tests\test_supervisor.py                        4 -> 4      1 -> 0    {} -> {}
+   | tests\test_p0_security.py                       0 -> 0      0 -> 0    {} -> {}
+   | unchanged files delta: ruff +0, mypy +0
+   | RESULT: no changed file is worse than baseline
+   | Found 263 errors.
+   | Found 49 errors in 17 files (checked 46 source files)
+== diff ==

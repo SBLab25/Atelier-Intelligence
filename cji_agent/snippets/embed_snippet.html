@@ -1,0 +1,14 @@
+<!-- Insert this into the <head> of your HTML -->
+<script>
+window.CJI_CONFIG = {
+    api_key: "YOUR_TRACKER_API_KEY",
+    journey_name: "my_vercel_site",
+    collector_url: "https://tcs-cjipip-install-r-cji-agent.onrender.com/collect/batch",
+    step_map: {
+        // Add regex url mappings here
+        "checkout_step_1": "/checkout/cart",
+        "landing_page": "/$"
+    }
+};
+</script>
+<script src="https://tcs-cjipip-install-r-cji-agent.onrender.com/tracker.js" defer></script>

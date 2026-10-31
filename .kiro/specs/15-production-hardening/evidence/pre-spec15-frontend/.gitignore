@@ -1,0 +1,14 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+# tests
+playwright-report/
+test-results/
+coverage/
+# local configuration (secrets)
+.env
+.env.local
+.env.*.local

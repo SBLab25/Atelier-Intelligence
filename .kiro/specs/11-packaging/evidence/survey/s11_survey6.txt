@@ -1,0 +1,195 @@
+===== main.py structure
+  cji_agent\main.py:30: def _parse_args() -> argparse.Namespace:
+  cji_agent\main.py:31:     parser = argparse.ArgumentParser(
+  cji_agent\main.py:131: def _configure_console(*streams) -> None:
+  cji_agent\main.py:161: def _report_outcome(outcome, settings, mode, journey_config, write_last_run) -> int:
+  cji_agent\main.py:198: def main() -> int:
+  cji_agent\main.py:305: if __name__ == "__main__":
+  cji_agent\main.py:306:     sys.exit(main())
+===== run_servers.py structure
+  cji_agent\run_servers.py:20: def launch_plan() -> list[tuple[str, str]]:
+  cji_agent\run_servers.py:25: def main(argv: list[str] | None = None) -> int:
+  cji_agent\run_servers.py:52:         for name, module_name in launch_plan():
+  cji_agent\run_servers.py:54:             logger.info(f"Spawning {module_name} ({name} on {endpoint.host}:{endpoint.port}, {endpoint.transport})...")
+  cji_agent\run_servers.py:56:                 [sys.executable, "-m", module_name],
+  cji_agent\run_servers.py:60:             processes.append((module_name, p))
+  cji_agent\run_servers.py:83: if __name__ == "__main__":
+===== settings/services.py module strings
+  cji_agent\settings\services.py:6: Pure module: stdlib and pydantic only.
+  cji_agent\settings\services.py:24:     "collector",
+  cji_agent\settings\services.py:49:                    "mcp_servers.ingestion_intelligence_server"),
+  cji_agent\settings\services.py:50:     ServiceDefault("cji-journey-data", "mcp", "sse", 8001, "/sse", "mcp_servers.journey_data_server"),
+  cji_agent\settings\services.py:51:     ServiceDefault("cji-friction-engine", "mcp", "sse", 8002, "/sse", "mcp_servers.friction_engine_server"),
+  cji_agent\settings\services.py:52:     ServiceDefault("cji-insight", "mcp", "sse", 8003, "/sse", "mcp_servers.insight_server"),
+  cji_agent\settings\services.py:53:     ServiceDefault("cji-report", "mcp", "sse", 8004, "/sse", "mcp_servers.report_server"),
+  cji_agent\settings\services.py:54:     ServiceDefault("collector", "http", "http", 8000, "", "collector.api:app"),
+===== settings/__main__.py
+  cji_agent\settings\__main__.py:8: from __future__ import annotations
+  cji_agent\settings\__main__.py:10: import argparse
+  cji_agent\settings\__main__.py:11: import json
+  cji_agent\settings\__main__.py:12: import os
+  cji_agent\settings\__main__.py:13: import sys
+  cji_agent\settings\__main__.py:15: from .errors import ConfigError
+  cji_agent\settings\__main__.py:16: from .load import DEFAULT_DOTENV_PATH, load_settings
+  cji_agent\settings\__main__.py:17: from .roles import ROLES_HELP, require
+  cji_agent\settings\__main__.py:20: def main(argv: list[str] | None = None) -> int:
+  cji_agent\settings\__main__.py:44: if __name__ == "__main__":
+===== pytest-asyncio / pytest-cov usage
+  cji_agent\tests\test_gateway.py:770: # Spec 08 gate findings: mcp 2.x error field, anyio exception groups, ingestion correlation
+  cji_agent\tests\test_gateway.py:792:         try:                                   # like the SSE client's anyio task group
+===== string module paths in tests and app (patch/import_module/-m)
+  cji_agent\collector\api.py:318:     tracker_path = ROOT / "tracker" / "tracker.js"
+  cji_agent\dashboard.py:417:         [sys.executable, str(ROOT / "main.py"), "--mode", mode, "--run", "--auto-approve"],
+  cji_agent\settings\services.py:49:                    "mcp_servers.ingestion_intelligence_server"),
+  cji_agent\settings\services.py:50:     ServiceDefault("cji-journey-data", "mcp", "sse", 8001, "/sse", "mcp_servers.journey_data_server"),
+  cji_agent\settings\services.py:51:     ServiceDefault("cji-friction-engine", "mcp", "sse", 8002, "/sse", "mcp_servers.friction_engine_server"),
+  cji_agent\settings\services.py:52:     ServiceDefault("cji-insight", "mcp", "sse", 8003, "/sse", "mcp_servers.insight_server"),
+  cji_agent\settings\services.py:53:     ServiceDefault("cji-report", "mcp", "sse", 8004, "/sse", "mcp_servers.report_server"),
+  cji_agent\settings\services.py:55:     ServiceDefault("dashboard", "ui", "http", 8501, "", "dashboard.py"),
+  cji_agent\tests\conftest.py:168:     api = sys.modules.get("collector.api")
+  cji_agent\tests\test_collector.py:64:     return importlib.import_module("collector.api")
+  cji_agent\tests\test_contracts.py:84:     api = importlib.import_module("collector.api")
+  cji_agent\tests\test_contracts.py:168:     api = importlib.import_module("collector.api")
+  cji_agent\tests\test_dashboard_smoke.py:28:         app = AppTest.from_file(str(APP_ROOT / "dashboard.py"), default_timeout=120)
+  cji_agent\tests\test_docs.py:40: @pytest.mark.parametrize("script", ["main.py", "run_servers.py", "tools/ingest_json.py"])
+  cji_agent\tests\test_gateway.py:761:         "or m in ('mcp_servers.insight_server', 'mcp_servers.report_server', 'tools.mcp_client')); print(bad)"
+  cji_agent\tests\test_p0_security.py:62:     return importlib.import_module("collector.api")
+  cji_agent\tests\test_reports.py:547:     full = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_repositories.py:110:     collector_api = importlib.import_module("collector.api")
+  cji_agent\tests\test_settings.py:467:         [sys.executable, "main.py", "--mode", "realtime", "--run"],
+  cji_agent\tests\test_settings.py:476:     source = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:563: PRODUCTION_PATHS = ["main.py", "run_servers.py", "graph.py", "dashboard.py", "config.py", "state.py",
+  cji_agent\tests\test_workflow.py:179:     for rel in ("graph.py", "agents/supervisor.py", "agents/workers.py", "agents/ingestion_worker.py",
+  cji_agent\tests\test_workflow.py:691:     return subprocess.run([sys.executable, "main.py", *args], cwd=APP_ROOT, env=proc_env, capture_output=True,
+===== import-time side effects (module level calls)
+  generate_diverse.py:83: print("Generating 1M+ records of diverse, highly-insightful synthetic data...")
+  generate_diverse.py:86: print(f"Done! Written to {out_path}")
+  mcp_servers\insight_server.py:20: logging.basicConfig(level=logging.INFO)
+  mcp_servers\report_server.py:12: logging.basicConfig(level=logging.INFO)
+  run_servers.py:14: logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+  snippets\verify_tracker.py:17: print("Generating 12 test events...")
+  tools\mcp_client.py:13: logging.basicConfig(level=logging.INFO)
+  tracker\snippet_generator.py:100: print("Generating 12 test events...")
+===== checkpoint APIs used by workflow (CVE exposure)
+===== chromadb client type
+  cji_agent\mcp_servers\insight_server.py:33:         _chroma_client = chromadb.PersistentClient(path=str(CHROMA_DIR.resolve()))
+===== who requires filelock / langchain / langchain-text-splitters / huggingface-hub / torch
+  chromadb -> tokenizers>=0.13.2
+  huggingface_hub -> filelock>=3.10.0
+  langchain -> langchain-text-splitters<1.0.0,>=0.3.9
+  langchain-community -> langchain<2.0.0,>=0.3.27
+  langgraph -> langgraph-checkpoint (>=1.0.2,<2.0.0)
+  langgraph-checkpoint-sqlite -> langgraph-checkpoint (>=1.0.11,<2.0.0)
+  litellm -> filelock>=3.16.1,<4.0
+  litellm -> openai>=2.20.0,<3.0.0
+  litellm -> tokenizers>=0.21.0,<1.0
+  litellm -> huggingface-hub>=0.34.0,<2.0
+  scikit-learn -> scipy>=1.10.0
+  sentence-transformers -> transformers<6.0.0,>=5.0.0
+  sentence-transformers -> tokenizers>=0.19
+  sentence-transformers -> huggingface-hub<3.0.0,>=1.3.0
+  sentence-transformers -> torch>=2.2
+  sentence-transformers -> scikit-learn>=1.1.0
+  sentence-transformers -> scipy>=1.0.0
+  tokenizers -> huggingface-hub>=0.16.4,<3.0
+  torch -> filelock
+  transformers -> huggingface-hub<3.0,>=1.31.0
+  transformers -> tokenizers<0.24.0,>=0.23.1
+===== old gate helper scripts: imports and sys.path
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:4: import asyncio
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:5: import inspect
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:6: import json
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:7: import os
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:8: import sys
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:12: sys.path.insert(0, os.getcwd())
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:14: import logging
+  .kiro\specs\02-p0-security\evidence\scripts\golden.py:17: from mcp_servers import journey_data_server as j  # noqa: E402
+  .kiro\specs\02-p0-security\evidence\scripts\compare_static.py:4: import json
+  .kiro\specs\02-p0-security\evidence\scripts\compare_static.py:5: import re
+  .kiro\specs\02-p0-security\evidence\scripts\compare_static.py:6: import sys
+  .kiro\specs\02-p0-security\evidence\scripts\compare_static.py:7: from collections import Counter
+  .kiro\specs\02-p0-security\evidence\scripts\compare_static.py:8: from pathlib import Path
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:6: from __future__ import annotations
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:8: import json
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:9: import os
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:10: import secrets
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:11: import socket
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:12: import subprocess
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:13: import sys
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:14: import tempfile
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:15: import time
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:16: import uuid
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:17: from pathlib import Path
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:19: import requests
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:21: APP = Path(__file__).resolve().parents[5] / "cji_agent"
+  .kiro\specs\07-collector\evidence\scripts\collector_smoke.py:59:                              "--port", str(port), "--log-level", "info"], cwd=APP, env=env,
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:9: from __future__ import annotations
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:11: import collections
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:12: import json
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:13: import sys
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:14: from pathlib import Path
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:16: APP = Path(__file__).resolve().parents[5] / "cji_agent"
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:17: sys.path.insert(0, str(APP))
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:18: from integrations.audit import AUDIT_FIELDS  # noqa: E402
+  .kiro\specs\08-ai-gateway\evidence\scripts\audit_check.py:20: AUDIT_DIR = APP / "data" / "audit"
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:9: from __future__ import annotations
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:11: import collections
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:12: import json
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:13: import sys
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:14: from pathlib import Path
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:16: APP = Path(__file__).resolve().parents[5] / "cji_agent"
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:17: sys.path.insert(0, str(APP))
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:18: from domain.runs import IllegalTransition, transition  # noqa: E402
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:19: from integrations.audit import AUDIT_FIELDS  # noqa: E402
+  .kiro\specs\09-durable-workflow\evidence\scripts\audit_workflow_check.py:21: PATH = APP / "data" / "audit" / "workflow.jsonl"
+===== README env var section and test_docs checks
+  README.md:10: ## Table of Contents
+  README.md:28: ## Why CJI?
+  README.md:36: ## Features
+  README.md:51: ## Quickstart
+  README.md:66: cp .env.example .env
+  README.md:87: ## System Architecture
+  README.md:163: ## Demo Mode Walkthrough
+  README.md:202: ## Importing Event Files
+  README.md:223: ## Realtime Mode Walkthrough
+  README.md:300: ## Environment Variables Reference
+  README.md:302: Settings are read from the process environment, then `cji_agent/.env` (never read when `CJI_ENV=test`).
+  README.md:303: `.env.example` documents every key. `python -m settings check --role <role>` prints the resolved values with secrets
+  README.md:313: | `CJI_DATA_DIR` | `cji_agent/data` | Parquet, checkpoints, `data/last_run.json`, ChromaDB. |
+  README.md:314: | `CJI_REPORTS_DIR` | `cji_agent/reports` | HTML reports. |
+  README.md:357: ## Guardrails
+  README.md:383:   invalid run id is replaced by the input hash. The file is written atomically inside `CJI_REPORTS_DIR` and nowhere else.
+  README.md:391: ## LangSmith Tracing
+  README.md:394: # In cji_agent/.env
+  README.md:402: ## Running the Tests
+  README.md:409: - Tests run offline with `CJI_ENV=test` (set in `tests/conftest.py`): no `.env`, no database uploads.
+  README.md:419: ## Security Practices
+  README.md:421: - `cji_agent/.env` is gitignored; `.env.example` contains no secrets.
+  README.md:431: ## Known Issues & FAQ
+  cji_agent\tests\test_docs.py:16: REPO_ROOT = APP_ROOT.parent
+  cji_agent\tests\test_docs.py:17: README = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+  cji_agent\tests\test_docs.py:21:     str(p.relative_to(REPO_ROOT)).replace("\\", "/")
+  cji_agent\tests\test_docs.py:22:     for p in [*(REPO_ROOT / "docs").glob("*.md"), *(REPO_ROOT / "Project Details").glob("*.md")]
+  cji_agent\tests\test_docs.py:28:     return set(re.findall(r'add_argument\(\s*"(--[\w-]+)"', path.read_text(encoding="utf-8")))
+  cji_agent\tests\test_docs.py:36:             flags |= set(re.findall(r"(?<![\w-])(--[a-z][\w-]*)", tail))
+  cji_agent\tests\test_docs.py:41: def test_readme_uses_only_real_cli_flags(script):
+  cji_agent\tests\test_docs.py:47: def test_readme_routes_exist():
+  cji_agent\tests\test_docs.py:51:     used = set(re.findall(r"`(?:GET|POST|PUT|DELETE) (/[\w./-]*)`", README))
+  cji_agent\tests\test_docs.py:56: def test_readme_environment_variables_exist():
+  cji_agent\tests\test_docs.py:57:     rows = re.findall(r"^\|\s*`([A-Z][A-Z0-9_]+)`\s*\|", README, re.MULTILINE)
+  cji_agent\tests\test_docs.py:63: def test_readme_documents_required_settings():
+  cji_agent\tests\test_docs.py:64:     rows = set(re.findall(r"^\|\s*`([A-Z][A-Z0-9_]+)`\s*\|", README, re.MULTILINE))
+  cji_agent\tests\test_docs.py:69: def test_readme_ports_come_from_the_service_registry():
+  cji_agent\tests\test_docs.py:72:     used = {int(p) for p in re.findall(r"(?:localhost:|127\.0\.0\.1:|--port |port )(\d{4})\b", README)}
+  cji_agent\tests\test_docs.py:73:     used |= {int(p) for p in re.findall(r"^\|\s*(\d{4})\s*\|", README, re.MULTILINE)}
+  cji_agent\tests\test_docs.py:81: def test_readme_paths_exist():
+  cji_agent\tests\test_docs.py:83:     for token in set(re.findall(r"`([\w./-]+\.(?:py|md|js|json|txt|ini|example|parquet|html))`", README)):
+  cji_agent\tests\test_docs.py:86:         if not any((base / token).exists() for base in (REPO_ROOT, APP_ROOT, APP_ROOT / "tracker")):
+  cji_agent\tests\test_docs.py:91: def test_readme_has_no_password_shaped_example():
+  cji_agent\tests\test_docs.py:97: def test_readme_starts_the_mcp_servers_before_the_pipeline():
+  cji_agent\tests\test_docs.py:103: def test_superseded_documents_say_so(rel):
+  cji_agent\tests\test_docs.py:104:     first = (REPO_ROOT / rel).read_text(encoding="utf-8-sig").lstrip().splitlines()[0]
+  cji_agent\tests\test_docs.py:109: def test_historical_design_documents_say_so(rel):
+  cji_agent\tests\test_docs.py:110:     first = (REPO_ROOT / rel).read_text(encoding="utf-8-sig").lstrip().splitlines()[0]
+  cji_agent\tests\test_docs.py:114: def test_docs_index_lists_every_document():
+  cji_agent\tests\test_docs.py:115:     index = (REPO_ROOT / "docs" / "README.md").read_text(encoding="utf-8")

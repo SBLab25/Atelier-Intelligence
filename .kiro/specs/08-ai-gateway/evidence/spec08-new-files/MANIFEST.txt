@@ -1,0 +1,32 @@
+deleted   cji_agent/guardrails/rate_limiter.py (copy in evidence/removed/; tracked: in spec08-tracked.patch)
+tracked   README.md (in spec08-tracked.patch)
+tracked   cji_agent/.env.example (in spec08-tracked.patch)
+tracked   cji_agent/.gitignore (in spec08-tracked.patch)
+tracked   cji_agent/requirements.txt (in spec08-tracked.patch)
+new       cji_agent/integrations/__init__.py sha256=c71256d76ca062c0
+new       cji_agent/integrations/audit.py sha256=b5ffe2569dc877b9
+new       cji_agent/integrations/context.py sha256=2e55932cbef0b0a2
+new       cji_agent/integrations/errors.py sha256=e8b6658474d3dd84
+new       cji_agent/integrations/llm.py sha256=b253b7dcce2070b3
+new       cji_agent/integrations/policy.py sha256=1565731b5fed4f59
+new       cji_agent/integrations/providers.py sha256=f884ccc4b7b36183
+new       cji_agent/integrations/testing.py sha256=63fd81220e916c99
+new       cji_agent/integrations/tools.py sha256=32e3eb42b2824a06
+new       cji_agent/integrations/types.py sha256=39da6b2776dc27b8
+new       cji_agent/integrations/usage.py sha256=f2e17836415389e2
+changed   cji_agent/settings/model.py sha256=2b9cf030ec6e201c
+changed   cji_agent/settings/load.py sha256=54f08ad3d8173b51
+tracked   cji_agent/tools/mcp_client.py (in spec08-tracked.patch)
+tracked   cji_agent/agents/workers.py (in spec08-tracked.patch)
+tracked   cji_agent/agents/ingestion_worker.py (in spec08-tracked.patch)
+tracked   cji_agent/mcp_servers/insight_server.py (in spec08-tracked.patch)
+tracked   cji_agent/mcp_servers/report_server.py (in spec08-tracked.patch)
+tracked   cji_agent/mcp_servers/ingestion_intelligence_server.py (in spec08-tracked.patch)
+tracked   cji_agent/state.py (in spec08-tracked.patch)
+tracked   cji_agent/main.py (in spec08-tracked.patch)
+tracked   cji_agent/tests/conftest.py (in spec08-tracked.patch)
+new       cji_agent/tests/test_gateway.py sha256=d18016e18a91b057
+changed   cji_agent/tests/test_settings.py sha256=5ce5f225830b709f
+changed   cji_agent/tests/test_contracts.py sha256=9c1c1f6469d3e25e
+changed   cji_agent/tests/test_cleanup.py sha256=6b67a45e4aec6bef
+tracked   cji_agent/tests/test_ingestion_intelligence.py (in spec08-tracked.patch)

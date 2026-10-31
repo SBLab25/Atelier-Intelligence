@@ -1,0 +1,213 @@
+﻿.\cji_agent\.venv\Scripts\python.exe : 
+C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_age
+nt\.venv\Lib\site-packages\langchain_core\_api\deprecatio
+n.py:27: UserWarning: Core Pydantic V1 functionality 
+isn't compatible with Python 3.14 or greater.
+At line:1 char:1
++ .\cji_agent\.venv\Scripts\python.exe 
+.\cji_agent\main.py --mode demo  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\so 
+   van\....14 or greater.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+2026-04-03T02:01:00 | cji.graph            | INFO     | 
+Building CJI StateGraph...
+2026-04-03T02:01:00 | cji.graph            | INFO     | 
+CJI StateGraph built successfully.
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 1 at 
+2026-04-02T20:31:01.015890+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 data_worker (no event_summary)
+2026-04-03T02:01:01 | cji.workers          | INFO     | 
+System info: demo mode, 0 events
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 2 at 
+2026-04-02T20:31:01.442496+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 3 at 
+2026-04-02T20:31:01.444607+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 4 at 
+2026-04-02T20:31:01.446225+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 5 at 
+2026-04-02T20:31:01.447613+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 6 at 
+2026-04-02T20:31:01.449756+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 7 at 
+2026-04-02T20:31:01.451429+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 8 at 
+2026-04-02T20:31:01.453066+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 9 at 
+2026-04-02T20:31:01.454570+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 10 at 
+2026-04-02T20:31:01.456278+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 11 at 
+2026-04-02T20:31:01.457835+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 12 at 
+2026-04-02T20:31:01.459352+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 13 at 
+2026-04-02T20:31:01.460736+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 14 at 
+2026-04-02T20:31:01.462364+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 15 at 
+2026-04-02T20:31:01.463977+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 16 at 
+2026-04-02T20:31:01.465744+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 17 at 
+2026-04-02T20:31:01.467258+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 18 at 
+2026-04-02T20:31:01.468697+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 19 at 
+2026-04-02T20:31:01.470271+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 20 at 
+2026-04-02T20:31:01.471819+00:00
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:01:01 | cji.supervisor       | INFO     | 
+Supervisor iteration 21 at 
+2026-04-02T20:31:01.473452+00:00
+2026-04-03T02:01:01 | cji.supervisor       | WARNING  | 
+Max iterations (20) exceeded ù halting.
+
+============================================================
+  CJI Analysis - Mode: DEMO
+  Thread ID: 3c84e243-1210-41fa-91ca-7da24e188670
+============================================================
+
+  [OK] data_worker: Collected 0 step metrics, 0 events
+  [OK] data_worker: Collected 0 step metrics, 0 events
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] friction_worker: No step_metrics in event_summary
+  [FAIL] friction_worker: No step metrics available ù skipping friction scoring
+  [WARN] supervisor: Max iterations (20) exceeded
+  [INFO] Dashboard data saved -> C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_agent\data\last_run.json
+
+[DONE] Analysis complete.

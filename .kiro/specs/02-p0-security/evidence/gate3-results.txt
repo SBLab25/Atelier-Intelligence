@@ -1,0 +1,13 @@
+﻿Spec 02 gate (after fix-ups) 2026-10-27T17:31:19
+   | ok  collector/api.py: PEP 604 annotation
+   | ok  collector/api.py: PEP 604/585 annotations
+   | ok  collector/api.py: narrow Optional for len()
+   | ok  mcp_servers/journey_data_server.py: distinct name for dict params
+   | ok  mcp_servers/journey_data_server.py: use dict params
+   | ok  mcp_servers/journey_data_server.py: justify fixed-string FROM clause
+   | ok  tests/test_p0_security.py: pandas stubs
+   | ok  tests/test_p0_security.py: dict literal
+   | 3 file(s) written
+golden identical: True
+   | 
+   | 

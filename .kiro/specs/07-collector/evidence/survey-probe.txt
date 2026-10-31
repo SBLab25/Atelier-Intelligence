@@ -1,0 +1,5 @@
+application/json: 200 {"status":"queued","accepted":1,"rejected":0}
+text/plain;charset=UTF-8: 422 {"detail":[{"type":"model_attributes_type","loc":["body"],"msg":"Input should be a valid dictionary or object to extract fields from","input":"{\"api_key\": \"cji_dev_localtest\", \"events\": [{\"time
+2MB metadata: 200 {"status":"queued","accepted":1,"rejected":0}
+/live/stats without credentials: 200
+fastapi 0.162.0 starlette 1.10.0

@@ -1,0 +1,82 @@
+Stage B started 2026-10-27T15:48:18
+pip-audit (pinned app deps)        exit=1         2s  log=b1-pip-audit.log
+protected env applied: proxy=127.0.0.1:9, dummy keys, dead DATABASE_URL
+pytest --collect-only              exit=2        16s  log=b2-pytest-collect.log
+pytest -m 'not integration'        exit=4         5s  log=b3-pytest-run.log
+ruff check --statistics            exit=1         0s  log=b4-ruff-stats.log
+ruff check (full list)             exit=1         0s  log=b4-ruff-full.log
+mypy .                             exit=1        80s  log=b5-mypy.log
+bandit -r .                        exit=1         2s  log=b6-bandit.log
+git status unchanged: True
+--- pytest tail ---
+python.exe : ERROR: file or directory not found: C:\Users\sovan\Documents\Proje
+cts\TCS-CJI\.kiro\specs\01-baseline\evidence\b3-pytest-junit.xml
+At C:\Users\sovan\.kiro\stage_b_checks.ps1:41 char:5
++     & $py -m pytest tests -p no:cacheprovider -m "not integration" -r ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: file or ...ytest-junit.xml 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+
+no tests ran in 0.00s
+--- collect tail ---
+=========================== short test summary info ===========================
+ERROR tests/test_supervisor.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+--- ruff stats ---
+51	BLE001 	[ ] blind-except
+48	C408   	[ ] unnecessary-collection-call
+44	F401   	[*] unused-import
+36	I001   	[-] unsorted-imports
+16	UP017  	[*] datetime-timezone-utc
+12	UP006  	[*] non-pep585-annotation
+ 9	UP035  	[-] deprecated-import
+ 9	F841   	[-] unused-variable
+ 6	S110   	[ ] try-except-pass
+ 5	F541   	[*] f-string-missing-placeholders
+ 4	RUF013 	[ ] implicit-optional
+ 4	G201   	[ ] logging-exc-info
+ 3	B023   	[ ] function-uses-loop-variable
+ 3	B005   	[ ] strip-with-multi-characters
+ 2	UP045  	[*] non-pep604-annotation-optional
+ 2	RUF100 	[*] unused-noqa
+ 1	SIM102 	[ ] collapsible-if
+ 1	RUF010 	[*] explicit-f-string-type-conversion
+ 1	SIM118 	[*] in-dict-keys
+ 1	SIM117 	[*] multiple-with-statements
+ 1	SIM103 	[ ] needless-bool
+ 1	UP007  	[*] non-pep604-annotation-union
+ 1	FURB105	[*] print-empty-string
+ 1	PLW0127	[ ] self-assigning-variable
+ 1	PLW1510	[ ] subprocess-run-without-check
+ 1	C401   	[ ] unnecessary-generator-set
+ 1	RUF059 	[ ] unused-unpacked-variable
+ 1	TRY201 	[ ] verbose-raise
+Found 266 errors.
+[*] 123 fixable with `--fix` (64 unsafe fixes available with `--fix --unsafe-fixes`).
+--- mypy tail ---
+mcp_servers\insight_server.py:199: error: Item "str" of "str | dict[Any, Any]" has no attribute "get"  [union-attr]
+mcp_servers\insight_server.py:202: error: Item "str" of "str | dict[Any, Any]" has no attribute "get"  [union-attr]
+Found 52 errors in 18 files (checked 45 source files)
+--- bandit totals ---
+--- pip-audit tail ---
+python.exe : WARNING:pip_audit._cli:--no-deps is supported, but users are 
+encouraged to fully hash their pinned dependencies
+At C:\Users\sovan\.kiro\stage_b_checks.ps1:23 char:5
++     & $py -m pip_audit -r (Join-Path $ev "constraints-baseline-2026-1 ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING:pip_aud...ed dependencies 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: 
+https://pip-tools.readthedocs.io/en/latest/#using-hashes
+ERROR:pip_audit._cli:requirement file C:\Users\sovan\Documents\Projects\TCS-CJI
+\.kiro\specs\01-baseline\evidence\constraints-baseline-2026-10-27.txt contains 
+invalid specifier at line 1: Invalid requirement: : Expected end or semicolon 
+(after name and no valid version specifier)
+    uv : Using Python 3.12.13 environment at:
+       ^
+Stage B finished 2026-10-27T15:50:04

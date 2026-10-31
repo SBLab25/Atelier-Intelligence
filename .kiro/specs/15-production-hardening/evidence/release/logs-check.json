@@ -1,0 +1,4 @@
+{
+  "ok": true,
+  "detail": "333 lines; not JSON or missing fields: none; request gate-run-cf51d005c644 -> run 964d022a-497e-4c48-8dbc-1b59a0f33410: 24 API lines, 3 MCP lines; Next.js trace 6627d0d5732b4799ad9b7f5936d178e3 in 3 API lines"
+}

@@ -1,0 +1,522 @@
+== moves (20)
+  agents -> src/cji/agents
+  collector -> src/cji/collector
+  domain -> src/cji/domain
+  guardrails -> src/cji/guardrails
+  integrations -> src/cji/integrations
+  mcp_servers -> src/cji/mcp_servers
+  reporting -> src/cji/reporting
+  repositories -> src/cji/repositories
+  settings -> src/cji/settings
+  tools -> src/cji/tools
+  workflow -> src/cji/workflow
+  config.py -> src/cji/config.py
+  graph.py -> src/cji/graph.py
+  main.py -> src/cji/main.py
+  state.py -> src/cji/state.py
+  dashboard.py -> src/cji/dashboard.py
+  run_servers.py -> src/cji/run_servers.py
+  generate_diverse.py -> src/cji/tools/generate_diverse.py
+  tracker/snippet_generator.py -> src/cji/tracker/snippet_generator.py
+  tracker/tracker.js -> src/cji/tracker/tracker.js
+  deleted tracker/.gitkeep (tracker/ now holds only the snippet launcher)
+  created src/cji/__init__.py
+  created src/cji/tracker/__init__.py
+
+== changed lines (391)
+  src/cji/agents/ingestion_worker.py:18: from config import INGESTION_CONFIDENCE_THRESHOLD  =>  from cji.config import INGESTION_CONFIDENCE_THRESHOLD
+  src/cji/agents/ingestion_worker.py:19: from integrations.context import run_or_new  =>  from cji.integrations.context import run_or_new
+  src/cji/agents/ingestion_worker.py:20: from integrations.usage import run_context_arg  =>  from cji.integrations.usage import run_context_arg
+  src/cji/agents/ingestion_worker.py:21: from state import CJIState, IngestionResult, WorkerStatus, WorkflowError  =>  from cji.state import CJIState, IngestionResult, WorkerStatus, WorkflowError
+  src/cji/agents/ingestion_worker.py:22: from tools.mcp_client import call_tool, mcp_session  =>  from cji.tools.mcp_client import call_tool, mcp_session
+  src/cji/agents/ingestion_worker.py:23: from workflow.step import step  =>  from cji.workflow.step import step
+  src/cji/agents/supervisor.py:19: from config import MAX_AGENT_ITERATIONS  =>  from cji.config import MAX_AGENT_ITERATIONS
+  src/cji/agents/supervisor.py:20: from domain.runs import STOPPED_STATUSES, VALID_WORKERS, workflow_error  =>  from cji.domain.runs import STOPPED_STATUSES, VALID_WORKERS, workflow_error
+  src/cji/agents/workers.py:28: from domain.insights import INSIGHTS, NARRATIVE, RANKED_FIXES, REPORT_RESULT  =>  from cji.domain.insights import INSIGHTS, NARRATIVE, RANKED_FIXES, REPORT_RESULT
+  src/cji/agents/workers.py:29: from domain.metrics import FRICTION_SCORES, FUNNEL_STEPS, STEP_METRICS_LIST  =>  from cji.domain.metrics import FRICTION_SCORES, FUNNEL_STEPS, STEP_METRICS_LIST
+  src/cji/agents/workers.py:30: from domain.runs import WorkflowError, insight_id_for  =>  from cji.domain.runs import WorkflowError, insight_id_for
+  src/cji/agents/workers.py:31: from domain.validation import check  =>  from cji.domain.validation import check
+  src/cji/agents/workers.py:32: from integrations import GatewayError  =>  from cji.integrations import GatewayError
+  src/cji/agents/workers.py:33: from integrations.audit import configured_secrets, scrub  =>  from cji.integrations.audit import configured_secrets, scrub
+  src/cji/agents/workers.py:34: from integrations.context import current_run, run_or_new  =>  from cji.integrations.context import current_run, run_or_new
+  src/cji/agents/workers.py:35: from integrations.usage import add_usage, run_context_arg  =>  from cji.integrations.usage import add_usage, run_context_arg
+  src/cji/agents/workers.py:36: from tools.mcp_client import mcp_session, call_tool  =>  from cji.tools.mcp_client import mcp_session, call_tool
+  src/cji/agents/workers.py:37: from workflow.errors import StepError  =>  from cji.workflow.errors import StepError
+  src/cji/agents/workers.py:38: from workflow.step import step  =>  from cji.workflow.step import step
+  src/cji/collector/api.py:22: from collector import ingest  =>  from cji.collector import ingest
+  src/cji/collector/api.py:23: from collector.middleware import (  =>  from cji.collector.middleware import (
+  src/cji/collector/api.py:29: from collector.models import CollectResult  =>  from cji.collector.models import CollectResult
+  src/cji/collector/api.py:30: from collector.security import (  =>  from cji.collector.security import (
+  src/cji/collector/api.py:37: from config import ROOT  =>  from cji.config import ROOT
+  src/cji/collector/api.py:38: from domain.journeys import JourneyId  =>  from cji.domain.journeys import JourneyId
+  src/cji/collector/api.py:39: from settings import ConfigError, get_settings, secret_value  =>  from cji.settings import ConfigError, get_settings, secret_value
+  src/cji/collector/api.py:40: from settings.model import DEV_TRACKER_KEY, KNOWN_DEFAULT_ADMIN_KEYS  =>  from cji.settings.model import DEV_TRACKER_KEY, KNOWN_DEFAULT_ADMIN_KEYS
+  src/cji/collector/api.py:41: from settings.roles import collector_problems, database_missing, endpoint_problems  =>  from cji.settings.roles import collector_problems, database_missing, endpoint_problems
+  src/cji/collector/ingest.py:20: from collector.models import CollectStatus, EventError  =>  from cji.collector.models import CollectStatus, EventError
+  src/cji/collector/ingest.py:21: from domain.events import TrackerEvent, to_live_events_row  =>  from cji.domain.events import TrackerEvent, to_live_events_row
+  src/cji/collector/ingest.py:22: from domain.journeys import MAX_IDENTIFIER_LENGTH  =>  from cji.domain.journeys import MAX_IDENTIFIER_LENGTH
+  src/cji/collector/models.py:17: from domain.events import ALLOWED_EVENT_TYPES, EventBatch, TrackerEvent  =>  from cji.domain.events import ALLOWED_EVENT_TYPES, EventBatch, TrackerEvent
+  src/cji/config.py:25: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/config.py:26: from settings.model import KNOWN_DEFAULT_ADMIN_KEYS as _KNOWN_DEFAULT_ADMIN_KEYS  =>  from cji.settings.model import KNOWN_DEFAULT_ADMIN_KEYS as _KNOWN_DEFAULT_ADMIN_KEYS
+  src/cji/config.py:27: from settings.model import secret_value as _secret  =>  from cji.settings.model import secret_value as _secret
+  src/cji/dashboard.py:23: from repositories.base import RepositoryError, describe_failure  =>  from cji.repositories.base import RepositoryError, describe_failure
+  src/cji/dashboard.py:24: from settings import ConfigError, get_settings, require  =>  from cji.settings import ConfigError, get_settings, require
+  src/cji/dashboard.py:621: from tools.ingest_json import ingest_file  =>  from cji.tools.ingest_json import ingest_file
+  src/cji/domain/insights.py:36: string """Output of guardrails.output_validator (and generate_insight, which adds insight_id)."""  =>  """Output of cji.guardrails.output_validator (and generate_insight, which adds insight_id)
+  src/cji/graph.py:26: from agents.supervisor import route, supervisor  =>  from cji.agents.supervisor import route, supervisor
+  src/cji/graph.py:27: from state import CJIState  =>  from cji.state import CJIState
+  src/cji/graph.py:40: from agents.ingestion_worker import ingestion_worker  =>  from cji.agents.ingestion_worker import ingestion_worker
+  src/cji/graph.py:41: from agents.workers import (  =>  from cji.agents.workers import (
+  src/cji/graph.py:1-16: multi-line string: module paths qualified
+  src/cji/guardrails/output_validator.py:2: from config import JOURNEY_CONFIG  =>  from cji.config import JOURNEY_CONFIG
+  src/cji/guardrails/output_validator.py:3: from domain.insights import FIX_EFFORTS, INSIGHT_CATEGORIES  =>  from cji.domain.insights import FIX_EFFORTS, INSIGHT_CATEGORIES
+  src/cji/guardrails/output_validator.py:4: from domain.journeys import journey_from_config  =>  from cji.domain.journeys import journey_from_config
+  src/cji/integrations/audit.py:95: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/integrations/audit.py:108: from settings import get_settings, secret_value  =>  from cji.settings import get_settings, secret_value
+  src/cji/integrations/llm.py:76: from settings import get_settings, secret_value  =>  from cji.settings import get_settings, secret_value
+  src/cji/integrations/providers.py:10: from settings.model import DEFAULT_LLM_MODELS as DEFAULT_MODELS  =>  from cji.settings.model import DEFAULT_LLM_MODELS as DEFAULT_MODELS
+  src/cji/integrations/providers.py:11: from settings.model import LLM_PROVIDERS as PROVIDERS  =>  from cji.settings.model import LLM_PROVIDERS as PROVIDERS
+  src/cji/integrations/providers.py:12: from settings.model import llm_model_mismatch as model_mismatch  =>  from cji.settings.model import llm_model_mismatch as model_mismatch
+  src/cji/integrations/tools.py:30: from settings import ConfigError, get_settings  =>  from cji.settings import ConfigError, get_settings
+  src/cji/integrations/tools.py:46: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/integrations/tools.py:132: from settings import ConfigError  =>  from cji.settings import ConfigError
+  src/cji/integrations/tools.py:206: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/integrations/usage.py:26: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/main.py:208: from settings import ConfigError  =>  from cji.settings import ConfigError
+  src/cji/main.py:211: from config import (  =>  from cji.config import (
+  src/cji/main.py:216: from settings import get_settings, require  =>  from cji.settings import get_settings, require
+  src/cji/main.py:229: from tools.synthetic_data import generate_demo_data  =>  from cji.tools.synthetic_data import generate_demo_data
+  src/cji/main.py:244: from workflow.errors import WorkflowRuntimeError  =>  from cji.workflow.errors import WorkflowRuntimeError
+  src/cji/main.py:245: from workflow.runtime import Workflow, initial_state, write_last_run  =>  from cji.workflow.runtime import Workflow, initial_state, write_last_run
+  src/cji/main.py:260: from tools.mcp_client import ping_all_servers  =>  from cji.tools.mcp_client import ping_all_servers
+  src/cji/mcp_servers/_serve.py:14: from settings import ConfigError, get_settings, require  =>  from cji.settings import ConfigError, get_settings, require
+  src/cji/mcp_servers/friction_engine_server.py:30: from config import FRICTION_SCORE_THRESHOLD  # noqa: E402 (required after sys.path fix)  =>  from cji.config import FRICTION_SCORE_THRESHOLD  # noqa: E402 (required after sys.path fix)
+  src/cji/mcp_servers/friction_engine_server.py:310: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  src/cji/mcp_servers/ingestion_intelligence_server.py:32: from config import (  =>  from cji.config import (
+  src/cji/mcp_servers/ingestion_intelligence_server.py:37: from domain.events import ALLOWED_EVENT_TYPES, EVENT_RECORD, EventType, sanitise_url  =>  from cji.domain.events import ALLOWED_EVENT_TYPES, EVENT_RECORD, EventType, sanitise_url
+  src/cji/mcp_servers/ingestion_intelligence_server.py:38: from integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id  =>  from cji.integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id
+  src/cji/mcp_servers/ingestion_intelligence_server.py:39: from repositories import RepositoryError, get_repository  =>  from cji.repositories import RepositoryError, get_repository
+  src/cji/mcp_servers/ingestion_intelligence_server.py:40: from settings import ConfigError  =>  from cji.settings import ConfigError
+  src/cji/mcp_servers/ingestion_intelligence_server.py:625: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  src/cji/mcp_servers/insight_server.py:8: from config import CHROMA_DIR  =>  from cji.config import CHROMA_DIR
+  src/cji/mcp_servers/insight_server.py:15: from guardrails.sanitiser import sanitise_for_llm  =>  from cji.guardrails.sanitiser import sanitise_for_llm
+  src/cji/mcp_servers/insight_server.py:16: from guardrails.output_validator import validate_llm_output  =>  from cji.guardrails.output_validator import validate_llm_output
+  src/cji/mcp_servers/insight_server.py:17: from integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id  =>  from cji.integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id
+  src/cji/mcp_servers/insight_server.py:302: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  src/cji/mcp_servers/journey_data_server.py:13: from config import DUCKDB_PATH, JOURNEY_CONFIG  =>  from cji.config import DUCKDB_PATH, JOURNEY_CONFIG
+  src/cji/mcp_servers/journey_data_server.py:14: from repositories import (  =>  from cji.repositories import (
+  src/cji/mcp_servers/journey_data_server.py:21: from settings import ConfigError  =>  from cji.settings import ConfigError
+  src/cji/mcp_servers/journey_data_server.py:170: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  src/cji/mcp_servers/report_server.py:6: from config import REPORTS_DIR  =>  from cji.config import REPORTS_DIR
+  src/cji/mcp_servers/report_server.py:7: from guardrails.sanitiser import sanitise_for_llm  =>  from cji.guardrails.sanitiser import sanitise_for_llm
+  src/cji/mcp_servers/report_server.py:8: from integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id  =>  from cji.integrations import GatewayError, LLMGateway, LLMRequest, RunContext, new_correlation_id
+  src/cji/mcp_servers/report_server.py:9: from reporting import SCHEMA, ReportInputError, ReportOutputError, parse_input, render, report_filename, write_report  =>  from cji.reporting import SCHEMA, ReportInputError, ReportOutputError, parse_input, render, report_filename, write_report
+  src/cji/mcp_servers/report_server.py:122: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  src/cji/repositories/__init__.py:16: from settings import ConfigError, Settings, get_settings  =>  from cji.settings import ConfigError, Settings, get_settings
+  src/cji/repositories/__init__.py:17: from settings.roles import database_missing  =>  from cji.settings.roles import database_missing
+  src/cji/repositories/base.py:18: from domain.events import EventRecord  =>  from cji.domain.events import EventRecord
+  src/cji/repositories/base.py:19: from domain.metrics import FunnelStep, StepMetrics  =>  from cji.domain.metrics import FunnelStep, StepMetrics
+  src/cji/repositories/duckdb_parquet.py:19: from domain.events import EVENT_RECORDS, EventRecord  =>  from cji.domain.events import EVENT_RECORDS, EventRecord
+  src/cji/repositories/duckdb_parquet.py:20: from domain.metrics import FunnelStep, StepMetrics  =>  from cji.domain.metrics import FunnelStep, StepMetrics
+  src/cji/repositories/postgres.py:21: from domain.events import EVENT_RECORDS, EventRecord  =>  from cji.domain.events import EVENT_RECORDS, EventRecord
+  src/cji/repositories/postgres.py:22: from domain.metrics import FunnelStep, StepMetrics  =>  from cji.domain.metrics import FunnelStep, StepMetrics
+  src/cji/run_servers.py:12: from settings import ConfigError, get_settings, require  =>  from cji.settings import ConfigError, get_settings, require
+  src/cji/settings/services.py:54: string "collector.api:app"  =>  "cji.collector.api:app"
+  src/cji/settings/services.py:53: string "mcp_servers.report_server"  =>  "cji.mcp_servers.report_server"
+  src/cji/settings/services.py:52: string "mcp_servers.insight_server"  =>  "cji.mcp_servers.insight_server"
+  src/cji/settings/services.py:51: string "mcp_servers.friction_engine_server"  =>  "cji.mcp_servers.friction_engine_server"
+  src/cji/settings/services.py:50: string "mcp_servers.journey_data_server"  =>  "cji.mcp_servers.journey_data_server"
+  src/cji/settings/services.py:49: string "mcp_servers.ingestion_intelligence_server"  =>  "cji.mcp_servers.ingestion_intelligence_server"
+  src/cji/state.py:24: from domain.events import EventRecord  =>  from cji.domain.events import EventRecord
+  src/cji/state.py:25: from domain.insights import Insight  =>  from cji.domain.insights import Insight
+  src/cji/state.py:26: from domain.metrics import FrictionScore, StepMetrics  =>  from cji.domain.metrics import FrictionScore, StepMetrics
+  src/cji/state.py:27: from domain.runs import IngestionResult, RunRecord, WorkerStatus, WorkflowError, merge_run  =>  from cji.domain.runs import IngestionResult, RunRecord, WorkerStatus, WorkflowError, merge_run
+  src/cji/state.py:49-63: multi-line string: module paths qualified
+  src/cji/tools/generate_diverse.py:10: from tools.synthetic_data import STEP_PROFILES, ERROR_CODES, generate_demo_data  =>  from cji.tools.synthetic_data import STEP_PROFILES, ERROR_CODES, generate_demo_data
+  src/cji/tools/ingest_json.py:58: from config import EVENTS_PARQUET, JOURNEY_CONFIG, logger  =>  from cji.config import EVENTS_PARQUET, JOURNEY_CONFIG, logger
+  src/cji/tools/ingest_json.py:59: from settings import ConfigError, get_settings  =>  from cji.settings import ConfigError, get_settings
+  src/cji/tools/ingest_json.py:60: from settings.roles import database_missing  =>  from cji.settings.roles import database_missing
+  src/cji/tools/ingest_json.py:64: from domain.events import ALLOWED_EVENT_TYPES  =>  from cji.domain.events import ALLOWED_EVENT_TYPES
+  src/cji/tools/ingest_json.py:65: from domain.journeys import journey_from_config  =>  from cji.domain.journeys import journey_from_config
+  src/cji/tools/mcp_client.py:9: from integrations.tools import resolve_mcp_url, tool_gateway  =>  from cji.integrations.tools import resolve_mcp_url, tool_gateway
+  src/cji/tools/mcp_client.py:10: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/tools/synthetic_data.py:29: from config import EVENTS_PARQUET, JOURNEY_CONFIG, logger  =>  from cji.config import EVENTS_PARQUET, JOURNEY_CONFIG, logger
+  src/cji/tools/synthetic_data.py:30: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/tracker/snippet_generator.py:9: from config import ROOT  =>  from cji.config import ROOT
+  src/cji/tracker/snippet_generator.py:10: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/workflow/errors.py:4: from integrations.errors import GatewayError  =>  from cji.integrations.errors import GatewayError
+  src/cji/workflow/errors.py:57: from integrations.audit import configured_secrets, scrub  =>  from cji.integrations.audit import configured_secrets, scrub
+  src/cji/workflow/runtime.py:32: from domain.runs import STOPPED_STATUSES, new_run_record  =>  from cji.domain.runs import STOPPED_STATUSES, new_run_record
+  src/cji/workflow/runtime.py:215: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/workflow/runtime.py:233: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/workflow/runtime.py:239: from settings import get_settings  =>  from cji.settings import get_settings
+  src/cji/workflow/runtime.py:245: from graph import WORKER_NODES  =>  from cji.graph import WORKER_NODES
+  src/cji/workflow/runtime.py:226: from graph import build_graph  =>  from cji.graph import build_graph
+  src/cji/workflow/runtime.py:1-12: multi-line string: module paths qualified
+  src/cji/workflow/step.py:25: from integrations.audit import AuditSink, default_sink, make_record  =>  from cji.integrations.audit import AuditSink, default_sink, make_record
+  src/cji/workflow/step.py:26: from integrations.context import bind_run, correlation_from_config  =>  from cji.integrations.context import bind_run, correlation_from_config
+  src/cji/workflow/step.py:27: from integrations.types import RunContext  =>  from cji.integrations.types import RunContext
+  src/cji/workflow/step.py:61: from settings import get_settings  =>  from cji.settings import get_settings
+  tests/_workflow_stubs.py:17: from domain.runs import insight_id_for  =>  from cji.domain.runs import insight_id_for
+  tests/_workflow_stubs.py:18: from integrations.context import current_run  =>  from cji.integrations.context import current_run
+  tests/_workflow_stubs.py:19: from workflow.step import step  =>  from cji.workflow.step import step
+  tests/_workflow_stubs.py:135: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/_workflow_stubs.py:136: from workflow.runtime import Workflow, initial_state  =>  from cji.workflow.runtime import Workflow, initial_state
+  tests/conftest.py:21: from tools.synthetic_data import generate_demo_data  =>  from cji.tools.synthetic_data import generate_demo_data
+  tests/conftest.py:70: from mcp_servers.friction_engine_server import BASELINES  =>  from cji.mcp_servers.friction_engine_server import BASELINES
+  tests/conftest.py:128: from settings import make_test_settings, override_settings  =>  from cji.settings import make_test_settings, override_settings
+  tests/conftest.py:179: from integrations import llm as llm_module  =>  from cji.integrations import llm as llm_module
+  tests/conftest.py:180: from integrations import tools as tools_module  =>  from cji.integrations import tools as tools_module
+  tests/conftest.py:181: from integrations.testing import BlockingTransport  =>  from cji.integrations.testing import BlockingTransport
+  tests/conftest.py:168: string "collector.api"  =>  "cji.collector.api"
+  tests/test_agent_layer.py:53: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:59: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:68: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:78: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:89: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:101: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:113: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_agent_layer.py:125: from agents.supervisor import supervisor  =>  from cji.agents.supervisor import supervisor
+  tests/test_agent_layer.py:132: from agents.supervisor import supervisor  =>  from cji.agents.supervisor import supervisor
+  tests/test_agent_layer.py:139: from agents.supervisor import supervisor  =>  from cji.agents.supervisor import supervisor
+  tests/test_agent_layer.py:147: from agents.supervisor import supervisor  =>  from cji.agents.supervisor import supervisor
+  tests/test_agent_layer.py:148: from config import MAX_AGENT_ITERATIONS  =>  from cji.config import MAX_AGENT_ITERATIONS
+  tests/test_agent_layer.py:162: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_agent_layer.py:168: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_cleanup.py:112: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:198: import main  =>  from cji import main
+  tests/test_cleanup.py:219: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:233: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:243: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:253: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:260: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_cleanup.py:292: from collector import api  =>  from cji.collector import api
+  tests/test_cleanup.py:310: from collector import api  =>  from cji.collector import api
+  tests/test_cleanup.py:321: from collector import api  =>  from cji.collector import api
+  tests/test_collector.py:18: from settings import ConfigError  =>  from cji.settings import ConfigError
+  tests/test_collector.py:143: from settings.model import DEV_TRACKER_KEY  =>  from cji.settings.model import DEV_TRACKER_KEY
+  tests/test_collector.py:249: from collector.security import RateLimiter  =>  from cji.collector.security import RateLimiter
+  tests/test_collector.py:267: from collector.security import RateLimiter  =>  from cji.collector.security import RateLimiter
+  tests/test_collector.py:279: from collector.security import RateLimiter  =>  from cji.collector.security import RateLimiter
+  tests/test_collector.py:290: from collector.security import RateLimiter  =>  from cji.collector.security import RateLimiter
+  tests/test_collector.py:303: from collector.security import client_address  =>  from cji.collector.security import client_address
+  tests/test_collector.py:315: from collector.security import key_fingerprint  =>  from cji.collector.security import key_fingerprint
+  tests/test_collector.py:641: from collector import ingest  =>  from cji.collector import ingest
+  tests/test_collector.py:649: from collector import ingest  =>  from cji.collector import ingest
+  tests/test_collector.py:660: from collector import ingest  =>  from cji.collector import ingest
+  tests/test_collector.py:673: from collector import ingest  =>  from cji.collector import ingest
+  tests/test_collector.py:683: from domain.events import TrackerEvent  =>  from cji.domain.events import TrackerEvent
+  tests/test_collector.py:64: string "collector.api"  =>  "cji.collector.api"
+  tests/test_collector_models.py:14: from collector.models import (  =>  from cji.collector.models import (
+  tests/test_contracts.py:51: import collector.models as cm  =>  import cji.collector.models as cm
+  tests/test_contracts.py:52: from domain.events import ALLOWED_EVENT_TYPES  =>  from cji.domain.events import ALLOWED_EVENT_TYPES
+  tests/test_contracts.py:53: from mcp_servers import ingestion_intelligence_server as ing  =>  from cji.mcp_servers import ingestion_intelligence_server as ing
+  tests/test_contracts.py:54: from tools import ingest_json as ij  =>  from cji.tools import ingest_json as ij
+  tests/test_contracts.py:64: import agents.supervisor as sup  =>  import cji.agents.supervisor as sup
+  tests/test_contracts.py:65: import collector.models as cm  =>  import cji.collector.models as cm
+  tests/test_contracts.py:66: import guardrails.output_validator as ov  =>  import cji.guardrails.output_validator as ov
+  tests/test_contracts.py:67: import state  =>  from cji import state
+  tests/test_contracts.py:68: from domain import events, insights, metrics, runs  =>  from cji.domain import events, insights, metrics, runs
+  tests/test_contracts.py:108: from domain.events import TrackerEvent, to_record  =>  from cji.domain.events import TrackerEvent, to_record
+  tests/test_contracts.py:121: from domain.events import TrackerEvent, to_live_events_row  =>  from cji.domain.events import TrackerEvent, to_live_events_row
+  tests/test_contracts.py:142: from domain.events import TrackerEvent  =>  from cji.domain.events import TrackerEvent
+  tests/test_contracts.py:150: from domain.events import EventBatch  =>  from cji.domain.events import EventBatch
+  tests/test_contracts.py:157: from domain.events import EVENT_RECORD, TrackerEvent, to_record  =>  from cji.domain.events import EVENT_RECORD, TrackerEvent, to_record
+  tests/test_contracts.py:198: from domain.events import EVENT_RECORDS  =>  from cji.domain.events import EVENT_RECORDS
+  tests/test_contracts.py:206: from config import JOURNEY_CONFIG  =>  from cji.config import JOURNEY_CONFIG
+  tests/test_contracts.py:207: from domain.metrics import FRICTION_SCORES, FUNNEL_RESULT, STEP_METRICS_LIST  =>  from cji.domain.metrics import FRICTION_SCORES, FUNNEL_RESULT, STEP_METRICS_LIST
+  tests/test_contracts.py:208: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_contracts.py:209: from mcp_servers.friction_engine_server import score_all_steps  =>  from cji.mcp_servers.friction_engine_server import score_all_steps
+  tests/test_contracts.py:221: from domain.insights import INSIGHT_DRAFT  =>  from cji.domain.insights import INSIGHT_DRAFT
+  tests/test_contracts.py:222: from guardrails.output_validator import _fallback, validate_llm_output  =>  from cji.guardrails.output_validator import _fallback, validate_llm_output
+  tests/test_contracts.py:230: from domain.insights import INSIGHT  =>  from cji.domain.insights import INSIGHT
+  tests/test_contracts.py:231: from guardrails.output_validator import _fallback  =>  from cji.guardrails.output_validator import _fallback
+  tests/test_contracts.py:232: from mcp_servers.insight_server import prioritise_fix  =>  from cji.mcp_servers.insight_server import prioritise_fix
+  tests/test_contracts.py:239: from domain.insights import NARRATIVE, REPORT_RESULT  =>  from cji.domain.insights import NARRATIVE, REPORT_RESULT
+  tests/test_contracts.py:240: from integrations import LLMGateway  =>  from cji.integrations import LLMGateway
+  tests/test_contracts.py:241: from integrations.testing import MemoryAuditSink  =>  from cji.integrations.testing import MemoryAuditSink
+  tests/test_contracts.py:242: from mcp_servers import report_server as rs  =>  from cji.mcp_servers import report_server as rs
+  tests/test_contracts.py:261: from domain.events import EVENT_RECORD  =>  from cji.domain.events import EVENT_RECORD
+  tests/test_contracts.py:262: from mcp_servers.ingestion_intelligence_server import apply_mapping  =>  from cji.mcp_servers.ingestion_intelligence_server import apply_mapping
+  tests/test_contracts.py:281: from tools.ingest_json import _finalise  =>  from cji.tools.ingest_json import _finalise
+  tests/test_contracts.py:296: from config import JOURNEY_CONFIG  =>  from cji.config import JOURNEY_CONFIG
+  tests/test_contracts.py:297: from domain.journeys import journey_from_config  =>  from cji.domain.journeys import journey_from_config
+  tests/test_contracts.py:323: from domain.runs import WORKER_STATUS  =>  from cji.domain.runs import WORKER_STATUS
+  tests/test_contracts.py:329: from domain.runs import WORKER_STATUS  =>  from cji.domain.runs import WORKER_STATUS
+  tests/test_contracts.py:336: import agents.supervisor as sup  =>  import cji.agents.supervisor as sup
+  tests/test_contracts.py:337: from domain.runs import WORKFLOW_ERRORS  =>  from cji.domain.runs import WORKFLOW_ERRORS
+  tests/test_contracts.py:358: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_contracts.py:359: from domain.runs import WORKFLOW_ERRORS  =>  from cji.domain.runs import WORKFLOW_ERRORS
+  tests/test_contracts.py:372: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_contracts.py:168: string "collector.api"  =>  "cji.collector.api"
+  tests/test_contracts.py:84: string "collector.api"  =>  "cji.collector.api"
+  tests/test_dashboard_smoke.py:19: from settings import make_test_settings, override_settings  =>  from cji.settings import make_test_settings, override_settings
+  tests/test_docs.py:13: from settings import KNOWN_KEYS, SERVICE_NAMES, get_settings  =>  from cji.settings import KNOWN_KEYS, SERVICE_NAMES, get_settings
+  tests/test_docs.py:48: from collector import api  =>  from cji.collector import api
+  tests/test_docs.py:53: string README routes not served by collector.api:   =>  README routes not served by cji.collector.api: 
+  tests/test_friction_engine.py:15: from mcp_servers.friction_engine_server import (  =>  from cji.mcp_servers.friction_engine_server import (
+  tests/test_gateway.py:20: from integrations import (  =>  from cji.integrations import (
+  tests/test_gateway.py:37: from integrations import tools as tools_module  =>  from cji.integrations import tools as tools_module
+  tests/test_gateway.py:38: from integrations.audit import JsonlSink, LogSink, default_sink, scrub  =>  from cji.integrations.audit import JsonlSink, LogSink, default_sink, scrub
+  tests/test_gateway.py:39: from integrations.policy import RetryPolicy, Timing  =>  from cji.integrations.policy import RetryPolicy, Timing
+  tests/test_gateway.py:40: from integrations.testing import (  =>  from cji.integrations.testing import (
+  tests/test_gateway.py:50: from settings import ConfigError, load_settings, make_test_settings, override_settings  =>  from cji.settings import ConfigError, load_settings, make_test_settings, override_settings
+  tests/test_gateway.py:412: from mcp_servers import insight_server  =>  from cji.mcp_servers import insight_server
+  tests/test_gateway.py:502: from tools import mcp_client  =>  from cji.tools import mcp_client
+  tests/test_gateway.py:522: from mcp_servers import insight_server  =>  from cji.mcp_servers import insight_server
+  tests/test_gateway.py:539: from mcp_servers import insight_server  =>  from cji.mcp_servers import insight_server
+  tests/test_gateway.py:557: from mcp_servers import report_server  =>  from cji.mcp_servers import report_server
+  tests/test_gateway.py:621: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_gateway.py:675: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_gateway.py:710: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_gateway.py:737: import agents.ingestion_worker as iw  =>  import cji.agents.ingestion_worker as iw
+  tests/test_gateway.py:738: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_gateway.py:827: from mcp_servers import ingestion_intelligence_server as ing  =>  from cji.mcp_servers import ingestion_intelligence_server as ing
+  tests/test_gateway.py:842: import agents.ingestion_worker as iw  =>  import cji.agents.ingestion_worker as iw
+  tests/test_gateway.py:761: string "or m in ('mcp_servers.insight_server', 'mcp_servers.report_server', 'tools.mcp_client'));  =>  "or m in ('cji.mcp_servers.insight_server', 'cji.mcp_servers.report_server', 'cji.tools.mc
+  tests/test_gateway.py:759: string "import sys; import mcp_servers.friction_engine_server; "  =>  "import sys; import cji.mcp_servers.friction_engine_server; "
+  tests/test_ingestion_intelligence.py:64: from mcp_servers.ingestion_intelligence_server import _column_fingerprint  =>  from cji.mcp_servers.ingestion_intelligence_server import _column_fingerprint
+  tests/test_ingestion_intelligence.py:70: from mcp_servers.ingestion_intelligence_server import _column_fingerprint  =>  from cji.mcp_servers.ingestion_intelligence_server import _column_fingerprint
+  tests/test_ingestion_intelligence.py:77: from mcp_servers.ingestion_intelligence_server import _sanitise_url  =>  from cji.mcp_servers.ingestion_intelligence_server import _sanitise_url
+  tests/test_ingestion_intelligence.py:83: from mcp_servers.ingestion_intelligence_server import _sanitise_url  =>  from cji.mcp_servers.ingestion_intelligence_server import _sanitise_url
+  tests/test_ingestion_intelligence.py:88: from mcp_servers.ingestion_intelligence_server import _sanitise_user_id  =>  from cji.mcp_servers.ingestion_intelligence_server import _sanitise_user_id
+  tests/test_ingestion_intelligence.py:95: from mcp_servers.ingestion_intelligence_server import _sanitise_user_id  =>  from cji.mcp_servers.ingestion_intelligence_server import _sanitise_user_id
+  tests/test_ingestion_intelligence.py:103: from mcp_servers.ingestion_intelligence_server import _load_file  =>  from cji.mcp_servers.ingestion_intelligence_server import _load_file
+  tests/test_ingestion_intelligence.py:112: from mcp_servers.ingestion_intelligence_server import _load_file  =>  from cji.mcp_servers.ingestion_intelligence_server import _load_file
+  tests/test_ingestion_intelligence.py:120: from mcp_servers.ingestion_intelligence_server import _load_file  =>  from cji.mcp_servers.ingestion_intelligence_server import _load_file
+  tests/test_ingestion_intelligence.py:128: from mcp_servers.ingestion_intelligence_server import CanonicalEvent  =>  from cji.mcp_servers.ingestion_intelligence_server import CanonicalEvent
+  tests/test_ingestion_intelligence.py:139: from mcp_servers.ingestion_intelligence_server import CanonicalEvent  =>  from cji.mcp_servers.ingestion_intelligence_server import CanonicalEvent
+  tests/test_ingestion_intelligence.py:152: from mcp_servers.ingestion_intelligence_server import apply_mapping  =>  from cji.mcp_servers.ingestion_intelligence_server import apply_mapping
+  tests/test_ingestion_intelligence.py:165: from mcp_servers.ingestion_intelligence_server import apply_mapping  =>  from cji.mcp_servers.ingestion_intelligence_server import apply_mapping
+  tests/test_ingestion_intelligence.py:175: from mcp_servers.ingestion_intelligence_server import apply_mapping  =>  from cji.mcp_servers.ingestion_intelligence_server import apply_mapping
+  tests/test_ingestion_intelligence.py:188: from mcp_servers.ingestion_intelligence_server import detect_schema  =>  from cji.mcp_servers.ingestion_intelligence_server import detect_schema
+  tests/test_ingestion_intelligence.py:200: from mcp_servers.ingestion_intelligence_server import detect_schema  =>  from cji.mcp_servers.ingestion_intelligence_server import detect_schema
+  tests/test_journey_data_service.py:15: from repositories import (  =>  from cji.repositories import (
+  tests/test_journey_data_service.py:20: from settings import make_test_settings, override_settings  =>  from cji.settings import make_test_settings, override_settings
+  tests/test_journey_data_service.py:39: from mcp_servers import journey_data_server as module  =>  from cji.mcp_servers import journey_data_server as module
+  tests/test_journey_data_service.py:158: from mcp_servers import ingestion_intelligence_server as ing  =>  from cji.mcp_servers import ingestion_intelligence_server as ing
+  tests/test_journey_data_service.py:172: from mcp_servers import ingestion_intelligence_server as ing  =>  from cji.mcp_servers import ingestion_intelligence_server as ing
+  tests/test_journey_data_service.py:183: from mcp_servers import ingestion_intelligence_server as ing  =>  from cji.mcp_servers import ingestion_intelligence_server as ing
+  tests/test_journey_data_service.py:208: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_journey_data_service.py:219: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_p0_security.py:92: from agents.supervisor import VALID_WORKERS  =>  from cji.agents.supervisor import VALID_WORKERS
+  tests/test_p0_security.py:93: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_p0_security.py:102: from agents.supervisor import VALID_WORKERS, route  =>  from cji.agents.supervisor import VALID_WORKERS, route
+  tests/test_p0_security.py:148: import agents.ingestion_worker as iw  =>  import cji.agents.ingestion_worker as iw
+  tests/test_p0_security.py:166: import agents.ingestion_worker as iw  =>  import cji.agents.ingestion_worker as iw
+  tests/test_p0_security.py:167: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_p0_security.py:182: import agents.ingestion_worker as iw  =>  import cji.agents.ingestion_worker as iw
+  tests/test_p0_security.py:183: from agents.supervisor import route  =>  from cji.agents.supervisor import route
+  tests/test_p0_security.py:205: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_p0_security.py:206: from repositories import event_repository, use_repository  =>  from cji.repositories import event_repository, use_repository
+  tests/test_p0_security.py:207: from settings import get_settings  =>  from cji.settings import get_settings
+  tests/test_p0_security.py:219: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_p0_security.py:220: from repositories import DuckDbParquetRepository, use_repository  =>  from cji.repositories import DuckDbParquetRepository, use_repository
+  tests/test_p0_security.py:234: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_p0_security.py:242: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_p0_security.py:250: from mcp_servers import journey_data_server as j  =>  from cji.mcp_servers import journey_data_server as j
+  tests/test_p0_security.py:258: from repositories import PostgresEventRepository, use_repository  =>  from cji.repositories import PostgresEventRepository, use_repository
+  tests/test_p0_security.py:259: from repositories import postgres as pg_module  =>  from cji.repositories import postgres as pg_module
+  tests/test_p0_security.py:398: from mcp_servers import report_server as rs  =>  from cji.mcp_servers import report_server as rs
+  tests/test_p0_security.py:62: string "collector.api"  =>  "cji.collector.api"
+  tests/test_reports.py:120: from mcp_servers import report_server as rs  =>  from cji.mcp_servers import report_server as rs
+  tests/test_reports.py:137: from reporting import ReportInput  =>  from cji.reporting import ReportInput
+  tests/test_reports.py:138: from reporting import render as _render  =>  from cji.reporting import render as _render
+  tests/test_reports.py:171: from reporting.escape import attr  =>  from cji.reporting.escape import attr
+  tests/test_reports.py:178: from reporting.escape import json_block  =>  from cji.reporting.escape import json_block
+  tests/test_reports.py:186: from reporting.escape import json_block  =>  from cji.reporting.escape import json_block
+  tests/test_reports.py:223: from reporting import ReportInput  =>  from cji.reporting import ReportInput
+  tests/test_reports.py:419: from reporting import output  =>  from cji.reporting import output
+  tests/test_reports.py:497: from reporting import ReportInput  =>  from cji.reporting import ReportInput
+  tests/test_reports.py:508: from reporting import output  =>  from cji.reporting import output
+  tests/test_reports.py:523: from mcp_servers import report_server as rs  =>  from cji.mcp_servers import report_server as rs
+  tests/test_reports.py:534: from reporting.output import ReportPathError, write_report  =>  from cji.reporting.output import ReportPathError, write_report
+  tests/test_repositories.py:21: from repositories import (  =>  from cji.repositories import (
+  tests/test_repositories.py:29: from repositories import base as repo_base  =>  from cji.repositories import base as repo_base
+  tests/test_repositories.py:30: from repositories import duckdb_parquet as duck_module  =>  from cji.repositories import duckdb_parquet as duck_module
+  tests/test_repositories.py:31: from settings import make_test_settings  =>  from cji.settings import make_test_settings
+  tests/test_repositories.py:426: from settings import ConfigError  =>  from cji.settings import ConfigError
+  tests/test_repositories.py:456: from repositories import queries as q  =>  from cji.repositories import queries as q
+  tests/test_repositories.py:110: string "collector.api"  =>  "cji.collector.api"
+  tests/test_settings.py:20: from settings import (  =>  from cji.settings import (
+  tests/test_settings.py:280: from tools import mcp_client  =>  from cji.tools import mcp_client
+  tests/test_settings.py:295: from tools import mcp_client  =>  from cji.tools import mcp_client
+  tests/test_settings.py:321: import run_servers  =>  from cji import run_servers
+  tests/test_settings.py:332: import run_servers  =>  from cji import run_servers
+  tests/test_settings.py:372: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  tests/test_settings.py:392: from mcp_servers._serve import serve  =>  from cji.mcp_servers._serve import serve
+  tests/test_settings.py:406: from tools import mcp_client  =>  from cji.tools import mcp_client
+  tests/test_settings.py:442: from collector import api  =>  from cji.collector import api
+  tests/test_settings.py:459: from collector import api  =>  from cji.collector import api
+  tests/test_settings.py:487: import config  =>  from cji import config
+  tests/test_settings.py:503: from integrations import LLMGateway  =>  from cji.integrations import LLMGateway
+  tests/test_settings.py:504: from integrations.testing import MemoryAuditSink, ScriptedTransport  =>  from cji.integrations.testing import MemoryAuditSink, ScriptedTransport
+  tests/test_settings.py:514: from mcp_servers import report_server as rs  =>  from cji.mcp_servers import report_server as rs
+  tests/test_settings.py:527: from mcp_servers import insight_server as ins  =>  from cji.mcp_servers import insight_server as ins
+  tests/test_settings.py:539: from tools import synthetic_data as sd  =>  from cji.tools import synthetic_data as sd
+  tests/test_settings.py:551: from collector import api  =>  from cji.collector import api
+  tests/test_settings.py:614: string "import settings, settings.load, settings.roles, settings.services"  =>  "import settings, cji.settings.load, cji.settings.roles, cji.settings.services"
+  tests/test_supervisor.py:22: from agents.supervisor import supervisor, route, VALID_WORKERS  =>  from cji.agents.supervisor import supervisor, route, VALID_WORKERS
+  tests/test_supervisor.py:189: from config import MAX_AGENT_ITERATIONS  =>  from cji.config import MAX_AGENT_ITERATIONS
+  tests/test_synthetic_data.py:14: from tools.synthetic_data import (  =>  from cji.tools.synthetic_data import (
+  tests/test_synthetic_data.py:76: from config import JOURNEY_CONFIG  =>  from cji.config import JOURNEY_CONFIG
+  tests/test_synthetic_data.py:110: from config import JOURNEY_CONFIG  =>  from cji.config import JOURNEY_CONFIG
+  tests/test_workflow.py:68: from integrations.testing import MemoryAuditSink  =>  from cji.integrations.testing import MemoryAuditSink
+  tests/test_workflow.py:69: from settings import make_test_settings, override_settings  =>  from cji.settings import make_test_settings, override_settings
+  tests/test_workflow.py:89: from integrations import ToolFailed  =>  from cji.integrations import ToolFailed
+  tests/test_workflow.py:94: from integrations import ToolTimeout  =>  from cji.integrations import ToolTimeout
+  tests/test_workflow.py:103: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:104: from integrations import ToolFailed  =>  from cji.integrations import ToolFailed
+  tests/test_workflow.py:115: from domain.runs import IllegalTransition, transition  =>  from cji.domain.runs import IllegalTransition, transition
+  tests/test_workflow.py:125: from domain.runs import IllegalTransition, step_transition  =>  from cji.domain.runs import IllegalTransition, step_transition
+  tests/test_workflow.py:136: from domain.runs import IllegalTransition, merge_run  =>  from cji.domain.runs import IllegalTransition, merge_run
+  tests/test_workflow.py:154: from domain.runs import merge_run  =>  from cji.domain.runs import merge_run
+  tests/test_workflow.py:155: from state import CJIState  =>  from cji.state import CJIState
+  tests/test_workflow.py:168: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_workflow.py:174: from graph import WORKER_NODES, build_graph  =>  from cji.graph import WORKER_NODES, build_graph
+  tests/test_workflow.py:249: from settings import override_settings  =>  from cji.settings import override_settings
+  tests/test_workflow.py:250: from workflow.step import step  =>  from cji.workflow.step import step
+  tests/test_workflow.py:269: from workflow.step import step  =>  from cji.workflow.step import step
+  tests/test_workflow.py:309: import agents.supervisor as sup  =>  import cji.agents.supervisor as sup
+  tests/test_workflow.py:339: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:378: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:389: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:399: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:407: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:416: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:417: from domain.runs import insight_id_for  =>  from cji.domain.runs import insight_id_for
+  tests/test_workflow.py:429: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:448: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:460: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:472: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:484: import agents.workers as w  =>  import cji.agents.workers as w
+  tests/test_workflow.py:485: from mcp_servers import report_server as srv  =>  from cji.mcp_servers import report_server as srv
+  tests/test_workflow.py:555: from workflow.errors import RunNotFound  =>  from cji.workflow.errors import RunNotFound
+  tests/test_workflow.py:563: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_workflow.py:565: from workflow.errors import LegacyRun  =>  from cji.workflow.errors import LegacyRun
+  tests/test_workflow.py:566: from workflow.runtime import open_checkpointer  =>  from cji.workflow.runtime import open_checkpointer
+  tests/test_workflow.py:581: from workflow.errors import RunNotResumable  =>  from cji.workflow.errors import RunNotResumable
+  tests/test_workflow.py:617: from workflow.errors import RunNotResumable  =>  from cji.workflow.errors import RunNotResumable
+  tests/test_workflow.py:625: from workflow.errors import RunNotFound  =>  from cji.workflow.errors import RunNotFound
+  tests/test_workflow.py:633: from workflow.errors import RunLeased  =>  from cji.workflow.errors import RunLeased
+  tests/test_workflow.py:634: from workflow.runtime import Lease  =>  from cji.workflow.runtime import Lease
+  tests/test_workflow.py:648: from workflow.runtime import Lease, owner_id, owner_is_dead  =>  from cji.workflow.runtime import Lease, owner_id, owner_is_dead
+  tests/test_workflow.py:663: from workflow.runtime import Lease  =>  from cji.workflow.runtime import Lease
+  tests/test_workflow.py:711: from workflow.runtime import write_last_run  =>  from cji.workflow.runtime import write_last_run
+  tests/test_workflow.py:727: from integrations.audit import AUDIT_FIELDS  =>  from cji.integrations.audit import AUDIT_FIELDS
+  tests/test_workflow.py:763: from domain.runs import insight_id_for  =>  from cji.domain.runs import insight_id_for
+  tests/test_workflow.py:764: from mcp_servers import insight_server as srv  =>  from cji.mcp_servers import insight_server as srv
+  tests/test_workflow.py:781: from mcp_servers import report_server as srv  =>  from cji.mcp_servers import report_server as srv
+  tests/test_workflow.py:792: from mcp_servers import ingestion_intelligence_server as srv  =>  from cji.mcp_servers import ingestion_intelligence_server as srv
+  tests/test_workflow.py:809: from mcp_servers.friction_engine_server import score_all_steps  =>  from cji.mcp_servers.friction_engine_server import score_all_steps
+  tests/test_workflow.py:819: from settings import ConfigError, load_settings  =>  from cji.settings import ConfigError, load_settings
+  tests/test_workflow.py:54: from graph import build_graph  =>  from cji.graph import build_graph
+  tests/test_workflow.py:56: from workflow.runtime import Workflow  =>  from cji.workflow.runtime import Workflow
+  tests/test_workflow.py:61: from workflow.runtime import initial_state  =>  from cji.workflow.runtime import initial_state
+  tests/test_workflow.py:77: import workflow.step as step_module  =>  import cji.workflow.step as step_module
+  tests/test_workflow.py:338: string """Patch agents.workers' MCP helpers. `faults` are raised by the first tool calls, in orde  =>  """Patch cji.agents.workers' MCP helpers. `faults` are raised by the first tool calls, in 
+
+== needs manual edit (0)
+
+== first-party names left unqualified after the rewrite (88)
+  src/cji/collector/api.py:43: string 'collector' (review)
+  src/cji/collector/api.py:318: string 'tracker.js' (review)
+  src/cji/collector/api.py:318: string 'tracker' (review)
+  src/cji/collector/api.py:98: string 'collector' (review)
+  src/cji/collector/api.py:125: string 'collector' (review)
+  src/cji/collector/api.py:187: string 'collector' (review)
+  src/cji/config.py:64: string 'collector' (review)
+  src/cji/config.py:65: string 'collector' (review)
+  src/cji/dashboard.py:36: string 'dashboard' (review)
+  src/cji/dashboard.py:417: string 'main.py' (review)
+  src/cji/integrations/tools.py:108: string 'workflow' (review)
+  src/cji/main.py:179: string 'workflow' (review)
+  src/cji/main.py:272: string 'collector' (review)
+  src/cji/settings/__main__.py:37: string 'settings' (review)
+  src/cji/settings/load.py:228: string 'collector' (review)
+  src/cji/settings/model.py:276: string 'collector' (review)
+  src/cji/settings/model.py:277: string 'workflow' (review)
+  src/cji/settings/roles.py:85: string 'collector' (review)
+  src/cji/settings/roles.py:71: string 'collector' (review)
+  src/cji/settings/roles.py:91: string 'dashboard' (review)
+  src/cji/settings/services.py:24: string 'collector' (review)
+  src/cji/settings/services.py:25: string 'dashboard' (review)
+  src/cji/settings/services.py:54: string 'collector' (review)
+  src/cji/settings/services.py:55: string 'dashboard' (review)
+  src/cji/settings/services.py:55: string 'dashboard.py' (review)
+  src/cji/tracker/snippet_generator.py:27: string 'collector' (review)
+  src/cji/workflow/step.py:38: string 'workflow' (review)
+  src/cji/workflow/step.py:47: string 'workflow' (review)
+  tests/test_cleanup.py:104: string 'mcp_servers' (review)
+  tests/test_cleanup.py:269: string 'tools' (review)
+  tests/test_cleanup.py:344: string 'guardrails' (review)
+  tests/test_collector.py:537: string 'collector' (review)
+  tests/test_collector.py:559: string 'collector' (review)
+  tests/test_collector.py:539: string 'collector' (review)
+  tests/test_contracts.py:91: string 'domain' (review)
+  tests/test_dashboard_smoke.py:28: string 'dashboard.py' (review)
+  tests/test_docs.py:40: string 'main.py' (review)
+  tests/test_docs.py:40: string 'run_servers.py' (review)
+  tests/test_docs.py:86: string 'tracker' (review)
+  tests/test_gateway.py:741: string 'state' (review)
+  tests/test_gateway.py:741: string 'config' (review)
+  tests/test_journey_data_service.py:54: string 'mcp_servers' (review)
+  tests/test_p0_security.py:100: string 'state' (review)
+  tests/test_p0_security.py:112: string 'agents' (review)
+  tests/test_reports.py:547: string 'dashboard.py' (review)
+  tests/test_reports.py:200: string 'reporting' (review)
+  tests/test_repositories.py:443: string 'repositories' (review)
+  tests/test_repositories.py:450: string 'domain' (review)
+  tests/test_repositories.py:450: string 'settings' (review)
+  tests/test_repositories.py:451: string 'repositories' (review)
+  tests/test_settings.py:208: string 'dashboard' (review)
+  tests/test_settings.py:563: string 'main.py' (review)
+  tests/test_settings.py:563: string 'run_servers.py' (review)
+  tests/test_settings.py:563: string 'graph.py' (review)
+  tests/test_settings.py:563: string 'dashboard.py' (review)
+  tests/test_settings.py:563: string 'config.py' (review)
+  tests/test_settings.py:563: string 'state.py' (review)
+  tests/test_settings.py:564: string 'agents' (review)
+  tests/test_settings.py:564: string 'collector' (review)
+  tests/test_settings.py:564: string 'mcp_servers' (review)
+  tests/test_settings.py:564: string 'tools' (review)
+  tests/test_settings.py:564: string 'guardrails' (review)
+  tests/test_settings.py:564: string 'domain' (review)
+  tests/test_settings.py:123: string 'collector' (review)
+  tests/test_settings.py:218: string 'dashboard' (review)
+  tests/test_settings.py:240: string 'collector' (review)
+  tests/test_settings.py:639: string 'collector' (review)
+  tests/test_settings.py:78: string 'collector' (review)
+  tests/test_settings.py:78: string 'dashboard' (review)
+  tests/test_settings.py:230: string 'collector' (review)
+  tests/test_settings.py:245: string 'collector' (review)
+  tests/test_settings.py:255: string 'collector' (review)
+  tests/test_settings.py:298: string 'collector' (review)
+  tests/test_settings.py:467: string 'main.py' (review)
+  tests/test_settings.py:624: string 'settings' (review)
+  tests/test_settings.py:233: string 'collector' (review)
+  tests/test_settings.py:409: string 'agents' (review)
+  tests/test_settings.py:476: string 'dashboard.py' (review)
+  tests/test_settings.py:492: string 'collector' (review)
+  tests/test_settings.py:359: string 'mcp_servers' (review)
+  tests/test_settings.py:553: string 'collector' (review)
+  tests/test_settings.py:588: string 'settings' (review)
+  tests/test_settings.py:599: string 'settings' (review)
+  tests/test_settings.py:635: string 'settings' (review)
+  tests/test_settings.py:633: string 'settings' (review)
+  tests/test_workflow.py:179: string 'graph.py' (review)
+  tests/test_workflow.py:691: string 'main.py' (review)
+  tests/test_workflow.py:260: string 'workflow' (review)
+
+== review of the strings listed above (by hand, T3/T4)
+Imports left unqualified: 0. Every listed string was reviewed; none is an unqualified module reference after T3/T4:
+  - "collector", "dashboard", "workflow", "settings" (roles, service names, worker names, error fields,
+    argparse prog) and "state"/"config" (function parameter names) are not module paths: unchanged.
+  - File paths "main.py", "run_servers.py", "graph.py", "dashboard.py", "config.py", "state.py", "tracker.js",
+    "tracker", "mcp_servers", "agents", "tools", "guardrails", "domain", "reporting", "repositories" used to
+    build source paths in tests: the tests now read them under SRC = cji_agent/src/cji (T4).
+  - settings/services.py "dashboard.py" launch entry -> "cji.dashboard" (T3).
+  - dashboard.py and tests that ran "main.py" / "-m settings" in a subprocess -> "-m cji.main" /
+    "-m cji.settings" (T3/T4); collector/api.py "tracker"/"tracker.js" -> importlib.resources (T3).
+  - tests/test_contracts.py "import config" in a `python -c` string -> "from cji import config" (T4);
+    tests/test_settings.py "import settings, ..." -> "import cji.settings, ..." (T4).

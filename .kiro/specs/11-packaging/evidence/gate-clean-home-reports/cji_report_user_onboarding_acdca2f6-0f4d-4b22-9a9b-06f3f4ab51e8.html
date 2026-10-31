@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;sha256-ArN2gwAa5zRF5bpqebBQG9f9U1Ngqq2bfJAGny7VaH4=&#x27;; img-src &#x27;none&#x27;; script-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CJI Report - user_onboarding</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 2rem; }
+h1, h2, h3 { color: #2c3e50; }
+.header { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; }
+.badge { display: inline-block; padding: 0.25em 0.5em; font-size: 0.8em; font-weight: bold; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; background-color: #6c757d; color: #fff; }
+.badge.critical { background-color: #dc3545; }
+.badge.demo { background-color: #17a2b8; }
+.badge.realtime { background-color: #28a745; }
+.narrative { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #007bff; margin-bottom: 2rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note { color: #6c757d; font-size: 0.9em; font-style: italic; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+table, th, td { border: 1px solid #ddd; }
+th, td { padding: 12px; text-align: left; overflow-wrap: anywhere; }
+th { background-color: #f2f2f2; }
+.chart-container { width: 100%; max-width: 800px; margin: 2rem auto; }
+.chart text { font-size: 13px; fill: #333; }
+.insight-card { border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-wrap: anywhere; }
+.insight-card h4 { margin-top: 0; color: #d9534f; }
+.details { border-top: 2px solid #eee; margin-top: 2rem; padding-top: 1rem; font-size: 0.9em; color: #555; }
+.details dt { font-weight: bold; }
+.details dd { margin: 0 0 0.5rem 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<header class="header">
+<h1>Customer Journey Intelligence Report</h1>
+<p><strong>Journey:</strong> user_onboarding | <span class="badge demo">DEMO MODE</span> | <strong>Generated:</strong> 2026-10-28 13:25:27 UTC</p>
+</header>
+<h2>Executive Summary</h2>
+<div class="narrative">This analysis of the user_onboarding journey identified 4 critical friction point(s) with an average friction score of 52.1/100. We recommend immediate investigation of the top-priority findings detailed in the table below.</div>
+<h2>Funnel Analysis</h2>
+<div class="chart-container">
+<svg class="chart" viewBox="0 0 860 312" width="100%" role="img" aria-label="Users entered per funnel step">
+<g><title>landing_page: 1,489 users</title><text class="label" x="170" y="31" text-anchor="end">landing_page</text><rect class="bar" x="180" y="12" width="600.0" height="28" fill="#007bff"/><text class="value" x="786.0" y="31">1,489</text></g>
+<g><title>sign_up_form: 1,335 users</title><text class="label" x="170" y="67" text-anchor="end">sign_up_form</text><rect class="bar" x="180" y="48" width="537.9" height="28" fill="#007bff"/><text class="value" x="723.9" y="67">1,335</text></g>
+<g><title>email_verification: 1,037 users</title><text class="label" x="170" y="103" text-anchor="end">email_verification</text><rect class="bar" x="180" y="84" width="417.9" height="28" fill="#007bff"/><text class="value" x="603.9" y="103">1,037</text></g>
+<g><title>profile_setup: 654 users</title><text class="label" x="170" y="139" text-anchor="end">profile_setup</text><rect class="bar" x="180" y="120" width="263.5" height="28" fill="#007bff"/><text class="value" x="449.5" y="139">654</text></g>
+<g><title>plan_selection: 531 users</title><text class="label" x="170" y="175" text-anchor="end">plan_selection</text><rect class="bar" x="180" y="156" width="214.0" height="28" fill="#007bff"/><text class="value" x="400.0" y="175">531</text></g>
+<g><title>payment_info: 387 users</title><text class="label" x="170" y="211" text-anchor="end">payment_info</text><rect class="bar" x="180" y="192" width="155.9" height="28" fill="#007bff"/><text class="value" x="341.9" y="211">387</text></g>
+<g><title>confirm_details: 248 users</title><text class="label" x="170" y="247" text-anchor="end">confirm_details</text><rect class="bar" x="180" y="228" width="99.9" height="28" fill="#007bff"/><text class="value" x="285.9" y="247">248</text></g>
+<g><title>onboarding_done: 234 users</title><text class="label" x="170" y="283" text-anchor="end">onboarding_done</text><rect class="bar" x="180" y="264" width="94.3" height="28" fill="#007bff"/><text class="value" x="280.3" y="283">234</text></g>
+</svg>
+</div>
+<h2>Friction by step</h2>
+<table class="friction">
+<thead><tr><th>Step</th><th>Friction score</th><th>Critical</th></tr></thead>
+<tbody>
+<tr><td>email_verification</td><td>90.0</td><td>Yes</td></tr>
+<tr><td>payment_info</td><td>85.0</td><td>Yes</td></tr>
+<tr><td>sign_up_form</td><td>72.0</td><td>Yes</td></tr>
+<tr><td>plan_selection</td><td>63.0</td><td>Yes</td></tr>
+<tr><td>profile_setup</td><td>54.0</td><td>—</td></tr>
+<tr><td>landing_page</td><td>31.0</td><td>—</td></tr>
+<tr><td>confirm_details</td><td>17.0</td><td>—</td></tr>
+<tr><td>onboarding_done</td><td>5.0</td><td>—</td></tr>
+</tbody>
+</table>
+<h2>Top Prioritised Insights</h2>
+<div class="insights-container">
+<div class="insight-card">
+<h4>[Priority 2] - email_verification</h4>
+<p><strong>Issue:</strong> Friction at email_verification</p>
+<p><strong>Root Cause:</strong> LLM analysis unavailable. Manual investigation required.</p>
+<p><strong>Recommendation:</strong> Review metrics manually.</p>
+</div>
+<div class="insight-card">
+<h4>[Priority 3] - payment_info</h4>
+<p><strong>Issue:</strong> Friction at payment_info</p>
+<p><strong>Root Cause:</strong> LLM analysis unavailable. Manual investigation required.</p>
+<p><strong>Recommendation:</strong> Review metrics manually.</p>
+</div>
+<div class="insight-card">
+<h4>[Priority 2] - sign_up_form</h4>
+<p><strong>Issue:</strong> Friction at sign_up_form</p>
+<p><strong>Root Cause:</strong> LLM analysis unavailable. Manual investigation required.</p>
+<p><strong>Recommendation:</strong> Review metrics manually.</p>
+</div>
+<div class="insight-card">
+<h4>[Priority 3] - plan_selection</h4>
+<p><strong>Issue:</strong> Friction at plan_selection</p>
+<p><strong>Root Cause:</strong> LLM analysis unavailable. Manual investigation required.</p>
+<p><strong>Recommendation:</strong> Review metrics manually.</p>
+</div>
+</div>
+<footer class="details">
+<h2>Report details</h2>
+<dl>
+<dt>Run</dt><dd>acdca2f6-0f4d-4b22-9a9b-06f3f4ab51e8</dd>
+<dt>Schema</dt><dd>cji-report/1 (cji-report-renderer/1)</dd>
+<dt>Input SHA-256</dt><dd>c895d92dc4486b0f5adb8260de079c556049d506287aad4ed825ac96ea64b287</dd>
+<dt>Narrative</dt><dd>fallback</dd>
+<dt>Shortened</dt><dd>nothing</dd>
+</dl>
+</footer>
+<script type="application/json" id="cji-report-data">{"counts":{"friction_rows":[8,8],"funnel_steps":[8,8],"insights":[4,4]},"funnel":[{"step_id":"landing_page","users":1489},{"step_id":"sign_up_form","users":1335},{"step_id":"email_verification","users":1037},{"step_id":"profile_setup","users":654},{"step_id":"plan_selection","users":531},{"step_id":"payment_info","users":387},{"step_id":"confirm_details","users":248},{"step_id":"onboarding_done","users":234}],"generated_at":"2026-10-28T13:25:27Z","input_sha256":"c895d92dc4486b0f5adb8260de079c556049d506287aad4ed825ac96ea64b287","journey":"user_onboarding","mode":"demo","narrative":{"model":"","source":"fallback"},"renderer":"cji-report-renderer/1","run_id":"acdca2f6-0f4d-4b22-9a9b-06f3f4ab51e8","schema":"cji-report/1","truncated":{}}</script>
+</body>
+</html>

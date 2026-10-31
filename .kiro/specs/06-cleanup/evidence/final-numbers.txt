@@ -1,0 +1,186 @@
+gate-results.txt:
+   ﻿Spec 06 gate started 2026-10-28T03:23:20
+   pytest full (not integration)            exit=1        62s  log=gate-pytest-full.log
+   pytest Spec 06 tests                     exit=0        34s  log=gate-new-tests.log
+   golden snapshot                          exit=0         4s  log=gate-golden.log
+   golden identical to Spec 05: True
+   seeded synthetic data                    exit=0         2s  log=gate-synthetic.log
+   SYNTH identical: True (deterministic columns, current vs pre-Spec-06 generator)
+   ruff check . (full list)                 exit=1         0s  log=gate-ruff.log
+   ruff unused/undefined names (no snippets) exit=0         0s  log=gate-ruff-names.log
+   ruff check new code                      exit=0         0s  log=gate-ruff-new.log
+   mypy .                                   exit=1        49s  log=gate-mypy.log
+   mypy --strict repositories               exit=0        10s  log=gate-mypy-repositories-strict.log
+   bandit -r . (json)                       exit=1         3s  log=gate-bandit.json.log
+   static compare vs Spec 01                exit=0         0s  log=gate-static-compare.log
+   main.py --help                           exit=0         0s  log=gate-help-main.log
+   run_servers.py --help                    exit=0         0s  log=gate-help-run-servers.log
+   tools/ingest_json.py --help              exit=0         2s  log=gate-help-ingest-json.log
+   tracker/snippet_generator.py --help      exit=0         0s  log=gate-help-snippet.log
+   python -m settings check (cli)           exit=0         0s  log=gate-settings-check.log
+   collector import (app routes)            exit=0         2s  log=gate-collector-import.log
+   servers: 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+   demo pipeline                            exit=0        50s  log=gate-demo-pipeline.log
+   ingest probe                             exit=0        52s  log=gate-ingest-probe.log
+   mode mismatch (realtime CLI, demo servers) exit=0         4s  log=gate-mode-mismatch.log
+   ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+   git diff --check (cr-at-eol)             exit=0         0s  log=gate-diff-check.log
+   git diff --stat                          exit=0         0s  log=gate-diff-stat.log
+   git status (deleted files)               exit=0         0s  log=gate-git-status.log
+   tracked events.parquet unchanged: True
+   Spec 06 gate finished 2026-10-28T03:28:03
+full suite: 510/521 pass, 11 fail, 0 skipped (Spec 05: 409/420)
+failures identical to the Spec 05 set (F-01): True; new: []; fixed: []
+Spec 06 tests: 101/101 pass, 0 skipped; failing: []
+Spec 06 tests before the change: 20/101 pass (81 fail)
+ruff total findings: 135 (Spec 05: 233)
+ruff F401/F841/F811/F821/E722 (no snippets): All checks passed
+gate-ruff-new.log: ��All checks passed!
+gate-mypy-repositories-strict.log: ��Success: no issues found in 5 source files
+mypy: Found 43 errors in 16 files (checked 66 source files) (Spec 05: 46)
+static compare:
+   ��file                                                ruff      mypy  bandit medium+ (before -> after)
+   main.py                                        14 -> 5      0 -> 0    {} -> {}
+   graph.py                                        5 -> 1      0 -> 0    {} -> {}
+   dashboard.py                                   60 -> 46     7 -> 6    {'B608': 10} -> {'B608': 10}
+   collector\api.py                               17 -> 6      2 -> 1    {'B608': 1} -> {}
+   generate_diverse.py                             1 -> 1      0 -> 0    {} -> {}
+   mcp_servers\journey_data_server.py             14 -> 0      4 -> 1    {'B608': 9} -> {}
+   mcp_servers\ingestion_intelligence_server.py   23 -> 8      4 -> 4    {} -> {}
+   mcp_servers\insight_server.py                  12 -> 7     14 -> 14   {} -> {}
+   mcp_servers\report_server.py                   11 -> 4      1 -> 1    {'B113': 1} -> {}
+   mcp_servers\friction_engine_server.py           3 -> 1      0 -> 0    {} -> {}
+   agents\workers.py                              20 -> 19     0 -> 0    {} -> {}
+   agents\ingestion_worker.py                      6 -> 4      0 -> 0    {} -> {}
+   tools\mcp_client.py                             8 -> 2      5 -> 5    {} -> {}
+   tools\ingest_json.py                           13 -> 6      1 -> 1    {} -> {}
+   tools\synthetic_data.py                         4 -> 2      3 -> 3    {} -> {}
+   repositories\duckdb_parquet.py                  0 -> 0      0 -> 0    {} -> {}
+   settings\roles.py                               0 -> 0      0 -> 0    {} -> {}
+   guardrails\output_validator.py                  0 -> 0      0 -> 0    {} -> {}
+   tracker\snippet_generator.py                    6 -> 4      1 -> 0    {} -> {}
+   tests\conftest.py                               1 -> 0      1 -> 1    {} -> {}
+   tests\test_agent_layer.py                       4 -> 2      0 -> 0    {} -> {}
+   tests\test_collector_models.py                  1 -> 1      0 -> 0    {} -> {}
+   tests\test_friction_engine.py                   2 -> 2      0 -> 0    {} -> {}
+   tests\test_supervisor.py                        4 -> 2      1 -> 0    {} -> {}
+   tests\test_synthetic_data.py                    1 -> 1      1 -> 1    {} -> {}
+   tests\test_ingestion_intelligence.py            4 -> 0      1 -> 1    {'B108': 1} -> {'B108': 1}
+   unchanged files delta: ruff -21, mypy -2
+   RESULT: no changed file is worse than baseline
+gate-demo-pipeline.log:
+   | [OK] data_worker: Collected 8 step metrics, 50 events
+   | [OK] data_worker: Collected 8 step metrics, 50 events
+   | [OK] friction_worker: Scored 8 steps, 4 critical
+   | [OK] friction_worker: Scored 8 steps, 4 critical
+   | [OK] insight_worker: Generated 4 insights, ranked 106 fixes
+   | [OK] insight_worker: Generated 4 insights, ranked 106 fixes
+   | [OK] report_worker: Report exported (4.5KB) ��� C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_032705.html
+   | [OK] report_worker: Report exported (4.5KB) ��� C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_032705.html
+gate-ingest-probe.log:
+   | 2026-10-28T03:27:13 | cji.ingestion_worker | INFO     | Processed 0 file(s). 1 flagged for review. 0 error(s).
+   | [OK] ingestion_worker: Processed 0 file(s). 1 flagged for review. 0 error(s).
+   | [OK] ingestion_worker: Processed 0 file(s). 1 flagged for review. 0 error(s).
+gate-mode-mismatch.log:
+   | |     raise ModeMismatch(
+   | | agents.workers.ModeMismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+   | |     raise ModeMismatch(
+   | | agents.workers.ModeMismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+   | |     raise ModeMismatch(
+   | | agents.workers.ModeMismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+   | |     raise ModeMismatch(
+   | | agents.workers.ModeMismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+gate-settings-check.log:
+   | "status": "ok",
+gate-collector-import.log:
+   | ['/admin/api-keys', '/collect/batch', '/docs', '/docs/oauth2-redirect', '/health', '/live/stats', '/openapi.json', '/redoc', '/tracker.js']
+gate-help-main.log: ��usage: main.py [-h] [--mode {demo,realtime}] [--generate-data]
+gate-help-run-servers.log: ��usage: run_servers.py [-h] [--mode {demo,realtime}]
+gate-help-ingest-json.log: ��python.exe : COLLECTOR_PORT is deprecated; use CJI_COLLECTOR_PORT or CJI_COLLECTOR_URL.
+gate-help-snippet.log: ��python.exe : COLLECTOR_PORT is deprecated; use CJI_COLLECTOR_PORT or CJI_COLLECTOR_URL.
+git status (deleted / modified tracked files):
+   �� M "Project Details/ARCHITECTURE.md"
+    M "Project Details/MVP_TECH_DOC.md"
+    M "Project Details/PRD.md"
+    M "Project Details/SYSTEM_DESIGN.md"
+    M Project_Memory.md
+    M Project_status.md
+    M README.md
+    D check_parquet.py
+    M cji_agent/.env.example
+    M cji_agent/agents/ingestion_worker.py
+    M cji_agent/agents/supervisor.py
+    M cji_agent/agents/workers.py
+    M cji_agent/collector/api.py
+    M cji_agent/collector/models.py
+    M cji_agent/config.py
+    M cji_agent/dashboard.py
+    D cji_agent/dashboard2.py
+    D cji_agent/fix.py
+    M cji_agent/generate_diverse.py
+    M cji_agent/graph.py
+    M cji_agent/guardrails/output_validator.py
+    M cji_agent/guardrails/rate_limiter.py
+    M cji_agent/main.py
+    M cji_agent/mcp_servers/friction_engine_server.py
+    M cji_agent/mcp_servers/ingestion_intelligence_server.py
+    M cji_agent/mcp_servers/insight_server.py
+    M cji_agent/mcp_servers/journey_data_server.py
+    M cji_agent/mcp_servers/report_server.py
+    M cji_agent/requirements.txt
+    M cji_agent/run_servers.py
+    M cji_agent/snippets/api_key.json
+    M cji_agent/snippets/embed_snippet.html
+    M cji_agent/snippets/useCJITracker.js
+    M cji_agent/snippets/verify_tracker.py
+    M cji_agent/state.py
+    D cji_agent/test_duckdb.py
+    D cji_agent/test_metadata_query.py
+    D cji_agent/test_pg.py
+    D cji_agent/test_servers.py
+    M cji_agent/tests/conftest.py
+    M cji_agent/tests/test_agent_layer.py
+    M cji_agent/tests/test_collector_models.py
+    M cji_agent/tests/test_friction_engine.py
+    M cji_agent/tests/test_ingestion_intelligence.py
+    M cji_agent/tests/test_supervisor.py
+    M cji_agent/tests/test_synthetic_data.py
+    M cji_agent/tools/ingest_json.py
+    M cji_agent/tools/mcp_client.py
+    M cji_agent/tools/synthetic_data.py
+    M cji_agent/tracker/snippet_generator.py
+    D cji_agent/verify_data.py
+    M docs/1-Product-Requirements.md
+    M docs/10-Development-Phases.md
+    M docs/11-Environment-and-DevOps.md
+    M docs/12-Testing-Strategy.md
+    M docs/13-Architecture_Diagram.md
+    M docs/2-User-Stories-and-Acceptance-Criteria.md
+    M docs/3-Information-Architecture.md
+    M docs/4-System-Architecture.md
+    M docs/5-Database-Schema.md
+    M docs/6-API-Contracts.md
+    M docs/7-Monorepo-Structure.md
+    M docs/8-Scoring-Engine-Spec.md
+    M docs/9-Engineering-Score-Definitions.md
+    M docs/development_status.md
+    D err.log
+    D error.log
+    D ingest_ga4_log.txt
+    D inspect_schemas.py
+    D main_log.txt
+    D main_log2.txt
+    D main_log3.txt
+    D main_log4.txt
+    D main_log5.txt
+    D out.log
+    D parquet_check.txt
+    D query_test.py
+    D schema_report.txt
+    D stderr.log
+    D test_data_server.py
+    D test_duckdb_async.py
+    D test_load.py
+    D test_server.py
+    D test_threads.py
+diff --check log bytes: 0

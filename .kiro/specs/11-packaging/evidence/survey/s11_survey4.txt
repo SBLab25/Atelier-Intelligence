@@ -1,0 +1,253 @@
+
+===== generate_diverse.py, stray files, snippets
+  """
+  Optional: generate a large, high-friction demo dataset (about 1M events).
+  
+  Run from cji_agent/:  python generate_diverse.py
+  Overwrites data/events.parquet (the default demo data, also read by the golden
+  snapshot) and, when a database URL is configured outside CJI_ENV=test, replaces
+  the demo_events table, as `python main.py --mode demo --generate-data` does.
+  Restore the default data with:  python main.py --mode demo --generate-data
+  """
+  from tools.synthetic_data import STEP_PROFILES, ERROR_CODES, generate_demo_data
+  
+  # Create highly diverse and problematic step profiles with very specific "personas" of friction
+  diverse_profiles = {
+      "landing_page": {
+          "drop_rate": 0.08,       
+          "avg_dwell_s": 8,        
+          "error_rate": 0.05,      
+          "rage_rate": 0.25,       # High rage clicks, meaning users click aggressively on something unclickable
+          "retry_rate": 0.0,
+          "click_count": 5,
+      },
+      "sign_up_form": {
+          "drop_rate": 0.45,       # Massive drop off
+          "avg_dwell_s": 120,      # Takes way too long, meaning friction in form fields
+          "error_rate": 0.55,      # Huge error rate
+  cji_agent\generate_diverse.py:4: Run from cji_agent/:  python generate_diverse.py
+  README.md:195: - `python generate_diverse.py` creates a larger (about 1M events), high-friction dataset. It overwrites
+  cji_agent\tracker\snippet_generator.py:24:     parser.add_argument("--journey", required=True, help="Journey the key is registered for (e.g. 'user_onboarding')")
+  cji_agent\tracker\snippet_generator.py:25:     parser.add_argument("--api-key", required=True, type=_api_key,
+  cji_agent\tracker\snippet_generator.py:27:     parser.add_argument("--host", default=get_settings().services.get("collector").url,
+  cji_agent\tracker\snippet_generator.py:29:     parser.add_argument("--output", default="snippets", help="Output directory for generated files")
+  cji_agent\tracker\snippet_generator.py:33:     output_dir = ROOT / args.output
+  cji_agent\tracker\snippet_generator.py:34:     output_dir.mkdir(parents=True, exist_ok=True)
+  cji_agent\tracker\snippet_generator.py:59:     with open(output_dir / "embed_snippet.html", "w", encoding="utf-8") as f:
+  cji_agent\tracker\snippet_generator.py:82:     with open(output_dir / "useCJITracker.js", "w", encoding="utf-8") as f:
+  cji_agent\tracker\snippet_generator.py:122:     with open(output_dir / "verify_tracker.py", "w", encoding="utf-8") as f:
+  cji_agent\tracker\snippet_generator.py:131:     with open(output_dir / "api_key.json", "w", encoding="utf-8") as f:
+  cji_agent\tracker\snippet_generator.py:134:     print(f"\nGenerated CJI Tracker integration files in '{output_dir}' for journey '{args.journey}'.")
+
+===== settings: APP_ROOT, dotenv, defaults
+  cji_agent\settings\load.py:4: Process environment wins over `.env`; `.env` is never read when CJI_ENV=test.
+  cji_agent\settings\load.py:19: from dotenv import dotenv_values
+  cji_agent\settings\load.py:53: APP_ROOT: Path = Path(__file__).resolve().parent.parent
+  cji_agent\settings\load.py:54: DEFAULT_DOTENV_PATH: Path = APP_ROOT / ".env"
+  cji_agent\settings\load.py:210: def _path(raw: str | None, default: Path) -> Path:
+  cji_agent\settings\load.py:214:     return path if path.is_absolute() else APP_ROOT / path
+  cji_agent\settings\load.py:320:         loaded = {k: v for k, v in dotenv_values(dotenv_path).items() if v is not None}
+  cji_agent\settings\load.py:346:         data_dir=_path(r.raw("CJI_DATA_DIR"), APP_ROOT / "data"),
+  cji_agent\settings\load.py:347:         reports_dir=_path(r.raw("CJI_REPORTS_DIR"), APP_ROOT / "reports"),
+  cji_agent\settings\load.py:354:         audit_dir = _path(raw_audit, storage.data_dir / "audit")
+  cji_agent\settings\load.py:358:     checkpoints = _path(raw_checkpoints, storage.data_dir / "cji_checkpoints.db") if raw_checkpoints else None
+  cji_agent\settings\__init__.py:9: the environment and `.env` are read on the first get_settings() / load_settings().
+  cji_agent\settings\__init__.py:19: from .load import APP_ROOT, DEFAULT_DOTENV_PATH, KNOWN_KEYS, load_settings
+  cji_agent\settings\__init__.py:25:     "APP_ROOT",
+  cji_agent\settings\__init__.py:47:     """The process-wide settings, loaded from os.environ and `.env` on first use."""
+  cji_agent\settings\__init__.py:73:     """Test settings: CJI_ENV=test, storage under tmp_path, no `.env`, extra variables from **env."""
+  cji_agent\settings\__main__.py:25:     check.add_argument("--no-dotenv", action="store_true", help="ignore the .env file")
+  cji_agent\config.py:10:   - Values come from settings: process environment > .env > defaults. No secret
+  cji_agent\config.py:12:   - .env is also loaded into the process environment (except CJI_ENV=test) for
+  cji_agent\config.py:23: from dotenv import load_dotenv
+  cji_agent\config.py:30:     load_dotenv()
+  cji_agent\config.py:70: CJI_ENV: str = SETTINGS.app.env
+
+===== ROOT / __file__ uses in app code (what they locate)
+  cji_agent\config.py:49: ROOT:           Path = Path(__file__).parent.resolve()
+  cji_agent\dashboard.py:80: ROOT          = Path(__file__).parent
+  cji_agent\dashboard.py:417:         [sys.executable, str(ROOT / "main.py"), "--mode", mode, "--run", "--auto-approve"],
+  cji_agent\dashboard.py:418:         capture_output=True, text=True, timeout=SETTINGS.budgets.pipeline_timeout_s, cwd=str(ROOT),
+  cji_agent\run_servers.py:17: ROOT_DIR = Path(__file__).parent.resolve()
+  cji_agent\run_servers.py:47:     env["PYTHONPATH"] = str(ROOT_DIR)
+  cji_agent\run_servers.py:57:                 cwd=str(ROOT_DIR),
+  cji_agent\collector\api.py:37: from config import ROOT
+  cji_agent\collector\api.py:318:     tracker_path = ROOT / "tracker" / "tracker.js"
+  cji_agent\settings\__init__.py:19: from .load import APP_ROOT, DEFAULT_DOTENV_PATH, KNOWN_KEYS, load_settings
+  cji_agent\settings\__init__.py:25:     "APP_ROOT",
+  cji_agent\tracker\snippet_generator.py:9: from config import ROOT
+  cji_agent\tracker\snippet_generator.py:33:     output_dir = ROOT / args.output
+
+===== tests: how they locate the app (APP_ROOT / source reads / subprocess env)
+  cji_agent\tests\test_cleanup.py:21: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_cleanup.py:137:         source = path.read_text(encoding="utf-8")
+  cji_agent\tests\test_cleanup.py:269:     source = (APP_ROOT / "tools" / "ingest_json.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_contracts.py:22: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_contracts.py:311:     out = subprocess.run([sys.executable, "-c", script], cwd=APP_ROOT, env=env,
+  cji_agent\tests\test_dashboard_smoke.py:21: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_docs.py:15: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_docs.py:17: README = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+  cji_agent\tests\test_docs.py:115:     index = (REPO_ROOT / "docs" / "README.md").read_text(encoding="utf-8")
+  cji_agent\tests\test_gateway.py:52: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_gateway.py:578:         src = (APP_ROOT / rel).read_text(encoding="utf-8")
+  cji_agent\tests\test_gateway.py:763:     out = subprocess.run([sys.executable, "-c", code], cwd=APP_ROOT, capture_output=True, text=True,
+  cji_agent\tests\test_journey_data_service.py:29: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_journey_data_service.py:54:     source = (APP_ROOT / "mcp_servers" / "journey_data_server.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_p0_security.py:16: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_p0_security.py:112:     src = (APP_ROOT / "agents" / "ingestion_worker.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_p0_security.py:413:     return Path(res["report_path"]).read_text(encoding="utf-8")
+  cji_agent\tests\test_reports.py:27: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_reports.py:129:     return Path(res["report_path"]).read_text(encoding="utf-8")
+  cji_agent\tests\test_reports.py:200:     src = (APP_ROOT / "reporting" / "render.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_reports.py:338:         out = subprocess.run([sys.executable, "-c", code], check=False, cwd=APP_ROOT, env=env, capture_output=True,
+  cji_agent\tests\test_reports.py:547:     full = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_repositories.py:33: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_settings.py:29: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_settings.py:359:     source = (APP_ROOT / "mcp_servers" / filename).read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:467:         [sys.executable, "main.py", "--mode", "realtime", "--run"],
+  cji_agent\tests\test_settings.py:468:         cwd=APP_ROOT, env=clean_env(CJI_ENV="test"), capture_output=True, text=True,
+  cji_agent\tests\test_settings.py:476:     source = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:553:     source = (APP_ROOT / "collector" / "api.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:588:     registry = (APP_ROOT / "settings" / "services.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:614:         [sys.executable, "-c", "import settings, settings.load, settings.roles, settings.services"],
+  cji_agent\tests\test_settings.py:615:         cwd=APP_ROOT, env=clean_env(CJI_ENV="test", CJI_DATA_DIR=str(target)),
+  cji_agent\tests\test_settings.py:624:         [sys.executable, "-m", "settings", "check", "--no-dotenv", *args],
+  cji_agent\tests\test_settings.py:625:         cwd=APP_ROOT, env=clean_env(**env), capture_output=True, text=True, timeout=120, check=False,
+  cji_agent\tests\test_workflow.py:21: APP_ROOT = Path(__file__).resolve().parent.parent
+  cji_agent\tests\test_workflow.py:181:         src = (APP_ROOT / rel).read_text(encoding="utf-8")
+  cji_agent\tests\test_workflow.py:509:                 "PYTHONPATH": str(APP_ROOT)}
+  cji_agent\tests\test_workflow.py:510:     proc = subprocess.run([sys.executable, "-c", code], cwd=APP_ROOT, env=proc_env, capture_output=True,
+  cji_agent\tests\test_workflow.py:650:     dead = subprocess.run([sys.executable, "-c", "import os; print(os.getpid())"], capture_output=True, text=True,
+  cji_agent\tests\test_workflow.py:691:     return subprocess.run([sys.executable, "main.py", *args], cwd=APP_ROOT, env=proc_env, capture_output=True,
+  tests reading app source files (APP_ROOT / ...):
+  cji_agent\tests\test_cleanup.py:104:     tools = _tool_names(APP_ROOT / "mcp_servers" / "journey_data_server.py")
+  cji_agent\tests\test_cleanup.py:182:     found = {p.name for p in (APP_ROOT / "tests").glob("*.py") if _sys_path_lines(p)}
+  cji_agent\tests\test_cleanup.py:269:     source = (APP_ROOT / "tools" / "ingest_json.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_cleanup.py:341:     reqs = (APP_ROOT / "requirements.txt").read_text(encoding="utf-8").lower()
+  cji_agent\tests\test_cleanup.py:344:     assert not (APP_ROOT / "guardrails" / "rate_limiter.py").exists()
+  cji_agent\tests\test_contracts.py:23: PARQUET = APP_ROOT / "data" / "events.parquet"
+  cji_agent\tests\test_contracts.py:91:     for path in sorted((APP_ROOT / "domain").glob("*.py")):
+  cji_agent\tests\test_dashboard_smoke.py:28:         app = AppTest.from_file(str(APP_ROOT / "dashboard.py"), default_timeout=120)
+  cji_agent\tests\test_docs.py:86:         if not any((base / token).exists() for base in (REPO_ROOT, APP_ROOT, APP_ROOT / "tracker")):
+  cji_agent\tests\test_journey_data_service.py:54:     source = (APP_ROOT / "mcp_servers" / "journey_data_server.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_p0_security.py:112:     src = (APP_ROOT / "agents" / "ingestion_worker.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_reports.py:200:     src = (APP_ROOT / "reporting" / "render.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_reports.py:547:     full = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_repositories.py:443:     pkg = APP_ROOT / "repositories"
+  cji_agent\tests\test_repositories.py:451:     for path in sorted((APP_ROOT / "repositories").glob("*.py")):
+  cji_agent\tests\test_settings.py:69:     assert s.storage.events_parquet == APP_ROOT / "data" / "events.parquet"
+  cji_agent\tests\test_settings.py:70:     assert s.storage.reports_dir == APP_ROOT / "reports"
+  cji_agent\tests\test_settings.py:359:     source = (APP_ROOT / "mcp_servers" / filename).read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:409:     for path in (APP_ROOT / "agents").glob("*.py"):
+  cji_agent\tests\test_settings.py:476:     source = (APP_ROOT / "dashboard.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:553:     source = (APP_ROOT / "collector" / "api.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:588:     registry = (APP_ROOT / "settings" / "services.py").read_text(encoding="utf-8")
+  cji_agent\tests\test_settings.py:599:     for path in sorted((APP_ROOT / "settings").glob("*.py")):
+
+===== import X.sub forms and dynamic imports of first-party modules
+  cji_agent\tests\test_contracts.py:51:     import collector.models as cm
+  cji_agent\tests\test_contracts.py:64:     import agents.supervisor as sup
+  cji_agent\tests\test_contracts.py:65:     import collector.models as cm
+  cji_agent\tests\test_contracts.py:66:     import guardrails.output_validator as ov
+  cji_agent\tests\test_contracts.py:336:     import agents.supervisor as sup
+  cji_agent\tests\test_contracts.py:358:     import agents.workers as w
+  cji_agent\tests\test_contracts.py:372:     import agents.workers as w
+  cji_agent\tests\test_gateway.py:621:     import agents.workers as w
+  cji_agent\tests\test_gateway.py:675:     import agents.workers as w
+  cji_agent\tests\test_gateway.py:710:     import agents.workers as w
+  cji_agent\tests\test_gateway.py:737:     import agents.ingestion_worker as iw
+  cji_agent\tests\test_gateway.py:738:     import agents.workers as w
+  cji_agent\tests\test_gateway.py:842:     import agents.ingestion_worker as iw
+  cji_agent\tests\test_journey_data_service.py:208:     import agents.workers as w
+  cji_agent\tests\test_journey_data_service.py:219:     import agents.workers as w
+  cji_agent\tests\test_p0_security.py:148:     import agents.ingestion_worker as iw
+  cji_agent\tests\test_p0_security.py:166:     import agents.ingestion_worker as iw
+  cji_agent\tests\test_p0_security.py:182:     import agents.ingestion_worker as iw
+  cji_agent\tests\test_workflow.py:77:         import workflow.step as step_module
+  cji_agent\tests\test_workflow.py:103:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:309:     import agents.supervisor as sup
+  cji_agent\tests\test_workflow.py:339:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:378:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:389:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:399:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:407:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:416:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:429:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:448:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:460:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:472:     import agents.workers as w
+  cji_agent\tests\test_workflow.py:484:     import agents.workers as w
+  cji_agent\tests\test_collector.py:64:     return importlib.import_module("collector.api")
+  cji_agent\tests\test_contracts.py:84:     api = importlib.import_module("collector.api")
+  cji_agent\tests\test_contracts.py:168:     api = importlib.import_module("collector.api")
+  cji_agent\tests\test_gateway.py:764:                          timeout=120, check=False, env={**__import__("os").environ, "CJI_ENV": "test"})
+  cji_agent\tests\test_p0_security.py:62:     return importlib.import_module("collector.api")
+  cji_agent\tests\test_repositories.py:110:     collector_api = importlib.import_module("collector.api")
+
+===== pytest import mode / rootdir / conftest sys.path
+  """
+  Shared pytest fixtures for CJI project.
+  """
+  import os
+  
+  # Spec 04: tests run in the test environment (no .env, no PostgreSQL uploads).
+  os.environ.setdefault("CJI_ENV", "test")
+  # Spec 09: workflow step retries do not wait in tests (the attempt count is unchanged).
+  os.environ.setdefault("CJI_WORKFLOW_RETRY_BACKOFF_S", "0")
+  
+  import sys
+  from pathlib import Path
+  from urllib.parse import urlsplit
+  
+  import pandas as pd
+  import pytest
+  
+  # Allow running from both cji_agent/ and cji_agent/tests/ (until Spec 11 (R-14) packaging)
+  sys.path.insert(0, str(Path(__file__).parent.parent))
+  
+  from tools.synthetic_data import generate_demo_data
+  
+  # ── Friction Engine Fixtures ──────────────────────────────────────────────────
+  
+  @pytest.fixture
+  def low_step() -> dict:
+      """Low-friction step — landing page characteristics. Score should be < 60."""
+      return {
+          "step_id":           "landing_page",
+          "unique_users":      2000,
+          "abandon_rate_pct":  15.0,
+          "error_rate_pct":    2.1,
+          "avg_dwell_ms":      12000,
+          "avg_retries":       0.01,
+          "avg_rage_clicks":   0.02,
+      }
+  
+  
+  @pytest.fixture
+  def high_step() -> dict:
+  cji_agent\tests\test_cleanup.py:156: 
+  cji_agent\tests\test_cleanup.py:157: 
+  cji_agent\tests\test_cleanup.py:158: # ── sys.path policy (CL-11) ──────────────────────────────────────────────────
+  cji_agent\tests\test_cleanup.py:159: 
+  cji_agent\tests\test_cleanup.py:160: ALLOWED_SYS_PATH = {
+  cji_agent\tests\test_cleanup.py:179: 
+  cji_agent\tests\test_cleanup.py:180: 
+  cji_agent\tests\test_cleanup.py:181: def test_tests_rely_on_conftest_for_sys_path():
+  cji_agent\tests\test_cleanup.py:182:     found = {p.name for p in (APP_ROOT / "tests").glob("*.py") if _sys_path_lines(p)}
+  cji_agent\tests\test_cleanup.py:183:     assert found == {"conftest.py"}
+  cji_agent\tests\test_cleanup.py:181: def test_tests_rely_on_conftest_for_sys_path():
+  cji_agent\tests\test_cleanup.py:182:     found = {p.name for p in (APP_ROOT / "tests").glob("*.py") if _sys_path_lines(p)}
+  cji_agent\tests\test_cleanup.py:183:     assert found == {"conftest.py"}
+  cji_agent\tests\test_cleanup.py:184: 
+  cji_agent\tests\test_cleanup.py:185: 
+  cji_agent\tests\test_cleanup.py:184: 
+  cji_agent\tests\test_cleanup.py:185: 
+  cji_agent\tests\test_cleanup.py:186: @pytest.mark.parametrize("rel", sorted(ALLOWED_SYS_PATH | {"tests/conftest.py"}))
+  cji_agent\tests\test_cleanup.py:187: def test_remaining_sys_path_workarounds_point_at_packaging(rel):
+  cji_agent\tests\test_cleanup.py:188:     path = APP_ROOT / rel
+
+===== git: tracked files under cji_agent by top-level entry
+  $ git -C c:\Users\sovan\Documents\Projects\TCS-CJI ls-files cji_agent
+  .env.example:1, .gitignore:1, agents:4, collector:3, config.py:1, dashboard.py:1, dashboard2.py:1, data:1, fix.py:1, generate_diverse.py:1, graph.py:1, guardrails:4, main.py:1, mcp_servers:6, pytest.ini:1, requirements-dev.txt:1, requirements.txt:1, run_servers.py:1, snippets:4, state.py:1, test_duckdb.py:1, test_metadata_query.py:1, test_output.txt:1, test_pg.py:1, test_results.txt:1, test_servers.py:1, tests:8, tools:4, tracker:3, verify_data.py:1
+  $ git -C c:\Users\sovan\Documents\Projects\TCS-CJI status --porcelain --untracked-files=no
+  modified tracked files now: 85

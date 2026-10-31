@@ -1,0 +1,19 @@
+tracked   README.md (in spec10-tracked.patch)
+new       .gitattributes sha256=ff4daa8c586d14f8
+new       cji_agent/reporting/__init__.py sha256=0e516a9e594e588a
+new       cji_agent/reporting/model.py sha256=1a4c1570dbfadb4e
+new       cji_agent/reporting/escape.py sha256=b9369d4d17b5df46
+new       cji_agent/reporting/render.py sha256=4ac958ce9ce49583
+new       cji_agent/reporting/output.py sha256=ad2a43bf75ea155b
+tracked   cji_agent/mcp_servers/report_server.py (in spec10-tracked.patch)
+changed   cji_agent/domain/insights.py sha256=1ced6a0ac6d9bedc
+tracked   cji_agent/agents/workers.py (in spec10-tracked.patch)
+tracked   cji_agent/dashboard.py (in spec10-tracked.patch)
+new       cji_agent/tests/test_reports.py sha256=5aaded1ff6f38930
+new       cji_agent/tests/_report_checks.py sha256=8cf0c15fa7c59847
+new       cji_agent/tests/snapshots/report_basic.html sha256=bad4d7d45465de23
+new       cji_agent/tests/snapshots/report_empty.html sha256=a0736372c2a74169
+new       cji_agent/tests/snapshots/report_malicious.html sha256=cca82a509163f357
+tracked   cji_agent/tests/conftest.py (in spec10-tracked.patch)
+changed   cji_agent/tests/test_p0_security.py sha256=6b4e5c7e6374ee37
+changed   cji_agent/tests/test_workflow.py sha256=2e6903a0150219ee

@@ -1,0 +1,5 @@
+{
+    "api_key": "YOUR_TRACKER_API_KEY",
+    "journey_name": "my_vercel_site",
+    "host": "https://tcs-cjipip-install-r-cji-agent.onrender.com"
+}

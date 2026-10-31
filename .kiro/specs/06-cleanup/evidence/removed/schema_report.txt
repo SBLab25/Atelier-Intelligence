@@ -1,0 +1,33 @@
+=== GA4 TOP KEYS === ['source', 'description', 'schema_version', 'journey', 'total_events', 'date_range', 'events']
+  LIST KEY='events' len=8237
+  EVENT KEYS: ['event_name', 'user_id', 'session_id', 'timestamp', 'device_category', 'browser', 'country', 'traffic_source', 'journey_name', 'page_location', 'engagement_time_msec']
+  SAMPLE: {'event_name': 'session_start', 'user_id': '63d5b50b-40d0-4202-95c9-c8bb84915f5c', 'session_id': '281c8533-3be2-4f3e-8969-d723ebecc4f3', 'timestamp': '2026-03-14T04:45:52Z', 'device_category': 'tablet', 'browser': 'Chrome', 'country': 'IN', 'traffic_source': 'social', 'journey_name': 'user_onboarding', 'page_location': 'https://app.example.com/'}
+
+=== HOTJAR ===
+TYPE: dict
+TOP KEYS: ['source', 'description', 'schema_version', 'journey', 'total_sessions', 'date_range', 'sessions']
+  LIST KEY='sessions' len=1686
+  KEYS: ['session_id', 'step_name', 'journey_name', 'recording_url', 'heatmap', 'scroll', 'hesitation', 'form_analytics', 'nps_trigger']
+  SAMPLE: {'session_id': '60edccd6-7b12-4c67-ba4a-07bf9c206392', 'step_name': 'landing_page', 'journey_name': 'user_onboarding', 'recording_url': 'https://hotjar.com/recordings/60edccd6', 'heatmap': {'total_clicks': 5, 'click_clusters': [{'element': 'submit_button', 'click_count': 1}, {'element': 'form_field_address', 'click_count': 3}, {'element': 'help_icon', 'click_count': 0}], 'dead_clicks': 2, 'rage_clicks': 1}, 'scroll': {'max_scroll_depth_pct': 99, 'avg_fold_visibility': 0.55}, 'hesitation': {'first_interaction_delay_ms': 3051, 'mouse_idle_periods': 2, 'cursor_backtrack_count': 1}, 'form_analytics': {'field_drop_off': None, 'refill_count': 0, 'time_in_form_sec': 28, 'blank_submit_attempts': 0}, 'nps_trigger': {'shown': False, 'score': 10, 'comment': None}}
+
+=== ALL_SOURCES_BUNDLE ===
+TYPE: dict
+TOP KEYS: ['meta', 'ga4_clickstream', 'hotjar', 'uxcam', 'surveys', 'support_tickets']
+  'meta': dict {'project': 'Customer Journey Intelligence — PoC', 'generated_at': '2026-03-22T1
+  'ga4_clickstream': dict {'source': 'GA4 / Google Analytics 4', 'description': 'Clickstream event stream 
+  'hotjar': dict {'source': 'Hotjar', 'description': 'Heatmap, session recording metadata and for
+  'uxcam': dict {'source': 'UXCam', 'description': 'Mobile session recordings and gesture analyt
+  'surveys': dict {'source': 'Survey Tool (Typeform / SurveyMonkey)', 'description': 'In-app and e
+  'support_tickets': dict {'source': 'Support Ticketing (Zendesk / Freshdesk)', 'description': 'Customer s
+
+=== combined_signals_5k.csv ===
+COLUMNS: ['source', 'user_id', 'session_id', 'step_name', 'journey_name', 'device', 'country', 'hesitation_ms', 'rage_clicks', 'dead_clicks', 'form_refill_count', 'form_time_sec', 'nps_score', 'frustration_score', 'sentiment', 'verbatim']
+ROW1: {'source': 'hotjar', 'user_id': '90c695af-3103-4da0-be75-30a004f9853d', 'session_id': '0b993f4d-af13-4d52-b9ba-8982f7e5e920', 'step_name': 'email_verify', 'journey_name': 'user_onboarding', 'device': 'mobile', 'country': 'BR', 'hesitation_ms': '6673', 'rage_clicks': '1', 'dead_clicks': '2', 'form_refill_count': '0', 'form_time_sec': '56', 'nps_score': '7', 'frustration_score': '', 'sentiment': ''}
+ROW2: {'source': 'hotjar', 'user_id': '90c695af-3103-4da0-be75-30a004f9853d', 'session_id': '0b993f4d-af13-4d52-b9ba-8982f7e5e920', 'step_name': 'sign_up_form', 'journey_name': 'user_onboarding', 'device': 'mobile', 'country': 'BR', 'hesitation_ms': '3017', 'rage_clicks': '1', 'dead_clicks': '0', 'form_refill_count': '0', 'form_time_sec': '22', 'nps_score': '7', 'frustration_score': '', 'sentiment': ''}
+
+=== surveys.json ===
+TYPE: dict
+TOP KEYS: ['source', 'description', 'schema_version', 'journey', 'total_responses', 'date_range', 'responses']
+  LIST KEY='responses' len=250
+  KEYS: ['survey_id', 'user_id', 'timestamp', 'channel', 'journey_name', 'triggered_at_step', 'survey_type', 'nps_score', 'csat_score', 'ces_score', 'sentiment', 'verbatim_comment', 'device', 'completion_rate']
+  SAMPLE: {'survey_id': '35d6279b-e7a4-4ad4-9457-3c4a7d758ef3', 'user_id': '254b6621-101d-4610-9be8-1d0c14114b1e', 'timestamp': '2026-03-12T10:23:11Z', 'channel': 'in_app_popup', 'journey_name': 'user_onboarding', 'triggered_at_step': 'profile_setup', 'survey_type': 'CSAT', 'nps_score': 3, 'csat_score': 3, 'ces_score': 1}

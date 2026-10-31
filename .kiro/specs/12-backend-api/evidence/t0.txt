@@ -1,0 +1,2 @@
+pre-spec12-tracked.patch: 512160 bytes
+untracked files copied: 100

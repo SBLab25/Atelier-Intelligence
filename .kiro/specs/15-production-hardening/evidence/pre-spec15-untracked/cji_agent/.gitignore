@@ -1,0 +1,50 @@
+# ── Environment ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Runtime data (auto-created, not source code) ──────────────────
+data/
+data/**
+reports/
+reports/**
+
+# ── Snippet output (may contain API keys) ─────────────────────────
+# snippets/api_key.json
+# snippets/embed_snippet.html
+# snippets/
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Testing ───────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# ── IDE ────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Gateway audit records (Spec 08)
+data/audit/

@@ -1,0 +1,205 @@
+gate-results.txt:
+   ﻿Spec 10 gate started 2026-10-28T17:10:55
+   pytest full (not integration)                    exit=0        98s  log=gate-pytest-full.log
+   pytest Spec 10 tests                             exit=0        66s  log=gate-new-tests.log
+   collector smoke (Spec 07 regression)             exit=0         8s  log=gate-collector-smoke.log
+   golden snapshot                                  exit=0         3s  log=gate-golden.log
+   golden identical to Spec 09: True
+   ruff check . (full list)                         exit=1         0s  log=gate-ruff.log
+   ruff check new code                              exit=0         0s  log=gate-ruff-new.log
+   mypy .                                           exit=1        51s  log=gate-mypy.log
+   mypy --strict workflow domain/runs.py            exit=0        50s  log=gate-mypy-workflow-strict.log
+   mypy --strict reporting                          exit=0         1s  log=gate-mypy-reporting-strict.log
+   mypy --strict integrations                       exit=0         7s  log=gate-mypy-integrations-strict.log
+   mypy --strict repositories                       exit=0         5s  log=gate-mypy-repositories-strict.log
+   bandit -r . (json)                               exit=1         4s  log=gate-bandit.json.log
+   bandit workflow (text)                           exit=0         1s  log=gate-bandit-workflow.log
+   bandit reporting (text)                          exit=0         1s  log=gate-bandit-reporting.log
+   static compare vs Spec 01                        exit=0         0s  log=gate-static-compare.log
+   main.py --help                                   exit=0         0s  log=gate-help-main.log
+   run_servers.py --help                            exit=0         0s  log=gate-help-run-servers.log
+   python -m settings check (cli)                   exit=0         1s  log=gate-settings-check.log
+   settings check: step timeout below MCP call timeout exit=2         1s  log=gate-settings-step-timeout.log
+   CLI refuses unknown thread (--status/--approve/--resume) exit=0         6s  log=gate-cli-unknown.log
+   servers (none): 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+   demo pipeline --run --auto-approve (dashboard call) exit=0         7s  log=gate-demo-pipeline-none.log
+   pause: --run without --auto-approve              exit=0         4s  log=gate-pause.log
+   paused thread: 19205aa5-ceaf-4324-855c-997e6fa9b741
+   status of the paused run                         exit=0         2s  log=gate-status-paused.log
+   --resume of a paused run is refused (exit 1)     exit=1         3s  log=gate-resume-paused.log
+   approve                                          exit=0         3s  log=gate-approve.log
+   approve again (no-op)                            exit=0         3s  log=gate-approve-again.log
+   status after approval                            exit=0         2s  log=gate-status-approved.log
+   report files for the approved run: 1
+   servers (groq): 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+   demo pipeline (groq, dummy key, offline)         exit=0        67s  log=gate-demo-pipeline.log
+   kill during insight_worker, then resume          exit=0        73s  log=gate-kill-resume.log
+   ingest probe                                     exit=0        78s  log=gate-ingest-probe.log
+   mode mismatch (realtime CLI, demo servers; exit 1) exit=1         3s  log=gate-mode-mismatch.log
+   ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+   audit files: fields, secrets, correlation (Spec 08) exit=0         1s  log=gate-audit-check.log
+   workflow audit: steps, runs, kill/resume         exit=0         1s  log=gate-audit-workflow.log
+   report contract and inertness (gate reports)     exit=0         0s  log=gate-report-contract.log
+   new report files in reports/: 5
+   git diff --check (cr-at-eol)                     exit=0         0s  log=gate-diff-check.log
+   git diff --stat                                  exit=0         0s  log=gate-diff-stat.log
+   git status (tracked)                             exit=0         0s  log=gate-git-status.log
+   tracked events.parquet unchanged: True
+   Spec 10 gate finished 2026-10-28T17:20:25
+full suite: 1036/1036 pass, 0 fail, 0 skipped (Spec 09: 749/749)
+tests added: 287; tests no longer present: []
+added per module: {'tests.test_reports': 280, 'tests.test_workflow': 7}
+Spec 10 test set: 556/556 pass; failing: []; test_reports.py: 280 tests
+T1 baseline of tests/test_reports.py before the change: 0/280 pass
+ruff total findings: 97 (Spec 09: 98)
+gate-ruff-new.log: All checks passed!
+gate-mypy-reporting-strict.log: Success: no issues found in 5 source files
+gate-mypy-workflow-strict.log: Success: no issues found in 5 source files
+gate-mypy-integrations-strict.log: Success: no issues found in 11 source files
+gate-mypy-repositories-strict.log: Success: no issues found in 5 source files
+gate-bandit-reporting.log: empty (no output)
+gate-bandit-workflow.log: empty (no output)
+mypy: Found 35 errors in 13 files (checked 94 source files) (Spec 09: Found 35 errors in 13 files (checked 87 source files))
+mypy per-file changes vs Spec 09: none
+bandit totals: {'SEVERITY.HIGH': 0, 'SEVERITY.LOW': 1065, 'SEVERITY.MEDIUM': 12, 'SEVERITY.UNDEFINED': 0} (Spec 09: {'SEVERITY.HIGH': 0, 'SEVERITY.LOW': 957, 'SEVERITY.MEDIUM': 12, 'SEVERITY.UNDEFINED': 0})
+bandit changes vs Spec 09: tests/test_reports.py LOW:B101 +100, tests/test_reports.py LOW:B404 +1, tests/test_reports.py LOW:B603 +1, tests/test_workflow.py LOW:B101 +6
+gate-report-contract.log:
+   | reports written by this gate: 5
+   | cji_report_user_onboarding_19205aa5-ceaf-4324-855c-997e6fa9b741.html 7841 bytes schema=cji-report/1 narrative={'model': '', 'source': 'fallback'} counts={'friction_rows': [8, 8], 'funnel_steps': [8, 8], 'insights': [4, 4]} truncated=0 OK
+   | cji_report_user_onboarding_235b9aa8-2ebb-4637-adba-c28b8d7b1bb0.html 7841 bytes schema=cji-report/1 narrative={'model': '', 'source': 'fallback'} counts={'friction_rows': [8, 8], 'funnel_steps': [8, 8], 'insights': [4, 4]} truncated=0 OK
+   | cji_report_user_onboarding_b6012341-1dae-48cb-9435-8b677e8934b4.html 7841 bytes schema=cji-report/1 narrative={'model': '', 'source': 'fallback'} counts={'friction_rows': [8, 8], 'funnel_steps': [8, 8], 'insights': [4, 4]} truncated=0 OK
+   | cji_report_user_onboarding_bca8aef2-2a7b-4e5a-8c4e-cd9c28df166e.html 7841 bytes schema=cji-report/1 narrative={'model': '', 'source': 'fallback'} counts={'friction_rows': [8, 8], 'funnel_steps': [8, 8], 'insights': [4, 4]} truncated=0 OK
+   | cji_report_user_onboarding_f8a82acd-1ab7-4c42-9b29-6a79643e01ea.html 7841 bytes schema=cji-report/1 narrative={'model': '', 'source': 'fallback'} counts={'friction_rows': [8, 8], 'funnel_steps': [8, 8], 'insights': [4, 4]} truncated=0 OK
+   | report contract check: PASS
+gate-audit-check.log:
+   | audit files: ['cji-ingestion-intelligence.jsonl', 'cji-insight.jsonl', 'cji-report.jsonl', 'workflow.jsonl']; records: 242
+   | 1  kind=llm service=cji-ingestion-intelligence outcome=error code=provider_unavailable
+   | 1  kind=llm service=cji-insight outcome=cancelled code=None
+   | 8  kind=llm service=cji-insight outcome=error code=llm_disabled
+   | 12  kind=llm service=cji-insight outcome=error code=provider_unavailable
+   | 2  kind=llm service=cji-report outcome=error code=llm_disabled
+   | 3  kind=llm service=cji-report outcome=error code=provider_unavailable
+   | 1  kind=run service=workflow outcome=None code=mode_mismatch
+   | 17  kind=run service=workflow outcome=None code=None
+   | 1  kind=step service=workflow outcome=error code=mode_mismatch
+   | 21  kind=step service=workflow outcome=ok code=None
+   | 5  kind=tool service=cji-friction-engine outcome=ok code=None
+   | 1  kind=tool service=cji-ingestion-intelligence outcome=ok code=None
+   | 65  kind=tool service=cji-insight outcome=ok code=None
+   | 21  kind=tool service=cji-journey-data outcome=ok code=None
+   | 10  kind=tool service=cji-report outcome=ok code=None
+   | 15  kind=tool_session service=cji-friction-engine outcome=ok code=None
+   | 11  kind=tool_session service=cji-ingestion-intelligence outcome=ok code=None
+   | 16  kind=tool_session service=cji-insight outcome=ok code=None
+   | 16  kind=tool_session service=cji-journey-data outcome=ok code=None
+   | 15  kind=tool_session service=cji-report outcome=ok code=None
+   | correlation ids used by workflow tool calls: 6
+   | audit check: PASS
+gate-audit-workflow.log:
+   | workflow.jsonl: 215 records, 22 step, 18 run
+   | run bca8aef2-2a7b-4e5a-8c4e-cd9c28df166e: running -> approved -> completed
+   | run 19205aa5-ceaf-4324-855c-997e6fa9b741: running -> awaiting_approval -> approved -> completed
+   | run 235b9aa8-2ebb-4637-adba-c28b8d7b1bb0: running -> approved -> completed
+   | run b6012341-1dae-48cb-9435-8b677e8934b4: running -> approved -> completed
+   | run f8a82acd-1ab7-4c42-9b29-6a79643e01ea: running -> approved -> completed
+   | run 86babebf-0cfe-49a3-ab18-e5cc4e5ecc02: running -> failed
+   | completed runs: 5; awaiting/failed: [('completed', 5), ('failed', 1)]
+   | runs whose insight step started more than once (kill/resume): []
+   | workflow audit check: PASS
+gate-kill-resume.log:
+   | killed during insight step: True
+   | thread: b6012341-1dae-48cb-9435-8b677e8934b4
+   | "status": "running",
+   | [DONE] Report generated -> C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_b6012341-1dae-48cb-9435-8b677e8934b4.html
+   | "status": "completed",
+gate-mode-mismatch.log:
+   | [FAILED] data_worker: mode_mismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+gate-collector-smoke.log:
+   | smoke: 16/16 checks passed
+git status (modified tracked files):
+    M "Project Details/ARCHITECTURE.md"
+    M "Project Details/MVP_TECH_DOC.md"
+    M "Project Details/PRD.md"
+    M "Project Details/SYSTEM_DESIGN.md"
+    M Project_Memory.md
+    M Project_status.md
+    M README.md
+    D check_parquet.py
+    M cji_agent/.env.example
+    M cji_agent/.gitignore
+    M cji_agent/agents/ingestion_worker.py
+    M cji_agent/agents/supervisor.py
+    M cji_agent/agents/workers.py
+    M cji_agent/collector/api.py
+    M cji_agent/collector/models.py
+    M cji_agent/config.py
+    M cji_agent/dashboard.py
+    D cji_agent/dashboard2.py
+    D cji_agent/fix.py
+    M cji_agent/generate_diverse.py
+    M cji_agent/graph.py
+    M cji_agent/guardrails/output_validator.py
+    D cji_agent/guardrails/rate_limiter.py
+    M cji_agent/main.py
+    M cji_agent/mcp_servers/friction_engine_server.py
+    M cji_agent/mcp_servers/ingestion_intelligence_server.py
+    M cji_agent/mcp_servers/insight_server.py
+    M cji_agent/mcp_servers/journey_data_server.py
+    M cji_agent/mcp_servers/report_server.py
+    M cji_agent/requirements.txt
+    M cji_agent/run_servers.py
+    M cji_agent/snippets/api_key.json
+    M cji_agent/snippets/embed_snippet.html
+    M cji_agent/snippets/useCJITracker.js
+    M cji_agent/snippets/verify_tracker.py
+    M cji_agent/state.py
+    D cji_agent/test_duckdb.py
+    D cji_agent/test_metadata_query.py
+    D cji_agent/test_pg.py
+    D cji_agent/test_servers.py
+    M cji_agent/tests/conftest.py
+    M cji_agent/tests/test_agent_layer.py
+    M cji_agent/tests/test_collector_models.py
+    M cji_agent/tests/test_friction_engine.py
+    M cji_agent/tests/test_ingestion_intelligence.py
+    M cji_agent/tests/test_supervisor.py
+    M cji_agent/tests/test_synthetic_data.py
+    M cji_agent/tools/ingest_json.py
+    M cji_agent/tools/mcp_client.py
+    M cji_agent/tools/synthetic_data.py
+    M cji_agent/tracker/snippet_generator.py
+    D cji_agent/verify_data.py
+    M docs/1-Product-Requirements.md
+    M docs/10-Development-Phases.md
+    M docs/11-Environment-and-DevOps.md
+    M docs/12-Testing-Strategy.md
+    M docs/13-Architecture_Diagram.md
+    M docs/2-User-Stories-and-Acceptance-Criteria.md
+    M docs/3-Information-Architecture.md
+    M docs/4-System-Architecture.md
+    M docs/5-Database-Schema.md
+    M docs/6-API-Contracts.md
+    M docs/7-Monorepo-Structure.md
+    M docs/8-Scoring-Engine-Spec.md
+    M docs/9-Engineering-Score-Definitions.md
+    M docs/development_status.md
+    D err.log
+    D error.log
+    D ingest_ga4_log.txt
+    D inspect_schemas.py
+    D main_log.txt
+    D main_log2.txt
+    D main_log3.txt
+    D main_log4.txt
+    D main_log5.txt
+    D out.log
+    D parquet_check.txt
+    D query_test.py
+    D schema_report.txt
+    D stderr.log
+    D test_data_server.py
+    D test_duckdb_async.py
+    D test_load.py
+    D test_server.py
+    D test_threads.py
+diff --check log bytes: 0

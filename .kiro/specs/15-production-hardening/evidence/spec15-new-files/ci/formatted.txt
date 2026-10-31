@@ -1,0 +1,29 @@
+# Files checked by `ruff format --check --line-length 120` (ci/run_ci.py, stage "format"; Spec 15, OD-170).
+# Every Python file created or rewritten from Spec 15 on is listed here; the list only grows.
+# Paths are relative to the repository root.
+ci/release_check.py
+ci/rollback_drill.py
+ci/run_ci.py
+ci/scans.py
+ci/sensitive_scan.py
+cji_agent/scripts/secret_scan.py
+cji_agent/src/cji/migrations/__init__.py
+cji_agent/src/cji/migrations/runner.py
+cji_agent/src/cji/observability/__init__.py
+cji_agent/src/cji/observability/context.py
+cji_agent/src/cji/observability/metrics.py
+cji_agent/src/cji/observability/trace.py
+cji_agent/src/cji/ops/__init__.py
+cji_agent/src/cji/ops/backup.py
+cji_agent/src/cji/ops/cli.py
+cji_agent/src/cji/ops/common.py
+cji_agent/src/cji/ops/db_cli.py
+cji_agent/src/cji/ops/trace_cli.py
+cji_agent/tests/_system.py
+cji_agent/tests/test_backup.py
+cji_agent/tests/test_ci_tools.py
+cji_agent/tests/test_migrations.py
+cji_agent/tests/test_operations_doc.py
+cji_agent/tests/test_production_hardening.py
+cji_agent/tests/test_recovery.py
+cji_agent/tests/test_secret_scan.py

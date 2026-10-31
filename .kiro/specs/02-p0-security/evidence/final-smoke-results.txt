@@ -1,0 +1,33 @@
+﻿Spec 02 final smoke 2026-10-27T17:41:24
+servers: 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+demo pipeline exit=0
+ingest probe exit=0
+ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+git diff --check (cr-at-eol) exit=0
+diffstat:  14 files changed, 273 insertions(+), 163 deletions(-)
+status |  M cji_agent/.env.example
+status |  M cji_agent/agents/ingestion_worker.py
+status |  M cji_agent/agents/supervisor.py
+status |  M cji_agent/collector/api.py
+status |  M cji_agent/config.py
+status |  M cji_agent/mcp_servers/journey_data_server.py
+status |  M cji_agent/mcp_servers/report_server.py
+status |  M cji_agent/requirements.txt
+status |  M cji_agent/snippets/api_key.json
+status |  M cji_agent/snippets/embed_snippet.html
+status |  M cji_agent/snippets/useCJITracker.js
+status |  M cji_agent/snippets/verify_tracker.py
+status |  M cji_agent/tests/test_supervisor.py
+status |  M docs/6-API-Contracts.md
+status | ?? .agents/
+status | ?? .kiro/
+status | ?? System.Xml.XmlElement
+status | ?? antigravity_upgrade_prompts.md
+status | ?? cji_agent/System.Xml.XmlElement
+status | ?? cji_agent/tests/test_p0_security.py
+status | ?? free_plan_workflow.md
+status | ?? graphify-out/
+status | ?? kiro_upgrade_guide.md
+status | ?? kiro_upgrade_prompts.md
+status | ?? project_summary.md
+status | ?? refactoring.md

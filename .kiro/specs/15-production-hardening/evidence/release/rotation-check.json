@@ -1,0 +1,4 @@
+{
+  "ok": true,
+  "detail": "{\"api_token\": {\"rotate_exit\": 0, \"old_after\": 401, \"new_after\": 200}, \"tracker_key\": {\"revoke\": 200, \"batch_after\": 401}}"
+}

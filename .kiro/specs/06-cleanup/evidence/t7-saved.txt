@@ -1,0 +1,10 @@
+spec06-tracked.patch exit=0 bytes=326972
+copied cji_agent/tests/test_cleanup.py tracked=False sha256=f21d32d371597ef4
+copied cji_agent/tests/test_docs.py tracked=False sha256=7283ffc14304d022
+copied cji_agent/tests/test_dashboard_smoke.py tracked=False sha256=4b942f6c511d8384
+copied docs/README.md tracked=False sha256=e4bd14815ebea602
+copied .gitignore tracked=False sha256=7f34c3aad5ad6d16
+copied cji_agent/tests/conftest.py tracked=True sha256=8ccb42c61e6e385d
+copied cji_agent/repositories/duckdb_parquet.py tracked=False sha256=efd63925a8f38bda
+copied cji_agent/settings/roles.py tracked=False sha256=398a427e491a6ef2
+copied cji_agent/tests/test_ingestion_intelligence.py tracked=True sha256=ee25ec664056b51a

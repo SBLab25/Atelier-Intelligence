@@ -1,0 +1,20 @@
+bannered Project_Memory.md
+bannered Project_status.md
+bannered docs/development_status.md
+bannered Project Details/ARCHITECTURE.md
+bannered Project Details/MVP_TECH_DOC.md
+bannered Project Details/PRD.md
+bannered Project Details/SYSTEM_DESIGN.md
+bannered docs/1-Product-Requirements.md
+bannered docs/10-Development-Phases.md
+bannered docs/11-Environment-and-DevOps.md
+bannered docs/12-Testing-Strategy.md
+bannered docs/13-Architecture_Diagram.md
+bannered docs/2-User-Stories-and-Acceptance-Criteria.md
+bannered docs/3-Information-Architecture.md
+bannered docs/4-System-Architecture.md
+bannered docs/5-Database-Schema.md
+bannered docs/6-API-Contracts.md
+bannered docs/7-Monorepo-Structure.md
+bannered docs/8-Scoring-Engine-Spec.md
+bannered docs/9-Engineering-Score-Definitions.md

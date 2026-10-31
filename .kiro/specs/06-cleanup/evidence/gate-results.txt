@@ -1,0 +1,30 @@
+﻿Spec 06 gate started 2026-10-28T03:23:20
+pytest full (not integration)            exit=1        62s  log=gate-pytest-full.log
+pytest Spec 06 tests                     exit=0        34s  log=gate-new-tests.log
+golden snapshot                          exit=0         4s  log=gate-golden.log
+golden identical to Spec 05: True
+seeded synthetic data                    exit=0         2s  log=gate-synthetic.log
+SYNTH identical: True (deterministic columns, current vs pre-Spec-06 generator)
+ruff check . (full list)                 exit=1         0s  log=gate-ruff.log
+ruff unused/undefined names (no snippets) exit=0         0s  log=gate-ruff-names.log
+ruff check new code                      exit=0         0s  log=gate-ruff-new.log
+mypy .                                   exit=1        49s  log=gate-mypy.log
+mypy --strict repositories               exit=0        10s  log=gate-mypy-repositories-strict.log
+bandit -r . (json)                       exit=1         3s  log=gate-bandit.json.log
+static compare vs Spec 01                exit=0         0s  log=gate-static-compare.log
+main.py --help                           exit=0         0s  log=gate-help-main.log
+run_servers.py --help                    exit=0         0s  log=gate-help-run-servers.log
+tools/ingest_json.py --help              exit=0         2s  log=gate-help-ingest-json.log
+tracker/snippet_generator.py --help      exit=0         0s  log=gate-help-snippet.log
+python -m settings check (cli)           exit=0         0s  log=gate-settings-check.log
+collector import (app routes)            exit=0         2s  log=gate-collector-import.log
+servers: 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+demo pipeline                            exit=0        50s  log=gate-demo-pipeline.log
+ingest probe                             exit=0        52s  log=gate-ingest-probe.log
+mode mismatch (realtime CLI, demo servers) exit=0         4s  log=gate-mode-mismatch.log
+ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+git diff --check (cr-at-eol)             exit=0         0s  log=gate-diff-check.log
+git diff --stat                          exit=0         0s  log=gate-diff-stat.log
+git status (deleted files)               exit=0         0s  log=gate-git-status.log
+tracked events.parquet unchanged: True
+Spec 06 gate finished 2026-10-28T03:28:03

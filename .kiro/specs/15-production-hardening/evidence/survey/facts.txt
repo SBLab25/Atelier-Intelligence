@@ -1,0 +1,45 @@
+check-ignore .env: cji_agent/.gitignore:2:.env	cji_agent/.env
+tracked .env files: 
+check-ignore api_tokens: cji_agent/.gitignore:7:data/	cji_agent/data/api_tokens.json
+HEAD: 8523e47 2026-04-25 v2.0 - Smart Ingestion Intelligence: AI-powered schema detection, multi-format data ingestion (CSV/JSON/Excel/Parquet), column fingerprint caching, PII sanitisation, Pydantic v2 validation, new MCP Server 0 on port 8005, ingestion_worker LangGraph node, 16 unit tests, CLI flags --ingest --file --source-hint
+src/lib/session-core.ts:25: readonly httpOnly: true;
+src/lib/session-core.ts:26: readonly secure: true;
+src/lib/session-core.ts:27: readonly sameSite: "strict";
+src/lib/session-core.ts:29: readonly maxAge: number;
+src/lib/session-core.ts:32: export function cookieOptions(maxAge: number = SESSION_MAX_AGE_S): CookieOptions {
+src/lib/session-core.ts:33: return { httpOnly: true, secure: true, sameSite: "strict", path: "/", maxAge };
+frontend\src\lib\session-core.ts:26: readonly secure: true;
+frontend\src\lib\session-core.ts:27: readonly sameSite: "strict";
+frontend\src\lib\session-core.ts:29: readonly maxAge: number;
+frontend\src\lib\session-core.ts:32: export function cookieOptions(maxAge: number = SESSION_MAX_AGE_S): CookieOptions {
+frontend\src\lib\session-core.ts:33: return { httpOnly: true, secure: true, sameSite: "strict", path: "/", maxAge };
+frontend\src\proxy.ts:30: const csp = contentSecurityPolicy(nonce, process.env.NODE_ENV === "development");
+api/routes/runs.py:249: if body.comment:
+api/routes/runs.py:250: logger.info("run %s approved by %s, comment=%r", run_id, caller.token_id, body.comment)
+collector/api.py:41: from cji.settings.model import DEV_TRACKER_KEY, KNOWN_DEFAULT_ADMIN_KEYS
+collector/api.py:153: is_active BOOLEAN DEFAULT true
+collector/api.py:164: """), {"api_key": DEV_TRACKER_KEY, "journey": JOURNEY_NAME})
+collector/security.py:22: _KEY_LOOKUP = text("SELECT journey_name, is_active FROM api_keys WHERE api_key = :api_key")
+settings/model.py:25: DEV_TRACKER_KEY = "cji_dev_localtest"
+settings/model.py:191: dev_tracker_key: str = DEV_TRACKER_KEY
+api/serve.py:2: cji-api: serve the /api/v1 backend (cji.api.app:app) with uvicorn on the configured `api` endpoint
+api/serve.py:16: description="Run the CJI backend API (/api/v1, FastAPI) with uvicorn on the configured api endpoint. "
+api/serve.py:19: parser.add_argument("--host", default=None, help="bind address (default: the configured api host)")
+api/serve.py:32: import uvicorn
+api/serve.py:34: uvicorn.run("cji.api.app:app", host=args.host or endpoint.host, port=args.port or endpoint.port)
+mcp_servers/_serve.py:4: Every server's entry point calls serve(mcp, "<logical name>") instead of choosing
+mcp_servers/_serve.py:10: import logging
+mcp_servers/_serve.py:14: from cji.logs import configure_logging
+mcp_servers/_serve.py:20: configure_logging()
+mcp_servers/_serve.py:34: logging.getLogger("cji.mcp").info(
+mcp_servers/_serve.py:35: "Starting %s on %s:%s (%s)", name, endpoint.host, endpoint.port, endpoint.transport
+mcp_servers/_serve.py:37: mcp.run(transport=endpoint.transport, host=endpoint.host, port=endpoint.port)
+main.py:205: configure_logging,  # no settings import: CJI_MODE is applied below first
+main.py:208: configure_logging()
+settings/load.py:419: groq_api_key=r.secret("GROQ_API_KEY"),
+settings/load.py:420: anthropic_api_key=r.secret("ANTHROPIC_API_KEY"),
+settings/load.py:421: openai_api_key=r.secret("OPENAI_API_KEY"),
+settings/load.py:498: cursor_secret=r.secret("CJI_API_CURSOR_SECRET"),
+settings/load.py:505: langchain_api_key=r.secret("LANGCHAIN_API_KEY"),
+settings/load.py:528: auth=AuthSettings(admin_key=r.secret("CJI_ADMIN_KEY")),
+data dir: api_state.db, audit, chroma, cji_checkpoints.db, events.parquet, ingestion_uploads, last_run.json

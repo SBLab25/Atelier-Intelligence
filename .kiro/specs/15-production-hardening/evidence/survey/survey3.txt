@@ -1,0 +1,146 @@
+docker rc=1 client=29.6.2 server= failed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified.
+api/routes/runs.py:199: logger.info("approved run %s continued: %s", run_id, outcome.status)
+api/routes/runs.py:203: logger.error("approved run %s could not continue: %s", run_id, type(exc).__name__)
+api/routes/runs.py:250: logger.info("run %s approved by %s, comment=%r", run_id, caller.token_id, body.comment)
+api/routes/runs.py:273: logger.info("run %s %s: %s", run_id, what, getattr(outcome, "status", None))
+api/routes/runs.py:277: logger.error("run %s could not %s: %s", run_id, what, type(exc).__name__)
+api/routes/runs.py:302: logger.warning("preflight failed: %s", type(exc).__name__)
+api/routes/runs.py:318: logger.error("run %s: no checkpoint after start", run_id)
+api/routes/runs.py:372: logger.info("run %s started by %s (journey %s, auto_approve=%s)", run_id, caller.token_id, journey.name,
+api/routes/runs.py:407: logger.info("run %s resumed by %s", run_id, caller.token_id)
+api/routes/runs.py:415: logger.info("run %s not resumed: %s", run_id, type(exc).__name__)
+api/routes/runs.py:432: logger.info("results: %s entry skipped (missing required fields)", model.__name__)
+api/routes/runs.py:453: logger.info("results: insight skipped (missing required fields)")
+api/routes/ingestions.py:106: logger.info("ingestion %s validated by %s: %d of %d rows accepted", body["validation_id"], caller.token_id,
+api/middleware.py:124: logger.error("unhandled error request_id=%s type=%s message=%s", request_id, type(exc).__name__,
+api/middleware.py:150: logger.error("token file unusable: %s", ctx.tokens.path.name)
+api/middleware.py:157: logger.info("invalid token path=%s", scope.get("path", ""))
+api/middleware.py:162: logger.info("rate limited token=%s", principal.token_id)
+collector/api.py:169: logger.info(f"Keep-alive ping sent, status: {res.status_code}")
+collector/api.py:171: logger.error(f"Keep-alive ping failed: {type(e).__name__}: {e}")
+collector/api.py:190: logger.info("Connecting to Database...")
+collector/api.py:256: logger.error("collect failed request_id=%s key=%s received=%d error=%s sqlstate=%s",
+collector/api.py:263: logger.info("collect rejected request_id=%s key=%s reason=invalid_key", request_id, fingerprint)
+collector/api.py:272: logger.info("collect request_id=%s key=%s journey=%s received=%d accepted=%d duplicates=%d rejected=%d status=%d",
+collector/api.py:284: logger.warning("readiness check failed: %s sqlstate=%s", type(exc).__name__, _sqlstate(exc))
+collector/api.py:353: logger.info("collect rate limited request_id=%s key=%s", current_request_id(), fingerprint)
+collector/api.py:373: logger.error("live stats failed: %s sqlstate=%s", type(exc).__name__, _sqlstate(exc))
+collector/api.py:394: logger.error("API key insert failed: %s sqlstate=%s", type(exc).__name__, _sqlstate(exc))
+services/runs.py:68: logger.info("insights: run %s skipped (%s)", row.run_id, type(exc).__name__)
+services/ingestion.py:145: logger.info("ingestion: file not readable (%s)", type(exc).__name__)
+services/ingestion.py:201: logger.error("ingestion: database write failed (%s)", type(exc).__name__)
+services/ingestion.py:205: logger.info("ingestion %s written: %d rows (%s)", validation_id, written, write_mode)
+api/app.py:122: logger.error("storage failure: %s", type(exc).__name__)
+api/app.py:128: logger.error("configuration problem: %s", type(exc).__name__)
+api/app.py:154: logger.error("token file %s is not valid; authenticated requests will fail", ctx.tokens.path.name)
+api/app.py:158: logger.info("run index: %d runs added", added)
+api/app.py:164: logger.warning("startup maintenance skipped: %s", type(exc).__name__)
+integrations/policy.py:1: """Retry, deadline, rate-limit and budget policy (Spec 08, OD-56 / OD-58 / OD-59). Deterministic: no jitter."""
+integrations/policy.py:2: from __future__ import annotations
+integrations/policy.py:3: 
+integrations/policy.py:4: import asyncio
+integrations/policy.py:5: import time
+integrations/policy.py:6: from collections.abc import Awaitable, Callable
+integrations/policy.py:7: from dataclasses import dataclass, field
+integrations/policy.py:8: 
+integrations/policy.py:9: from .errors import BudgetExceeded, RateLimited
+integrations/policy.py:10: from .types import RunBudget
+integrations/policy.py:11: 
+integrations/policy.py:12: 
+integrations/policy.py:13: @dataclass
+integrations/policy.py:14: class Timing:
+integrations/policy.py:15:     """Clock and sleep, injectable so tests never wait for real time."""
+integrations/policy.py:16: 
+integrations/policy.py:17:     now: Callable[[], float] = time.monotonic
+integrations/policy.py:18:     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep
+integrations/policy.py:19: 
+integrations/policy.py:20: 
+integrations/policy.py:21: @dataclass(frozen=True)
+integrations/policy.py:22: class RetryPolicy:
+integrations/policy.py:23:     attempts: int = 3
+integrations/policy.py:24:     min_wait_s: float = 2.0
+integrations/policy.py:25:     max_wait_s: float = 10.0
+integrations/policy.py:26: 
+integrations/policy.py:27:     def backoff(self, attempt: int) -> float:
+integrations/policy.py:28:         """Wait after failed attempt number `attempt` (1-based): min, 2*min, 4*min ... capped at max."""
+integrations/policy.py:29:         return float(min(self.max_wait_s, self.min_wait_s * (2 ** (attempt - 1))))
+integrations/policy.py:30: 
+integrations/policy.py:31: 
+integrations/policy.py:32: @dataclass
+integrations/policy.py:33: class TokenBucket:
+integrations/policy.py:34:     """`rate_per_min` calls per minute with bursts of the same size, for one provider in one process."""
+integrations/policy.py:35: 
+integrations/policy.py:36:     rate_per_min: int
+integrations/policy.py:37:     timing: Timing = field(default_factory=Timing)
+integrations/policy.py:38: 
+integrations/policy.py:39:     def __post_init__(self) -> None:
+integrations/policy.py:40:         self.capacity = float(self.rate_per_min)
+integrations/policy.py:41:         self.refill_per_s = self.rate_per_min / 60.0
+integrations/policy.py:42:         self._tokens = self.capacity
+integrations/policy.py:43:         self._last = self.timing.now()
+integrations/policy.py:44: 
+integrations/policy.py:45:     def _refill(self) -> None:
+integrations/policy.py:46:         now = self.timing.now()
+integrations/policy.py:47:         self._tokens = min(self.capacity, self._tokens + (now - self._last) * self.refill_per_s)
+integrations/policy.py:48:         self._last = now
+integrations/policy.py:49: 
+integrations/policy.py:50:     async def acquire(self, time_left_s: float, provider: str) -> None:
+integrations/policy.py:51:         """Take one token, waiting if needed; RateLimited when the wait does not fit `time_left_s`."""
+integrations/policy.py:52:         self._refill()
+integrations/policy.py:53:         if self._tokens >= 1.0 - 1e-9:
+integrations/policy.py:54:             self._tokens -= 1.0
+integrations/policy.py:55:             return
+integrations/policy.py:56:         wait = (1.0 - self._tokens) / self.refill_per_s
+integrations/policy.py:57:         if wait >= time_left_s:
+integrations/policy.py:58:             raise RateLimited(f"{provider} call not sent: local rate limit (rate_limited)")
+integrations/policy.py:59:         await self.timing.sleep(wait)
+integrations/policy.py:60:         self._refill()
+README:1: # Customer Journey Intelligence (CJI)
+README:10: ## Table of Contents
+README:30: ## Why CJI?
+README:38: ## Features
+README:53: ## Quickstart
+README:57: ### Local setup
+README:63: # 1. Create a virtual environment inside cji_agent/
+README:67: # source .venv/bin/activate       # macOS / Linux
+README:69: # 2. Install the locked dependencies (runtime and dev tools, hash-checked), then the package (editable)
+README:73: # 3. Configure (demo mode needs no secrets)
+README:77: # 4. Start the five MCP servers (keep this terminal open)
+README:80: # 5. In a second terminal: run the pipeline on the bundled demo data
+README:98: ### Runtime home (`CJI_HOME`)
+README:106: ### Commands
+README:127: ## System Architecture
+README:205: ## Demo Mode Walkthrough
+README:208: # Optional: regenerate data/events.parquet (2,000 sessions, seed 42)
+README:211: # Start the servers in demo mode, then run the pipeline in another terminal
+README:215: # Without --auto-approve the run pauses before the report; approve it with the printed thread id
+README:219: # Inspect a run, or continue one that was interrupted (process killed, timeout) or failed
+README:244: ## Importing Event Files
+README:249: # 1. Smart ingestion through the pipeline (LLM-assisted mapping; writes through the repository:
+README:250: #    demo -> data/events.parquet, realtime -> PostgreSQL tracking_events). Servers must be running.
+README:253: # 2. Direct conversion of known formats (GA4, Hotjar, UXCam, surveys, tickets, combined CSV, NDJSON)
+README:254: #    into PostgreSQL tracking_events. Appends by default, skipping event_ids already stored.
+README:265: ## Realtime Mode Walkthrough
+README:270: ### 1. Start the collector
+README:273: # Requires DATABASE_URL (or SUPABASE_DATABASE_URL). Outside CJI_ENV=development it also requires
+README:274: # CJI_ADMIN_KEY (32+ random characters) and CJI_CORS_ORIGINS.
+README:276: # same as: python -m uvicorn cji.collector.api:app --host 127.0.0.1 --port 8000
+README:314: ### 2. Embed the tracker
+README:330: ### 3. Run the analysis
+README:337: ### 4. Dashboard
+README:344: ## Backend API
+README:353: # 1. Create a token (printed once; only its SHA-256 hash is stored in CJI_API_TOKENS_FILE)
+README:358: # 2. Start the API (outside development: https CJI_API_CORS_ORIGINS and a 32+ character CJI_API_CURSOR_SECRET)
+README:361: # 3. Call it
+README:409: ## Web Frontend
+README:439: ## Environment Variables Reference
+README:507: ## Guardrails
+README:518: ### Report output contract
+README:541: ## LangSmith Tracing
+README:544: # In cji_agent/.env
+README:552: ## Running the Tests
+README:575: ## Security Practices
+README:587: ## Known Issues & FAQ
+test_workflow.py: tests=51 fault-ish=136
+test_gateway.py: tests=52 fault-ish=47
+test_collector.py: tests=52 fault-ish=16

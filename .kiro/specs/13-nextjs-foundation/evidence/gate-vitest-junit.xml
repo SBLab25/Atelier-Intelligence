@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="102" failures="0" errors="0" time="2.0370645">
+    <testsuite name="tests/components/components.test.tsx" timestamp="2026-10-28T18:33:02.494Z" hostname="Sovan" tests="15" failures="0" errors="0" skipped="0" time="0.3503803">
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; shows the problem with code and request id and retries" time="0.1963304">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; shows the Retry-After wait for 429" time="0.0066278">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; describes 403" time="0.0003573">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; describes 404" time="0.0002152">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; describes 422" time="0.0001883">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; describes 429" time="0.0001549">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; describes 500" time="0.0001601">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="ProblemPanel &gt; offers a way back instead of retry for 404" time="0.0116675">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="FrictionSummary &gt; renders the API&apos;s scores and critical flags as given (OD-140)" time="0.0620802">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="FrictionSummary &gt; does not re-threshold: a high score the API did not flag stays not critical" time="0.0055348">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="FrictionSummary &gt; has an empty state" time="0.0036729">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="small components &gt; announce loading and empty states" time="0.0203123">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="small components &gt; show status as text" time="0.0017969">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="small components &gt; format timestamps in UTC" time="0.0026503">
+        </testcase>
+        <testcase classname="tests/components/components.test.tsx" name="small components &gt; mark the current navigation item" time="0.0349039">
+            <system-err>
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/components/login.test.tsx" timestamp="2026-10-28T18:33:02.499Z" hostname="Sovan" tests="3" failures="0" errors="0" skipped="0" time="0.7751266">
+        <testcase classname="tests/components/login.test.tsx" name="LoginForm &gt; is a labelled password field that never pre-fills the token" time="0.1703906">
+        </testcase>
+        <testcase classname="tests/components/login.test.tsx" name="LoginForm &gt; shows the field error from the server action, linked to the field" time="0.3160999">
+        </testcase>
+        <testcase classname="tests/components/login.test.tsx" name="LoginForm &gt; shows API problems as a problem panel" time="0.2842834">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/client.test.ts" timestamp="2026-10-28T18:33:02.500Z" hostname="Sovan" tests="12" failures="0" errors="0" skipped="0" time="0.0650507">
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; returns data and sends the bearer token and request id" time="0.0450177">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; sends no Authorization header without a token" time="0.0016169">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 401 problem" time="0.0019384">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 403 problem" time="0.0012477">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 404 problem" time="0.0011561">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 422 problem" time="0.0021585">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 500 problem" time="0.0010423">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a 503 problem" time="0.0008354">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; keeps Retry-After for 429" time="0.0014625">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps a body that is not a problem" time="0.001554">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps network failures without the exception text" time="0.0011058">
+        </testcase>
+        <testcase classname="tests/lib/client.test.ts" name="typed client &gt; maps timeouts" time="0.0006599">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/config.test.ts" timestamp="2026-10-28T18:33:02.502Z" hostname="Sovan" tests="11" failures="0" errors="0" skipped="0" time="0.0306592">
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; uses the defaults with only a secret" time="0.0033844">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; normalises the base URL" time="0.0007087">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {}" time="0.0012488">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;short&quot;}" time="0.0003638">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;ssssssssssssssssssssssssssssssss&quot;,&quot;CJI_API_BASE_URL&quot;:&quot;not a url&quot;}" time="0.0004489">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;ssssssssssssssssssssssssssssssss&quot;,&quot;CJI_API_BASE_URL&quot;:&quot;ftp://x.test&quot;}" time="0.0003263">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;ssssssssssssssssssssssssssssssss&quot;,&quot;CJI_API_BASE_URL&quot;:&quot;http://user:pw@x.test&quot;}" time="0.0003062">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;ssssssssssssssssssssssssssssssss&quot;,&quot;CJI_API_TIMEOUT_MS&quot;:&quot;fast&quot;}" time="0.0002993">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="parseConfig &gt; rejects {&quot;CJI_SESSION_SECRET&quot;:&quot;ssssssssssssssssssssssssssssssss&quot;,&quot;CJI_API_TIMEOUT_MS&quot;:&quot;5&quot;}" time="0.0003506">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="no public configuration &gt; never reads NEXT_PUBLIC_ variables (OD-133)" time="0.0162283">
+        </testcase>
+        <testcase classname="tests/lib/config.test.ts" name="no public configuration &gt; guards every module that reads secrets with server-only" time="0.0022966">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/loaders.test.ts" timestamp="2026-10-28T18:33:02.504Z" hostname="Sovan" tests="5" failures="0" errors="0" skipped="0" time="0.1355867">
+        <testcase classname="tests/lib/loaders.test.ts" name="loaders &gt; make no API call without a session" time="0.0858105">
+        </testcase>
+        <testcase classname="tests/lib/loaders.test.ts" name="loaders &gt; return API data with the session token" time="0.0385873">
+            <system-out>
+[cji-frontend] api GET /journeys/{id}/friction status=200 request_id=6d6a2c1d-a535-4b6d-87e5-add789efea2b
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/lib/loaders.test.ts" name="loaders &gt; end the session on an API 401" time="0.0029637">
+            <system-out>
+[cji-frontend] api GET /me status=401 request_id=464dab3e-9cc1-4e85-9784-452ac9036a86
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/lib/loaders.test.ts" name="loaders &gt; return other problems as values" time="0.0022735">
+            <system-out>
+[cji-frontend] api GET /runs status=503 request_id=a185880a-267c-403d-b486-a0e34ad32f21
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/lib/loaders.test.ts" name="loaders &gt; call the public health endpoint without a token" time="0.0019453">
+            <system-out>
+[cji-frontend] api GET /health status=200 request_id=93e93b96-2a26-4f7b-98b7-585c750a979e
+
+            </system-out>
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/proxy.test.ts" timestamp="2026-10-28T18:33:02.506Z" hostname="Sovan" tests="14" failures="0" errors="0" skipped="0" time="0.0511905">
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; redirects a request without a session to the login page with next" time="0.0116862">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; protects /" time="0.0011273">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; protects /runs" time="0.0007708">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; protects /runs/abc" time="0.0006159">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; protects /reports/r1" time="0.0008399">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; protects /journeys" time="0.0007911">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; deletes an invalid cookie while redirecting" time="0.0050329">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; rejects a cookie sealed with another secret" time="0.0090176">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; lets a valid session through with CSP and security headers" time="0.0031965">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; leaves the report route&apos;s own sandbox CSP in place" time="0.002345">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; uses a fresh nonce per request" time="0.0022371">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; serves /login without a session" time="0.0013158">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; serves /auth/expired without a session" time="0.0007144">
+        </testcase>
+        <testcase classname="tests/lib/proxy.test.ts" name="proxy (authentication boundary, first layer) &gt; fails closed when the secret is missing" time="0.0074559">
+            <system-err>
+[cji-frontend] Frontend configuration is invalid:
+- CJI_SESSION_SECRET must be at least 32 random characters (node -e &quot;console.log(require(&apos;crypto&apos;).randomBytes(32).toString(&apos;base64url&apos;))&quot;).
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/redirects.test.ts" timestamp="2026-10-28T18:33:02.509Z" hostname="Sovan" tests="18" failures="0" errors="0" skipped="0" time="0.0142827">
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; keeps the same-origin path /journeys" time="0.0037028">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; keeps the same-origin path /journeys/user_onboarding?x=1" time="0.0006195">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; keeps the same-origin path %2Fruns%3Fstatus%3Dfailed" time="0.0004181">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; keeps the same-origin path /runs#top" time="0.0002988">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for null" time="0.0003218">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for undefined" time="0.0002155">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for " time="0.0002922">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for journeys" time="0.0002141">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for //evil.example" time="0.0003625">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for /\evil.example" time="0.0005002">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for %2F%2Fevil.example" time="0.0002083">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for https://evil.example/" time="0.0001595">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for javascript:alert(1)" time="0.0001417">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for /%0d%0aSet-Cookie:x" time="0.0001709">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for /login" time="0.0001823">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for /login?next=/x" time="0.0001798">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" time="0.0001553">
+        </testcase>
+        <testcase classname="tests/lib/redirects.test.ts" name="safeNext &gt; falls back to / for %E0%A4%A" time="0.000262">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/lib/session.test.ts" timestamp="2026-10-28T18:33:02.512Z" hostname="Sovan" tests="10" failures="0" errors="0" skipped="0" time="0.0296342">
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; round-trips and never stores the token in clear text" time="0.0172751">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects a cookie sealed with another key" time="0.001912">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects a tampered cookie" time="0.0020837">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects an expired cookie" time="0.0016125">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects undefined" time="0.0003779">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects " time="0.0002568">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects not-a-jwe" time="0.0004919">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects a.b.c.d.e" time="0.0004542">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; rejects xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" time="0.0002418">
+        </testcase>
+        <testcase classname="tests/lib/session.test.ts" name="session cookie &gt; uses HttpOnly, Secure, SameSite=Strict cookies" time="0.0005246">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/views/views.test.tsx" timestamp="2026-10-28T18:33:02.514Z" hostname="Sovan" tests="14" failures="0" errors="0" skipped="0" time="0.5851536">
+        <testcase classname="tests/views/views.test.tsx" name="status views &gt; render health, components and token" time="0.2274717">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="status views &gt; show problems per region" time="0.0212805">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="journey views &gt; list journeys with links" time="0.0576337">
+            <system-err>
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="journey views &gt; have an empty list state" time="0.0060807">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="journey views &gt; render steps, metrics and friction" time="0.0690182">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="journey views &gt; show 403 without retry and 503 with retry" time="0.0094764">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="journey views &gt; have an empty metrics state" time="0.0034182">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; list runs with status and report links" time="0.0597139">
+            <system-err>
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; have a filtered empty state" time="0.003117">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; label the status filter" time="0.0416042">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; accept only known statuses from the query" time="0.0003749">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; render a run with steps and report" time="0.062583">
+            <system-err>
+An update to ForwardRef(LinkComponent) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; render a failed run&apos;s failure" time="0.0137785">
+        </testcase>
+        <testcase classname="tests/views/views.test.tsx" name="run views &gt; show a run problem with a way back" time="0.0060293">
+        </testcase>
+    </testsuite>
+</testsuites>

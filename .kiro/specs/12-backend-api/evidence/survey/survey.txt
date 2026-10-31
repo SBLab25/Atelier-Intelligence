@@ -1,0 +1,257 @@
+
+===== collector routes (decorators)
+  api.py:180: @app.on_event("startup")
+  api.py:195: @app.on_event("shutdown")
+  api.py:290: @app.get("/health/live")
+  api.py:296: @app.get("/health/ready")
+  api.py:307: @app.get("/health")
+  api.py:318: @app.get("/tracker.js")
+  api.py:330: @app.post("/collect/batch")
+  api.py:358: @app.get("/live/stats")
+  api.py:378: @app.post("/admin/api-keys")
+
+===== HTTPException / JSONResponse status codes in collector
+  api.py:223: return JSONResponse(body, status_code=status_code, headers=headers)
+  api.py:227: return JSONResponse(result.model_dump(exclude_none=True), status_code=status_code, headers=headers)
+  api.py:234: raise HTTPException(status_code=429, detail="Too many admin requests.",
+  api.py:239: raise HTTPException(status_code=403, detail="Invalid ADMIN Key")
+  api.py:285: return JSONResponse({"status": "not_ready"}, status_code=503)
+  api.py:323: raise HTTPException(status_code=404, detail="tracker.js not found on server") from None
+  api.py:374: raise HTTPException(status_code=503, detail="Database unavailable") from exc
+  api.py:392: raise HTTPException(status_code=503, detail="Database not configured") from exc
+  api.py:395: raise HTTPException(status_code=500, detail="Database error") from exc
+
+===== public functions/classes per module (repositories, workflow, reporting, domain, settings.roles, collector)
+  repositories/__init__.py: def event_repository(settings); def get_repository(); def reset_repository(); def use_repository(repository)
+  repositories/base.py: class RepositoryError: []; class NotSupported: []; def describe_failure(exc); class TimeWindow: ['realtime_minutes']; class WriteResult: []; class LiveSnapshot: []; class EventRepository: ['health', 'window_fields', 'step_metrics', 'funnel', 'events', 'live_snapshot', 'append_events', 'close']; def frame_rows(df); def dedupe_batch(records)
+  repositories/duckdb_parquet.py: class DuckDbParquetRepository: ['close', 'health', 'window_fields', 'step_metrics', 'funnel', 'events', 'live_snapshot', 'append_events']
+  repositories/postgres.py: class PostgresEventRepository: ['close', 'health', 'window_fields', 'step_metrics', 'funnel', 'events', 'live_snapshot', 'append_events']
+  repositories/queries.py: class Dialect: []; def realtime_source(journey_id); def step_metrics_sql(dialect, source); def funnel_sql(dialect, source); def events_sql(dialect, source)
+  workflow/__init__.py: 
+  workflow/errors.py: class StepError: []; class WorkflowRuntimeError: []; class RunNotFound: []; class LegacyRun: []; class RunNotResumable: []; class RunLeased: []; def classify(exc); def error_text(exc)
+  workflow/runtime.py: def open_checkpointer(path); def owner_id(); def owner_is_dead(owner); class Lease: ['acquire', 'release', 'holder']; class RunOutcome: ['report_path', 'failure']; def initial_state(); def write_last_run(path, values); class Workflow: ['start', 'approve', 'resume', 'status']
+  workflow/step.py: def audit_sink(); def utc_now(); def write_audit(); def step(worker)
+  reporting/__init__.py: 
+  reporting/escape.py: def text(value); def attr(value); def json_block(obj); def css_class(value, allowed)
+  reporting/model.py: def clean_text(value); class ReportInsight: []; class FunnelBar: []; class FrictionRow: []; class ReportInput: ['shown_mode', 'input_sha256']; class ReportInputError: []; def parse_input(data)
+  reporting/output.py: class ReportOutputError: []; class ReportPathError: []; class ReportTooLarge: []; class ReportWriteError: []; def slug(journey_name); def report_filename(inp); def write_report(html, directory, filename)
+  reporting/render.py: def render(inp)
+  domain/__init__.py: 
+  domain/events.py: def sanitise_url(url); class TrackerEvent: []; class EventBatch: ['accepted_events_count']; class EventRecord: []; def to_record(event); def to_live_events_row(event)
+  domain/insights.py: class InsightDraft: []; class Insight: []; class RankedFix: []; class Narrative: []; class ReportResult: []
+  domain/journeys.py: class JourneyDefinition: []; def journey_from_config(config)
+  domain/metrics.py: class StepMetrics: []; class FunnelStep: []; class FunnelResult: []; class FrictionScore: []
+  domain/runs.py: class WorkerStatus: []; class WorkflowError: []; class StepRecord: []; class Failure: []; class RunRecord: []; class IngestionResult: []; def workflow_error(worker, error); def approval_state(state); class IllegalTransition: []; def transition(current, new); def step_transition(current, new); def merge_run(current, update); def new_run_record(run_id, now); def insight_id_for(run_id, step_id)
+  domain/validation.py: def check(adapter, value, worker, what)
+  collector/__init__.py: 
+  collector/api.py: def reset_rate_limits(); def cors_options(origins); class UnconfiguredDatabase: ['begin', 'dispose']; def admin_key_usable(key); def validate_collector_settings(env, admin_key, origins); def keep_alive(url, interval_s); def startup_event(); def shutdown_event(); class AdminKeyCreate: []; def health_live(); def health_ready(); def health_check(); def get_tracker(); def collect_batch(request); def live_stats(request, minutes, x_cji_admin_key); def create_api_key(request, data, x_cji_admin_key)
+  collector/ingest.py: class EnvelopeError: []; class Envelope: []; class CheckedBatch: []; def acceptable_content_type(value); def parse_envelope(body); def validate_events(raw_events, journey); def store_events(conn, events); def status_for(accepted, duplicates, rejected)
+  collector/middleware.py: def resolve_request_id(raw); def current_request_id(); class RequestIdFilter: ['filter']; class BodyTooLarge: []; class CollectorMiddleware: []
+  collector/models.py: class EventError: []; class CollectResult: []; class HealthStatus: []
+  collector/security.py: class KeyGrant: []; def key_fingerprint(key); def authenticate(api_key, conn); class RateLimiter: ['check']; def retry_after_header(wait_s); def client_address(peer, forwarded_for, trusted_hops)
+  collector/serve.py: def main(argv)
+
+===== settings roles / services (frontend, cors, auth)
+  settings/roles.py:2: Startup checks per role (Spec 04, CF-07). Each role checks only what it needs;
+  settings/roles.py:5: Roles: cli, launcher, collector, dashboard, mcp:<service>.
+  settings/roles.py:15: KNOWN_DEFAULT_ADMIN_KEYS,
+  settings/roles.py:16: MIN_ADMIN_KEY_LENGTH,
+  settings/roles.py:22: ROLES_HELP = "cli, launcher, collector, dashboard, mcp:<service>"
+  settings/roles.py:25: def database_missing(purpose: str) -> str:
+  settings/roles.py:32: def collector_problems(env: str, admin_key: str | None, origins: Sequence[str]) -> list[str]:
+  settings/roles.py:37: if not admin_key or admin_key in KNOWN_DEFAULT_ADMIN_KEYS or len(admin_key) < MIN_ADMIN_KEY_LENGTH:
+  settings/roles.py:39: f"CJI_ADMIN_KEY must be a random value of at least {MIN_ADMIN_KEY_LENGTH} characters "
+  settings/roles.py:46: "CJI_CORS_ORIGINS is empty. List the browser origins allowed to call the collector, "
+  settings/roles.py:54: f"CJI_CORS_ORIGINS must use https in production (plain http only for loopback hosts): "
+  settings/roles.py:60: def endpoint_problems(settings: Settings) -> list[str]:
+  settings/roles.py:79: def require(settings: Settings, role: str) -> Settings:
+  settings/roles.py:80: """Raise ConfigError if `settings` cannot serve `role`; return them unchanged otherwise."""
+  settings/roles.py:85: if role == "collector":
+  settings/roles.py:87: settings.app.env, secret_value(settings.auth.admin_key), settings.cors.origins
+  settings/roles.py:91: elif role in ("cli", "dashboard"):
+  settings/roles.py:93: problems.append(database_missing(f"CJI_MODE=realtime ({role})"))
+  settings/roles.py:94: elif role == "launcher":
+  settings/roles.py:96: elif role.startswith("mcp:"):
+  settings/roles.py:97: name = role.removeprefix("mcp:")
+  settings/roles.py:104: problems.append(f"Unknown role '{role}'. Use one of: {ROLES_HELP}.")
+  settings/roles.py:108: raise ConfigError(problems, role=role, env=settings.app.env)
+  settings/services.py:26: "frontend",
+  settings/services.py:37: class ServiceDefault:
+  settings/services.py:56: ServiceDefault("frontend", "ui", "http", 3000, "", None),
+  settings/services.py:60: def env_prefix(name: str) -> str:
+  settings/services.py:65: class ServiceEndpoint(BaseModel):
+  settings/services.py:78: def url(self) -> str:
+  settings/services.py:86: def is_remote(self) -> bool:
+  settings/services.py:90: class ServiceRegistry(BaseModel):
+  settings/services.py:95: def names(self) -> tuple[str, ...]:
+  settings/services.py:98: def get(self, name: str) -> ServiceEndpoint:
+  settings/services.py:104: def mcp_services(self) -> tuple[ServiceEndpoint, ...]:
+  settings/services.py:107: def with_endpoint(self, name: str, *, url: str | None = None, port: int | None = None) -> ServiceRegistry:
+  settings/model.py:21: MIN_ADMIN_KEY_LENGTH = 32
+  settings/model.py:22: # Admin key values that must never authenticate (shipped defaults).
+  settings/model.py:23: KNOWN_DEFAULT_ADMIN_KEYS: frozenset[str] = frozenset({"", "change-me", "change-me-in-production"})
+  settings/model.py:28: def secret_value(secret: SecretStr | None) -> str:
+  settings/model.py:33: def _redact(secret: SecretStr | None) -> str:
+  settings/model.py:37: class _Frozen(BaseModel):
+  settings/model.py:41: class AppSettings(_Frozen):
+  settings/model.py:47: class StorageSettings(_Frozen):
+  settings/model.py:55: def events_parquet(self) -> Path:
+  settings/model.py:59: def duckdb_path(self) -> Path:
+  settings/model.py:63: def chroma_dir(self) -> Path:
+  settings/model.py:67: def checkpoints_db(self) -> Path:
+  settings/model.py:71: def uploads_dir(self) -> Path:
+  settings/model.py:75: def mapping_registry(self) -> Path:
+  settings/model.py:79: def last_run_file(self) -> Path:
+  settings/model.py:82: def ensure(self) -> None:
+  settings/model.py:88: class DatabaseSettings(_Frozen):
+  settings/model.py:93: def configured(self) -> bool:
+  settings/model.py:96: def url_value(self) -> str | None:
+  settings/model.py:100: class RetryPolicy(_Frozen):
+  settings/model.py:115: def llm_model_mismatch(provider: str, model: str) -> str | None:
+  settings/model.py:125: class RunBudgetSettings(_Frozen):
+  settings/model.py:133: class LLMSettings(_Frozen):
+  settings/model.py:150: class MCPSettings(_Frozen):
+  settings/model.py:157: class BudgetSettings(_Frozen):
+  settings/model.py:167: def recursion_limit(self) -> int:
+  settings/model.py:172: class WorkflowSettings(_Frozen):
+  settings/model.py:180: def lease_s(self) -> float:
+  settings/model.py:185: class CorsSettings(_Frozen):
+  settings/model.py:189: class AuthSettings(_Frozen):
+  settings/model.py:190: admin_key: SecretStr | None = None
+  settings/model.py:194: class CollectorSettings(_Frozen):
+  settings/model.py:200: admin_rate_per_ip: int = 10         # admin requests per minute per client address
+  settings/model.py:204: class KeepAliveSettings(_Frozen):
+  settings/model.py:209: class ObservabilitySettings(_Frozen):
+  settings/model.py:215: class Settings(_Frozen):
+  settings/model.py:223: cors: CorsSettings
+  settings/model.py:224: auth: AuthSettings
+  settings/model.py:231: def ensure_storage(self) -> None:
+  settings/model.py:234: def with_endpoint(self, name: str, *, url: str | None = None, port: int | None = None) -> Settings:
+  settings/model.py:238: def describe(self) -> dict[str, Any]:
+  settings/model.py:275: "cors": list(self.cors.origins),
+  settings/model.py:276: "auth": {"admin_key": _redact(self.auth.admin_key)},
+
+===== dashboard data access (SQL tables, files, subprocess)
+  dashboard.py:5: Data:  PostgreSQL (DATABASE_URL / SUPABASE_DATABASE_URL)  +  data/last_run.json  (written by `cji --run`)
+  dashboard.py:16: import subprocess
+  dashboard.py:84: REPORTS_DIR   = SETTINGS.storage.reports_dir
+  dashboard.py:85: LAST_RUN_FILE = SETTINGS.storage.last_run_file
+  dashboard.py:152: @st.cache_data(ttl=15)
+  dashboard.py:153: def load_last_run():
+  dashboard.py:154: if LAST_RUN_FILE.exists():
+  dashboard.py:156: return json.loads(LAST_RUN_FILE.read_text(encoding="utf-8"))
+  dashboard.py:158: raise DataLoadError("Last run (data/last_run.json)", exc) from exc
+  dashboard.py:163: te = "SELECT user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, metadata::jsonb FROM tracking_events"
+  dashboard.py:164: le = "SELECT user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, 0 AS duration_ms, metadata::jsonb FROM live_events"
+  dashboard.py:165: de = "SELECT user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, metadata::jsonb FROM demo_events"
+  dashboard.py:175: @st.cache_data(ttl=60)
+  dashboard.py:179: @st.cache_data(ttl=15)
+  dashboard.py:180: def load_journey_df(journey_id=None):
+  dashboard.py:212: return pd.read_sql(query, conn, params=params)
+  dashboard.py:216: @st.cache_data(ttl=15)
+  dashboard.py:217: def load_business_kpis(journey_id=None):
+  dashboard.py:225: total_users = pd.read_sql(f"SELECT COUNT(DISTINCT user_id) FROM {from_clause}", conn, params=params).iloc[0,0]
+  dashboard.py:226: total_sessions = pd.read_sql(f"SELECT COUNT(DISTINCT session_id) FROM {from_clause}", conn, params=params).iloc[0,0]
+  dashboard.py:228: returning_users = pd.read_sql(f"""
+  dashboard.py:235: revenue = pd.read_sql(f"""
+  dashboard.py:242: conflict_users = pd.read_sql(f"""
+  dashboard.py:257: @st.cache_data(ttl=15)
+  dashboard.py:258: def load_audience_data(journey_id=None):
+  dashboard.py:266: regions_df = pd.read_sql(f"""
+  dashboard.py:270: devices_df = pd.read_sql(f"""
+  dashboard.py:279: @st.cache_data(ttl=15)
+  dashboard.py:280: def load_heatmap_data(journey_id=None):
+  dashboard.py:288: coords_df = pd.read_sql(f"""
+  dashboard.py:301: def load_reports():
+  dashboard.py:302: if not REPORTS_DIR.exists():
+  dashboard.py:304: return sorted(REPORTS_DIR.glob("*.html"), key=lambda f: f.stat().st_mtime, reverse=True)
+  dashboard.py:307: @st.cache_data(ttl=30)
+  dashboard.py:315: df = pd.read_sql(f"""
+  dashboard.py:366: @st.cache_data(ttl=30)
+  dashboard.py:418: result = subprocess.run(
+  dashboard.py:461: last = _load("Last run", load_last_run, flush=True)
+  dashboard.py:584: except subprocess.TimeoutExpired:
+  dashboard.py:623: # Call ingest_file directly (same-process, no subprocess needed)
+  dashboard.py:667: last          = _load("Last run", load_last_run)
+  dashboard.py:913: except (OSError, subprocess.TimeoutExpired) as e:
+  dashboard.py:1386: except (OSError, subprocess.TimeoutExpired) as e:
+
+===== main.py: workflow calls
+  main.py:163: def _report_outcome(outcome, settings, mode, journey_config, write_last_run) -> int:
+  main.py:187: out = write_last_run(settings.storage.last_run_file, values, mode=mode,
+  main.py:246: # ── --run / --approve / --resume / --status (Spec 09: workflow.runtime) ────────────
+  main.py:251: from cji.workflow.errors import WorkflowRuntimeError
+  main.py:252: from cji.workflow.runtime import Workflow, initial_state, write_last_run
+  main.py:260: workflow = Workflow(settings.storage.checkpoints_db, on_event=printer)
+  main.py:264: status = await workflow.status(args.thread_id)    # RunNotFound / LegacyRun before any work
+  main.py:272: return await workflow.approve(args.thread_id)
+  main.py:275: return await workflow.resume(args.thread_id)
+  main.py:276: state = initial_state(
+  main.py:288: return await workflow.start(state, run_id=run_id)
+  main.py:305: return _report_outcome(outcome, settings, CJI_MODE, JOURNEY_CONFIG, write_last_run)
+
+===== insight storage (chroma) functions
+  insight_server.py:23: def get_collection():
+  insight_server.py:39: def llm_gateway() -> LLMGateway:
+  insight_server.py:46: def _fallback_insight(step_id: str, friction_score: dict) -> dict:
+  insight_server.py:60: @mcp.tool()
+  insight_server.py:61: async def generate_insight(friction_score: dict, run_context: dict | None = None) -> dict:
+  insight_server.py:121: @mcp.tool()
+  insight_server.py:122: def prioritise_fix(insight: dict, unique_users: int) -> dict:
+  insight_server.py:155: @mcp.tool()
+  insight_server.py:156: def save_insight(insight: Union[str, dict]) -> dict:
+  insight_server.py:195: collection.upsert(
+  insight_server.py:205: @mcp.tool()
+  insight_server.py:206: def search_insights(query: str, n_results: int = 5) -> dict:
+  insight_server.py:217: results = collection.query(
+  insight_server.py:249: @mcp.tool()
+  insight_server.py:250: def rank_all_fixes(run_id: str = "") -> dict:
+  insight_server.py:263: all_results = collection.get(where={"run_id": run_id}, include=["metadatas", "documents"])
+  insight_server.py:265: all_results = collection.get(include=["metadatas", "documents"])
+
+===== tests touching the collector app / TestClient
+  test_cleanup.py: TestClient x1
+  test_collector.py: TestClient x3
+  test_contracts.py: TestClient x1
+  test_p0_security.py: TestClient x5
+
+===== frontend directory / Next.js presence
+  package.json: cji_agent\.venv\Lib\site-packages\plotly\labextension\package.json
+  package.json: cji_agent\.venv\share\jupyter\labextensions\jupyterlab-plotly\package.json
+
+===== installed versions
+  fastapi==0.162.0
+  starlette==1.10.0
+  pydantic==2.14.1
+  httpx==0.28.1
+  uvicorn==0.54.0
+  sqlalchemy==2.0.55
+  openapi-spec-validator: not installed
+  jsonschema==4.26.0
+  schemathesis: not installed
+  hypothesis: not installed
+  pgserver==0.1.4
+
+===== kiro_upgrade_guide.md rows mentioning API / frontend / Spec 12
+  kiro_upgrade_guide.md:163: | 12 Backend API | Stable `/api/v1` | Frontend-ready contracts |
+  kiro_upgrade_guide.md:164: | 13 Next.js Foundation | Frontend vertical slice | Authenticated web UI |
+  kiro_upgrade_guide.md:168: Do not start Spec 13 until Spec 12 has tested API contracts. Do not remove
+  kiro_upgrade_guide.md:232: - authentication changes and frontend route protection;
+  kiro_upgrade_guide.md:288: ### Spec 12 — versioned backend API
+  kiro_upgrade_guide.md:291: Create a stable /api/v1 contract for health, journeys, events, metrics,
+  kiro_upgrade_guide.md:301: ### Spec 13 — Next.js foundation
+  kiro_upgrade_guide.md:304: Build a thin Next.js TypeScript vertical slice against the tested /api/v1 API.
+  kiro_upgrade_guide.md:362: Never use concise mode for security analysis, migration design, API contracts,
+  kiro_upgrade_guide.md:405: API contract/OpenAPI checks
+  kiro_upgrade_guide.md:407: browser tests for frontend work
+  kiro_upgrade_guide.md:448: Start with the baseline Spec, not the Next.js frontend:
+  kiro_upgrade_prompts.md:367: ## Prompt 11 — Versioned backend API
+  kiro_upgrade_prompts.md:370: Create the first stable /api/v1 backend contract for the Next.js frontend.
+  kiro_upgrade_prompts.md:391: - do not build the full frontend in this Spec.
+  kiro_upgrade_prompts.md:400: ## Prompt 12 — Next.js foundation
+  kiro_upgrade_prompts.md:403: Create the Next.js frontend foundation against the tested /api/v1 contract.
+  kiro_upgrade_prompts.md:426: - make the frontend runnable independently.
+  kiro_upgrade_prompts.md:437: Expand Next.js feature by feature while preserving parity with Streamlit and
+  kiro_upgrade_prompts.md:443: 3. implement the Next.js UI;
+  kiro_upgrade_prompts.md:508: - API/OpenAPI contracts;
+  kiro_upgrade_prompts.md:518: - incomplete Next.js behavior;

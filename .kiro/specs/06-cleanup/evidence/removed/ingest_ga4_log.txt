@@ -1,0 +1,27 @@
+﻿.\cji_agent\.venv\Scripts\python.exe : 
+2026-04-03T01:54:07 | cji                  | INFO     | 
+[ingest] Input:  Dataset\ga4_clickstream.json
+At line:1 char:1
++ .\cji_agent\.venv\Scripts\python.exe 
+.\cji_agent\tools\ingest_json.py ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-04-03T 
+   01:5...lickstream.json:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-04-03T01:54:07 | cji                  | INFO     | 
+[ingest] Output: C:\Users\sovan\Documents\VS 
+Code\Internship - CJI\cji_agent\data\events.parquet
+2026-04-03T01:54:07 | cji                  | INFO     | 
+[ingest] Detected: GA4 clickstream
+2026-04-03T01:54:07 | cji                  | INFO     | 
+[ingest] Merged \u2192 127,187 unique events total
+2026-04-03T01:54:07 | cji                  | INFO     | 
+[ingest] \u2713 Wrote 127,187 rows \u2192 
+C:\Users\sovan\Documents\VS Code\Internship - 
+CJI\cji_agent\data\events.parquet
+
+\u2717 Ingestion failed: 'charmap' codec can't encode 
+character '\u2713' in position 2: character maps to 
+<undefined>

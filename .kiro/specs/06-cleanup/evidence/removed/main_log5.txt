@@ -1,0 +1,44 @@
+﻿.\cji_agent\.venv\Scripts\python.exe : C:\Users\sovan\Documents\VS Code\Internship - 
+CJI\cji_agent\.venv\Lib\site-packages\langchain_core\_api\deprecation.py:27: UserWarning: Core Pydantic V1 functionality isn't 
+compatible with Python 3.14 or greater.
+At line:1 char:1
++ .\cji_agent\.venv\Scripts\python.exe .\cji_agent\main.py --mode demo  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\sovan\....14 or greater.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+2026-04-03T02:14:28 | cji.graph            | INFO     | Building CJI StateGraph...
+2026-04-03T02:14:28 | cji.graph            | INFO     | CJI StateGraph built successfully.
+2026-04-03T02:14:28 | cji.supervisor       | INFO     | Supervisor iteration 1 at 2026-04-02T20:44:28.537516+00:00
+2026-04-03T02:14:28 | cji.supervisor       | INFO     | Route \u2192 data_worker (no event_summary)
+2026-04-03T02:14:28 | cji.workers          | INFO     | System info: demo mode, 0 events
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Supervisor iteration 2 at 2026-04-02T20:44:29.000660+00:00
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Route \u2192 friction_worker (no friction_scores)
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Supervisor iteration 3 at 2026-04-02T20:44:29.322498+00:00
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Route \u2192 insight_worker (no insights)
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Supervisor iteration 4 at 2026-04-02T20:44:29.324217+00:00
+2026-04-03T02:14:29 | cji.supervisor       | INFO     | Route \u2192 report_worker (approved, generating report)
+2026-04-03T02:14:31 | cji.supervisor       | INFO     | Supervisor iteration 5 at 2026-04-02T20:44:31.856848+00:00
+2026-04-03T02:14:31 | cji.supervisor       | INFO     | Route \u2192 insight_worker (no insights)
+2026-04-03T02:14:31 | cji.supervisor       | INFO     | Supervisor iteration 6 at 2026-04-02T20:44:31.858547+00:00
+2026-04-03T02:14:31 | cji.supervisor       | INFO     | Route \u2192 __end__ (COMPLETE)
+
+============================================================
+  CJI Analysis - Mode: DEMO
+  Thread ID: 1ef0aedb-0d73-4220-b60e-7cc6ad035e1c
+============================================================
+
+  [OK] data_worker: Collected 10 step metrics, 50 events
+  [OK] data_worker: Collected 10 step metrics, 50 events
+  [OK] friction_worker: Scored 10 steps, 0 critical
+  [OK] friction_worker: Scored 10 steps, 0 critical
+  [OK] insight_worker: No critical steps ù no insights generated
+  [OK] insight_worker: No critical steps ù no insights generated
+  [OK] report_worker: Report exported (4.62KB) ? C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_agent\reports\cji_report_user_onboarding_20260403_021431.html
+  [OK] report_worker: Report exported (4.62KB) ? C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_agent\reports\cji_report_user_onboarding_20260403_021431.html
+  [OK] insight_worker: No critical steps ù no insights generated
+  [OK] insight_worker: No critical steps ù no insights generated
+  [INFO] Dashboard data saved -> C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_agent\data\last_run.json
+
+[DONE] Report generated -> C:\Users\sovan\Documents\VS Code\Internship - CJI\cji_agent\reports\cji_report_user_onboarding_20260403_021431.html

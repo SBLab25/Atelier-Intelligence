@@ -1,0 +1,45 @@
+gate-results.txt:
+   ﻿Spec 13 gate started 2026-10-29T00:01:41
+   npm ci (package-lock.json)                                   exit=0        63s  log=gate-npm-ci.log
+   npm audit --omit=dev (runtime dependencies)                  exit=0         1s  log=gate-npm-audit-runtime.log
+   npm audit (all dependencies, json)                           exit=0         2s  log=gate-npm-audit.json.log
+   npm ls --omit=dev (runtime tree)                             exit=0         1s  log=gate-npm-ls-runtime.log
+   api:check (types = cji_agent/openapi/v1.json)                exit=0         1s  log=gate-api-check.log
+   typecheck (tsc --noEmit, strict)                             exit=0         3s  log=gate-typecheck.log
+   lint (eslint, max-warnings 0)                                exit=0         6s  log=gate-lint.log
+   unit and component tests (vitest)                            exit=0         4s  log=gate-vitest.log
+   next build (production)                                      exit=0         5s  log=gate-build.log
+   bundle scan (.next/static: no secret, server variable, token) exit=0         0s  log=gate-bundle-scan.log
+   browser smoke test (fixture API, installed Chrome)           exit=0         7s  log=gate-e2e-fixture.log
+   fixture smoke outcome: 1 passed (5.7s)
+   ports after fixture smoke: 3100:-  18006:-
+   cji-api-token create (viewer, user_onboarding)               exit=0         0s  log=gate-live-token.log
+   cji-api health before live smoke: 200
+   browser smoke test (live cji-api; fault step skipped)        exit=0         7s  log=gate-e2e-live.log
+   live smoke outcome: 1 passed (5.8s)
+   ports after live smoke: 3100:-  8006:-
+   cji-api log holds the token: False
+   pytest (Python suite, not integration)                       exit=0       130s  log=gate-pytest.log
+   ruff check                                                   exit=1         0s  log=gate-ruff.log
+   OpenAPI snapshot matches the API                             exit=0         3s  log=gate-openapi-snapshot.log
+   cji-dashboard --help (Streamlit kept)                        exit=0         0s  log=gate-dashboard-help.log
+   git diff --check (cr-at-eol)                                 exit=0         0s  log=gate-diff-check.log
+   git status (tracked)                                         exit=0         0s  log=gate-git-status.log
+   untracked frontend files (not ignored)                       exit=0         0s  log=gate-frontend-files.log
+   Spec 13 gate finished 2026-10-29T00:05:42
+vitest: 102/102 pass, 0 fail, 0 skipped; failing: []
+vitest files: 9
+gate-e2e-fixture.log: ['ok 1 e2e\\smoke.spec.ts:33:1 ΓÇ║ CJI frontend smoke test (3.4s)', '1 passed (5.7s)']
+gate-e2e-live.log: ['ok 1 e2e\\smoke.spec.ts:33:1 ΓÇ║ CJI frontend smoke test (3.8s)', '1 passed (5.8s)']
+gate-api-check.log: api:check: src/lib/api/schema.ts matches ../cji_agent/openapi/v1.json
+gate-typecheck.log: > tsc --noEmit
+gate-lint.log: > eslint --max-warnings 0 .
+gate-bundle-scan.log: bundle-scan: 17 client files scanned, no secret, server variable, API URL or token found
+gate-openapi-snapshot.log: C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\openapi\v1.json matches the app
+npm audit (all): {'info': 0, 'low': 0, 'moderate': 0, 'high': 0, 'critical': 0, 'total': 0}
+npm audit --omit=dev: found 0 vulnerabilities
+next build routes: 
+Python suite: 1169/1170 pass, 1 skipped, failing [] (Spec 12: 1169/1170, 1 skipped)
+ruff findings: 92 (Spec 12: 92)
+untracked frontend files (not ignored): 64; node_modules or .next listed: False
+git diff --check log bytes: 548

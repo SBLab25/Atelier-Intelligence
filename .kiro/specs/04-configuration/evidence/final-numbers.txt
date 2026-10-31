@@ -1,0 +1,68 @@
+gate-results.txt:
+   ﻿Spec 04 gate started 2026-10-28T00:51:57
+   pytest full (not integration)        exit=1        20s  log=gate-pytest-full.log
+   pytest test_settings.py              exit=0        12s  log=gate-settings.log
+   golden snapshot                      exit=0         4s  log=gate-golden.log
+   golden identical to Spec 03: True
+   settings check (cli, with .env)      exit=0         0s  log=gate-check-cli.log
+   settings check (launcher)            exit=0         0s  log=gate-check-launcher.log
+   ruff check . (full list)             exit=1         0s  log=gate-ruff.log
+   ruff check settings + tests          exit=0         0s  log=gate-ruff-settings.log
+   mypy .                               exit=1        45s  log=gate-mypy.log
+   mypy --strict settings               exit=0         4s  log=gate-mypy-settings-strict.log
+   bandit -r . (json)                   exit=1         3s  log=gate-bandit.json.log
+   static compare vs Spec 01            exit=0         0s  log=gate-static-compare.log
+   servers: 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+   demo pipeline                        exit=0        49s  log=gate-demo-pipeline.log
+   ingest probe                         exit=0        52s  log=gate-ingest-probe.log
+   ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+   git diff --check (cr-at-eol)         exit=0         0s  log=gate-diff-check.log
+   git diff --stat                      exit=0         0s  log=gate-diff-stat.log
+   git status --short                   exit=0         0s  log=gate-git-status.log
+   tracked events.parquet unchanged: True
+   Spec 04 gate finished 2026-10-28T00:55:21
+full suite: 344/355 pass, 11 fail (Spec 03: 239/250)
+failures identical to the F-01 set: True; new: []; fixed: []
+test_settings.py: 105/105 pass; before caller migration: 86/105 (19 fail)
+ruff total findings: 246 (Spec 03: 255, baseline 266)
+mypy: Found 46 errors in 16 files (checked 63 source files) (Spec 03: 49, baseline 52)
+gate-ruff-settings.log: All checks passed!
+gate-mypy-settings-strict.log: Success: no issues found in 7 source files
+static compare:
+   file                                                ruff      mypy  bandit medium+ (before -> after)
+   config.py                                       0 -> 0      0 -> 0    {} -> {}
+   tools\mcp_client.py                             8 -> 2      5 -> 5    {} -> {}
+   run_servers.py                                  1 -> 0      0 -> 0    {} -> {}
+   main.py                                        14 -> 14     0 -> 0    {} -> {}
+   dashboard.py                                   60 -> 60     7 -> 5    {'B608': 10} -> {'B608': 10}
+   collector\api.py                               17 -> 13     2 -> 1    {'B608': 1} -> {}
+   mcp_servers\journey_data_server.py             14 -> 13     4 -> 3    {'B608': 9} -> {}
+   mcp_servers\friction_engine_server.py           3 -> 3      0 -> 0    {} -> {}
+   mcp_servers\insight_server.py                  12 -> 12    14 -> 14   {} -> {}
+   mcp_servers\report_server.py                   11 -> 11     1 -> 1    {'B113': 1} -> {}
+   mcp_servers\ingestion_intelligence_server.py   23 -> 22     4 -> 4    {} -> {}
+   mcp_servers\_serve.py                           0 -> 0      0 -> 0    {} -> {}
+   guardrails\rate_limiter.py                      1 -> 1      0 -> 0    {} -> {}
+   tools\synthetic_data.py                         4 -> 4      3 -> 3    {} -> {}
+   tools\ingest_json.py                           13 -> 13     1 -> 1    {} -> {}
+   tracker\snippet_generator.py                    6 -> 4      1 -> 0    {} -> {}
+   tests\conftest.py                               1 -> 0      1 -> 1    {} -> {}
+   settings\__init__.py                            0 -> 0      0 -> 0    {} -> {}
+   settings\__main__.py                            0 -> 0      0 -> 0    {} -> {}
+   settings\errors.py                              0 -> 0      0 -> 0    {} -> {}
+   settings\load.py                                0 -> 0      0 -> 0    {} -> {}
+   settings\model.py                               0 -> 0      0 -> 0    {} -> {}
+   settings\roles.py                               0 -> 0      0 -> 0    {} -> {}
+   settings\services.py                            0 -> 0      0 -> 0    {} -> {}
+   unchanged files delta: ruff -4, mypy -1
+   RESULT: no changed file is worse than baseline
+demo pipeline:
+   | [OK] data_worker: Collected 8 step metrics, 50 events
+   | [OK] friction_worker: Scored 8 steps, 4 critical
+   | [OK] insight_worker: Generated 4 insights, ranked 66 fixes
+   | [OK] report_worker: Report exported (4.5KB) ΓåÆ C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_005425.html
+   | [DONE] Report generated -> C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_005425.html
+   contract violations: 0
+ingest probe: 8005 message posts 4, 404s 0, Max iterations 0, flagged True
+server start lines: Starting cji-friction-engine on 127.0.0.1:8002 (sse); Starting cji-ingestion-intelligence on 127.0.0.1:8005 (sse); Starting cji-insight on 127.0.0.1:8003 (sse); Starting cji-journey-data on 127.0.0.1:8001 (sse); Starting cji-report on 127.0.0.1:8004 (sse)
+diff --check log bytes: 0

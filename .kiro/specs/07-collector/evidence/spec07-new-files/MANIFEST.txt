@@ -1,0 +1,19 @@
+tracked   README.md (in spec07-tracked.patch)
+tracked   cji_agent/.env.example (in spec07-tracked.patch)
+tracked   cji_agent/collector/api.py (in spec07-tracked.patch)
+new       cji_agent/collector/ingest.py sha256=6f9f78078cf6dad2
+new       cji_agent/collector/middleware.py sha256=0adf2bcc4cbf866b
+tracked   cji_agent/collector/models.py (in spec07-tracked.patch)
+new       cji_agent/collector/security.py sha256=a84d50c6d2df8c7d
+changed   cji_agent/domain/events.py sha256=77cacdd59f665d92
+changed   cji_agent/settings/load.py sha256=394a5b332a80791d
+changed   cji_agent/settings/model.py sha256=579f120d618d359f
+changed   cji_agent/settings/roles.py sha256=640427e7b7e6c060
+tracked   cji_agent/snippets/verify_tracker.py (in spec07-tracked.patch)
+tracked   cji_agent/tracker/snippet_generator.py (in spec07-tracked.patch)
+tracked   cji_agent/tests/conftest.py (in spec07-tracked.patch)
+new       cji_agent/tests/test_collector.py sha256=6dacc330bb3641ec
+tracked   cji_agent/tests/test_collector_models.py (in spec07-tracked.patch)
+changed   cji_agent/tests/test_contracts.py sha256=e1bb99c4c4a61fa1
+changed   cji_agent/tests/test_p0_security.py sha256=88f07a32268b1f79
+changed   cji_agent/tests/test_repositories.py sha256=1f9c0987a5ab8d77

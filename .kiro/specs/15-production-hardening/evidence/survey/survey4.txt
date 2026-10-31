@@ -1,0 +1,239 @@
+SQL tables: api_keys: ['collector/api.py', 'collector/security.py']; checkpoints: ['workflow/index.py']; demo_events: ['dashboard.py']; events: ['repositories/duckdb_parquet.py']; funnel: ['repositories/queries.py']; idempotency: ['api/idempotency.py']; live_events: ['collector/api.py', 'collector/ingest.py', 'dashboard.py', 'repositories/queries.py']; ordered: ['repositories/queries.py']; ranked: ['repositories/queries.py']; read_parquet: ['repositories/duckdb_parquet.py']; run_index: ['workflow/index.py']; run_leases: ['workflow/runtime.py']; sqlite_master: ['workflow/index.py']; tracking_events: ['dashboard.py', 'repositories/queries.py', 'tools/ingest_json.py']
+
+===== cji_agent\src\cji\collector\api.py [125-165] of 397
+ 125:     if problems:
+ 126:         raise ConfigError(problems, role="collector", env=env or "unset")
+ 127: 
+ 128: 
+ 129: def _create_tables():
+ 130:     # Live events table matching the structure of synthetic events
+ 131:     with engine.begin() as conn:
+ 132:         conn.execute(text("""
+ 133:             CREATE TABLE IF NOT EXISTS live_events (
+ 134:                 timestamp TIMESTAMP,
+ 135:                 event_id VARCHAR PRIMARY KEY,
+ 136:                 session_id VARCHAR,
+ 137:                 user_id VARCHAR,
+ 138:                 journey_name VARCHAR,
+ 139:                 step_id VARCHAR,
+ 140:                 event_type VARCHAR,
+ 141:                 url VARCHAR,
+ 142:                 element_selectors VARCHAR,
+ 143:                 metadata JSONB
+ 144:             )
+ 145:         """))
+ 146:         # API Keys table
+ 147:         conn.execute(text("""
+ 148:             CREATE TABLE IF NOT EXISTS api_keys (
+ 149:                 api_key VARCHAR PRIMARY KEY,
+ 150:                 journey_name VARCHAR,
+ 151:                 description VARCHAR,
+ 152:                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ 153:                 is_active BOOLEAN DEFAULT true
+ 154:             )
+ 155:         """))
+ 156: 
+ 157:         # Development-only key for local tracker testing, for the configured journey
+ 158:         # (JOURNEY_NAME). No live or production key is ever written at startup (R-03).
+ 159:         if CJI_ENV == "development":
+ 160:             conn.execute(text("""
+ 161:                 INSERT INTO api_keys (api_key, journey_name, description)
+ 162:                 VALUES (:api_key, :journey, 'Local Development')
+ 163:                 ON CONFLICT (api_key) DO NOTHING
+ 164:             """), {"api_key": DEV_TRACKER_KEY, "journey": JOURNEY_NAME})
+ 165: 
+
+===== cji_agent\src\cji\collector\api.py [376-397] of 397
+ 376:     return {"window": f"{minutes}m", "stats": [{"step": r[0], "count": r[1]} for r in stats]}
+ 377: 
+ 378: @app.post("/admin/api-keys")
+ 379: def create_api_key(request: Request, data: AdminKeyCreate, x_cji_admin_key: str | None = Header(None)):
+ 380:     # Disabled until a real admin key is configured; constant-time comparison (R-03).
+ 381:     _require_admin(request, x_cji_admin_key)
+ 382: 
+ 383:     new_key = f"cji_live_{secrets.token_hex(16)}"
+ 384:     
+ 385:     try:
+ 386:         with engine.begin() as conn:
+ 387:             conn.execute(
+ 388:                 text("INSERT INTO api_keys (api_key, journey_name, description) VALUES (:key, :journey, :desc)"),
+ 389:                 {"key": new_key, "journey": data.journey_name, "desc": data.description}
+ 390:             )
+ 391:     except ConfigError as exc:
+ 392:         raise HTTPException(status_code=503, detail="Database not configured") from exc
+ 393:     except SQLAlchemyError as exc:
+ 394:         logger.error("API key insert failed: %s sqlstate=%s", type(exc).__name__, _sqlstate(exc))
+ 395:         raise HTTPException(status_code=500, detail="Database error") from exc
+ 396:         
+ 397:     return {"api_key": new_key, "journey_name": data.journey_name, "status": "active"}
+
+===== cji_agent\src\cji\http\request_id.py [1-44] of 44
+   1: """
+   2: Request ids (Spec 07, OD-47; shared since Spec 12, OD-120).
+   3: 
+   4: A well-formed client `X-Request-ID` (8-64 of A-Z a-z 0-9 . _ -) is kept; anything else is replaced by a UUID4.
+   5: The id lives in a context variable for the duration of the request, so routes, thread-pool code and log records
+   6: (through RequestIdFilter) can read it.
+   7: """
+   8: from __future__ import annotations
+   9: 
+  10: import logging
+  11: import re
+  12: import uuid
+  13: from contextvars import ContextVar, Token
+  14: 
+  15: REQUEST_ID_HEADER = "X-Request-ID"
+  16: _VALID_REQUEST_ID = re.compile(r"[A-Za-z0-9._-]{8,64}")
+  17: _request_id: ContextVar[str] = ContextVar("cji_request_id", default="-")
+  18: 
+  19: 
+  20: def resolve_request_id(raw: str | None) -> str:
+  21:     """Keep a well-formed client id; otherwise generate a UUID4."""
+  22:     if raw and _VALID_REQUEST_ID.fullmatch(raw):
+  23:         return raw
+  24:     return str(uuid.uuid4())
+  25: 
+  26: 
+  27: def current_request_id() -> str:
+  28:     return _request_id.get()
+  29: 
+  30: 
+  31: def set_request_id(value: str) -> Token[str]:
+  32:     return _request_id.set(value)
+  33: 
+  34: 
+  35: def reset_request_id(token: Token[str]) -> None:
+  36:     _request_id.reset(token)
+  37: 
+  38: 
+  39: class RequestIdFilter(logging.Filter):
+  40:     """Adds `request_id` to every record so formatters and log shippers can correlate lines."""
+  41: 
+  42:     def filter(self, record: logging.LogRecord) -> bool:
+  43:         record.__dict__["request_id"] = _request_id.get()
+  44:         return True
+
+ settings __main__:
+
+===== cji_agent\src\cji\settings\__main__.py [1-46] of 46
+   1: """
+   2: cji-settings check [--role ROLE] [--no-dotenv]   (Spec 04, CF-13; also `python -m cji.settings`)
+   3: 
+   4: Prints the resolved configuration with secrets redacted. Exit 0 when the role's
+   5: requirements are met, 2 on a configuration error.
+   6: """
+   7: 
+   8: from __future__ import annotations
+   9: 
+  10: import argparse
+  11: import json
+  12: import os
+  13: import sys
+  14: 
+  15: from .errors import ConfigError
+  16: from .load import DEFAULT_DOTENV_PATH, load_settings
+  17: from .roles import ROLES_HELP, require
+  18: 
+  19: 
+  20: def main(argv: list[str] | None = None) -> int:
+  21:     parser = argparse.ArgumentParser(prog="cji-settings", description="Check CJI configuration.")
+  22:     commands = parser.add_subparsers(dest="command", required=True)
+  23:     check = commands.add_parser("check", help="validate settings for a role and print them (redacted)")
+  24:     check.add_argument("--role", default="cli", help=f"one of: {ROLES_HELP} (default: cli)")
+  25:     check.add_argument("--no-dotenv", action="store_true", help="ignore the .env file")
+  26:     args = parser.parse_args(argv)
+  27: 
+  28:     try:
+  29:         settings = load_settings(os.environ, None if args.no_dotenv else DEFAULT_DOTENV_PATH)
+  30:         require(settings, args.role)
+  31:     except ConfigError as exc:
+  32:         print(exc, file=sys.stderr)
+  33:         return 2
+  34:     report = {
+  35:         "role": args.role,
+  36:         "status": "ok",
+  37:         "home": str(settings.storage.home),
+  38:         "settings": settings.describe(),
+  39:         "warnings": list(settings.warnings),
+  40:     }
+  41:     print(json.dumps(report, indent=2))
+  42:     return 0
+  43: 
+  44: 
+  45: if __name__ == "__main__":
+  46:     raise SystemExit(main())
+settings/load.py:57: """Default `dotenv_path`: the `.env` file in the runtime home, found when settings load (Spec 11, OD-99)."""
+settings/load.py:66: def resolve_home(environ: Mapping[str, str] | None = None) -> Path:
+settings/load.py:67: """The runtime home: CJI_HOME (relative values resolve against the working directory) or the working
+settings/load.py:100: "LANGCHAIN_TRACING_V2", "LANGCHAIN_API_KEY", "LANGCHAIN_PROJECT",
+settings/load.py:228: def _path(raw: str | None, default: Path, home: Path) -> Path:
+settings/load.py:232: return path if path.is_absolute() else home / path
+settings/load.py:355: CJI_HOME is read from `environ` only (not from `.env`, which lives in the home)."""
+settings/load.py:357: home = resolve_home(process)
+settings/load.py:358: dotenv = home / ".env" if isinstance(dotenv_path, _HomeDotenv) else dotenv_path
+settings/load.py:372: home=home,
+settings/load.py:373: data_dir=_path(r.raw("CJI_DATA_DIR"), home / "data", home),
+settings/load.py:374: reports_dir=_path(r.raw("CJI_REPORTS_DIR"), home / "reports", home),
+settings/load.py:376: # Gateway audit files (Spec 08, OD-62): <data_dir>/audit unless "off"; log only in tests.
+settings/load.py:379: audit_dir = None
+settings/load.py:381: audit_dir = _path(raw_audit, storage.data_dir / "audit", home)
+settings/load.py:383: audit_dir = None if env == "test" else storage.data_dir / "audit"
+settings/load.py:384: raw_checkpoints = r.raw("CJI_CHECKPOINTS_DB")
+settings/load.py:385: checkpoints = _path(raw_checkpoints, storage.data_dir / "cji_checkpoints.db", home) if raw_checkpoints else None
+settings/load.py:386: storage = storage.model_copy(update={"audit_dir": audit_dir, "checkpoints_path": checkpoints})
+settings/load.py:494: tokens_file=_path(r.raw("CJI_API_TOKENS_FILE"), storage.data_dir / "api_tokens.json", home),
+settings/load.py:504: langchain_tracing=r.boolean("LANGCHAIN_TRACING_V2", False),
+settings/load.py:505: langchain_api_key=r.secret("LANGCHAIN_API_KEY"),
+settings/load.py:506: langchain_project=r.text("LANGCHAIN_PROJECT", "cji-poc"),
+settings/model.py:37: class _Frozen(BaseModel):
+settings/model.py:41: class AppSettings(_Frozen):
+settings/model.py:47: class StorageSettings(_Frozen):
+settings/model.py:49: data_dir: Path
+settings/model.py:50: reports_dir: Path
+settings/model.py:51: audit_dir: Path | None = None    # gateway audit JSONL files; None = log only (Spec 08)
+settings/model.py:52: checkpoints_path: Path | None = None   # CJI_CHECKPOINTS_DB; None = <data_dir>/cji_checkpoints.db (Spec 09)
+settings/model.py:56: return self.data_dir / "events.parquet"
+settings/model.py:60: return self.data_dir / "cji.duckdb"
+settings/model.py:63: def chroma_dir(self) -> Path:
+settings/model.py:64: return self.data_dir / "chroma"
+settings/model.py:67: def checkpoints_db(self) -> Path:
+settings/model.py:68: return self.checkpoints_path or self.data_dir / "cji_checkpoints.db"
+settings/model.py:71: def uploads_dir(self) -> Path:
+settings/model.py:72: return self.data_dir / "ingestion_uploads"
+settings/model.py:76: return self.data_dir / "mapping_registry.json"
+settings/model.py:79: def last_run_file(self) -> Path:
+settings/model.py:80: return self.data_dir / "last_run.json"
+settings/model.py:84: for directory in (self.data_dir, self.reports_dir, self.uploads_dir):
+settings/model.py:88: class DatabaseSettings(_Frozen):
+settings/model.py:100: class RetryPolicy(_Frozen):
+settings/model.py:125: class RunBudgetSettings(_Frozen):
+settings/model.py:133: class LLMSettings(_Frozen):
+settings/model.py:150: class MCPSettings(_Frozen):
+settings/model.py:157: class BudgetSettings(_Frozen):
+settings/model.py:172: class WorkflowSettings(_Frozen):
+settings/model.py:185: class CorsSettings(_Frozen):
+settings/model.py:189: class AuthSettings(_Frozen):
+settings/model.py:194: class CollectorSettings(_Frozen):
+settings/model.py:204: class ApiSettings(_Frozen):
+settings/model.py:207: tokens_file: Path
+settings/model.py:217: class KeepAliveSettings(_Frozen):
+settings/model.py:222: class ObservabilitySettings(_Frozen):
+settings/model.py:223: langchain_tracing: bool = False
+settings/model.py:228: class Settings(_Frozen):
+settings/model.py:261: "data_dir": str(self.storage.data_dir),
+settings/model.py:262: "reports_dir": str(self.storage.reports_dir),
+settings/model.py:263: "audit_dir": str(self.storage.audit_dir) if self.storage.audit_dir else "off",
+settings/model.py:264: "checkpoints_db": str(self.storage.checkpoints_db),
+settings/model.py:294: "tokens_file": str(self.api.tokens_file),
+settings/model.py:302: "langchain_tracing": self.observability.langchain_tracing,
+frontend/session.ts:14: let secret: string;
+frontend/session.ts:16: secret = serverConfig().sessionSecret;
+frontend/session.ts:19: console.error(`[cji-frontend] ${exc.message}`);
+frontend/session.ts:25: return openSession(store.get(SESSION_COOKIE)?.value, secret);
+frontend/config-core.ts:6: export const MIN_SECRET_LENGTH = 32;
+frontend/config-core.ts:42: const sessionSecret = env.CJI_SESSION_SECRET ?? "";
+frontend/config-core.ts:43: if (sessionSecret.length < MIN_SECRET_LENGTH) {
+frontend/config-core.ts:45: `CJI_SESSION_SECRET must be at least ${MIN_SECRET_LENGTH} random characters ` +
+frontend/config-core.ts:46: "(node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\").",
+frontend/app/actions.ts:36: console.error(`[cji-frontend] ${exc.message}`);
+frontend/app/actions.ts:43: console.info(`[cji-frontend] sign-in status=${result.ok ? 200 : result.problem.status} request_id=${requestId}`);

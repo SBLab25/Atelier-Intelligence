@@ -1,0 +1,26 @@
+full suite: 239/250 pass, 11 fail (Spec 02: 204/215)
+failures identical to Spec 02 F-01 set: True; new: []; fixed: []
+contracts: 35/35 pass (before fix: see before-contracts-junit.xml)
+contracts before fix: 2/35 pass, 33 fail
+ruff total findings: 257 (Spec 02: 263, baseline 266)
+mypy: Found 49 errors in 17 files (checked 54 source files) (Spec 02: 49, baseline 52)
+gate-ruff-domain.log: All checks passed!
+gate-mypy-domain.log: Success: no issues found in 7 source files
+gate-mypy-domain-strict.log: Success: no issues found in 7 source files
+static compare: RESULT: no changed file is worse than baseline
+              unchanged files delta: ruff +1, mypy -2
+demo pipeline lines:
+   | [OK] data_worker: Collected 8 step metrics, 50 events
+   | [OK] friction_worker: Scored 8 steps, 4 critical
+   | [OK] insight_worker: Generated 4 insights, ranked 50 fixes
+   | [OK] report_worker: Report exported (4.5KB) ΓåÆ C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261027_230310.html
+   | [DONE] Report generated -> C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261027_230310.html
+   | report_worker: Report exported (4.5KB) ΓåÆ C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261027_230310.html
+   | reports\cji_report_user_onboarding_20261027_230310.html
+   contract violations logged: 0
+ingest probe:
+   8005 message posts: 0, 404s: 0, 8004/tools calls: 0, Max iterations hits: 0, contract violations: 0
+   | Processed 0 file(s). 1 flagged for review. 0 error(s).
+   | confidence (0.0) ΓÇö flagging for human review
+   | confidence: 0.0
+diff --check log bytes: 0

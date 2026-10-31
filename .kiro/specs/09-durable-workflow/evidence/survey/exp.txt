@@ -1,0 +1,16 @@
+exp0 _error_text(ToolFailed) -> RecursionError
+exp1 data fails: worker calls 20 ['data_worker', 'friction_worker', 'data_worker', 'friction_worker', 'data_worker', 'friction_worker'] ...
+exp1 iteration 21 | errors kept 1 [{'worker': 'supervisor', 'error': 'Max iterations (20) exceeded', 'ts': '2026-10-28T07:57:46.710378+00:00'}]
+exp1 worker_statuses kept 1
+exp2 run: calls ['data_worker', 'friction_worker', 'insight_worker'] | next ('data_worker',) | iteration 1
+exp2 approve #1: next after update ('data_worker',) | calls ['data_worker', 'friction_worker', 'insight_worker'] | report_path '' | next ('report_worker',)
+exp2 approve #2: next after update ('report_worker',) | calls ['report_worker'] | report_path '/tmp/r.html' | next ()
+exp3 approve unknown thread: calls ['data_worker', 'friction_worker', 'insight_worker'] | state keys ['event_summary', 'friction_scores', 'human_approved', 'insights', 'iteration', 'last_run_at', 'messages', 'next_worker', 'worker_statuses']
+exp4 child: friction_worker started; killing the process
+exp4 child exit code 9
+exp4 after kill: next ('supervisor',) | has event_summary False | iteration 0
+exp4 resume ainvoke(None): calls ['data_worker', 'friction_worker', 'insight_worker', 'report_worker'] | report '/tmp/r.html'
+done
+exp4 child: friction_worker started; killing the process
+exp4 child: friction_worker started; killing the process
+exp4 child: friction_worker started; killing the process

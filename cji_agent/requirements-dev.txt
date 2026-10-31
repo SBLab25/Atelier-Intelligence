@@ -1,0 +1,3 @@
+# Kept for the old setup command (Spec 11): requirements.lock already contains the dev tools
+# (dependency groups test, lint and build in pyproject.toml).
+-r requirements.lock

@@ -1,0 +1,159 @@
+
+===== README commands (lines with python / streamlit / pip / uv / cji)
+  57: cd cji_agent
+  58: python -m venv .venv
+  63: pip install -r requirements.txt
+  67: python -m settings check
+  70: python run_servers.py --mode demo
+  73: python main.py --mode demo --run --auto-approve
+  82: streamlit run dashboard.py
+  167: python main.py --mode demo --generate-data --sessions 2000 --seed 42
+  170: python run_servers.py --mode demo
+  171: python main.py --mode demo --run --auto-approve
+  174: python main.py --mode demo --run
+  175: python main.py --approve --thread-id <thread-id>
+  178: python main.py --status --thread-id <thread-id>
+  179: python main.py --resume --thread-id <thread-id>
+  209: python main.py --mode demo --ingest --file <path> --source-hint "GA4 export" --run --auto-approve
+  213: python tools/ingest_json.py <file>
+  214: python tools/ingest_json.py <file> --map userId=user_id page=step_id
+  215: python tools/ingest_json.py <file> --replace      # replaces the whole tracking_events table
+  233: python -m uvicorn collector.api:app --host 127.0.0.1 --port 8000
+  277: python tracker/snippet_generator.py --journey user_onboarding --api-key <key from POST /admin/api-keys>
+  289: python run_servers.py --mode realtime
+  290: python main.py --mode realtime --run --auto-approve --window-mins 60
+  405: pip install -r requirements-dev.txt
+  406: python -m pytest tests -m "not integration"
+  docs/: ['1-Product-Requirements.md', '10-Development-Phases.md', '11-Environment-and-DevOps.md', '12-Testing-Strategy.md', '13-Architecture_Diagram.html', '13-Architecture_Diagram.md', '2-User-Stories-and-Acceptance-Criteria.md', '3-Information-Architecture.md', '4-System-Architecture.md', '5-Database-Schema.md', '6-API-Contracts.md', '7-Monorepo-Structure.md', '8-Scoring-Engine-Spec.md', '9-Engineering-Score-Definitions.md', 'development_status.md', 'README.md']
+
+===== ruff / mypy configuration actually in effect
+  $ C:\Users\sovan\.venvs\cji-baseline-312\Scripts\python.exe -m ruff check --show-settings config.py
+  ruff: Resolved settings for: "c:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\config.py"
+  ruff: linter.rules.enabled = [
+  ruff: linter.unresolved_target_version = none
+  ruff: linter.per_file_target_version = {}
+  ruff: formatter.unresolved_target_version = 3.11
+  ruff: formatter.per_file_target_version = {}
+  ruff: analyze.target_version = 3.11
+  ruff enabled rules: 407; prefixes: []
+  $ C:\Users\sovan\.venvs\cji-baseline-312\Scripts\python.exe -m mypy --version
+  mypy: mypy 2.4.0 (compiled: yes)
+  ruff==0.17.3
+  mypy==2.4.0
+  bandit==1.9.4
+  pytest==9.1.1
+  pip==26.2.2
+  setuptools==84.2.1
+  wheel: not installed
+  hatchling: not installed
+  build==1.6.1
+  pip-tools: not installed
+  pytest-asyncio==1.4.1
+  pytest-cov==7.1.0
+  coverage==7.17.0
+
+===== uv pythons and cache
+  $ C:\Users\sovan\AppData\Local\hermes\bin\uv.EXE python list --only-installed
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Python\pythoncore-3.15-64\python.exe
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Python\bin\python3.exe
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Python\bin\python3.15.exe
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Python\bin\python.exe
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Microsoft\WindowsApps\python3.exe
+  cpython-3.15.2-windows-x86_64-none     C:\Users\sovan\AppData\Local\Microsoft\WindowsApps\python.exe
+  cpython-3.12.13-windows-x86_64-none    C:\Users\sovan\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe
+  cpython-3.12.13-windows-x86_64-none    C:\Users\sovan\.local\bin\python3.12.exe
+  cpython-3.12.13-windows-x86_64-none    C:\Users\sovan\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\python.exe
+  cpython-3.11.15-windows-x86_64-none    C:\Users\sovan\AppData\Roaming\uv\python\cpython-3.11.15-windows-x86_64-none\python.exe
+  cpython-3.11.15-windows-x86_64-none    C:\Users\sovan\.local\bin\python3.11.exe
+  cpython-3.11.15-windows-x86_64-none    C:\Users\sovan\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\python.exe
+
+===== third-party imports in app code vs declared requirements
+  aiosqlite              -> ['aiosqlite'] [app] NOT DECLARED
+  chromadb               -> ['chromadb'] [app, tests] declared
+  dotenv                 -> ['python-dotenv'] [app] declared
+  duckdb                 -> ['duckdb'] [app] declared
+  faker                  -> ['faker'] [app] declared
+  fastapi                -> ['fastapi'] [app, tests] declared
+  fastmcp                -> ['fastmcp-slim'] [app] NOT DECLARED
+  httpx                  -> ['httpx'] [app, tests] declared
+  langchain_core         -> ['langchain-core'] [app] declared
+  langgraph              -> ['langgraph', 'langgraph-checkpoint', 'langgraph-checkpoint-sqlite'] [app] declared
+  mcp                    -> ['mcp'] [app, tests] declared
+  numpy                  -> ['numpy'] [app] NOT DECLARED
+  pandas                 -> ['pandas'] [app, tests] declared
+  pgserver               -> ['pgserver'] [tests] NOT DECLARED
+  plotly                 -> ['plotly'] [app] declared
+  pydantic               -> ['pydantic'] [app, tests] declared
+  pytest                 -> ['pytest'] [tests] declared
+  requests               -> ['requests'] [app, tests] declared
+  sqlalchemy             -> ['sqlalchemy'] [app, tests] declared
+  starlette              -> ['starlette'] [app, tests] NOT DECLARED
+  streamlit              -> ['streamlit'] [app, tests] declared
+  typing_extensions      -> ['typing-extensions'] [app] NOT DECLARED
+  declared but never imported: ['anthropic', 'fastmcp', 'langchain-community', 'litellm', 'openpyxl', 'psycopg2-binary', 'pyarrow', 'pytest-asyncio', 'pytest-cov', 'sentence-transformers', 'uvicorn']
+
+===== declared requirement -> installed version
+  anthropic==2.3.0
+  chromadb==1.5.9
+  duckdb==1.5.6
+  faker==40.43.0
+  fastapi==0.162.0
+  fastmcp==4.1.4
+  httpx==0.28.1
+  langchain-community==0.3.31
+  langchain-core==0.3.86
+  langgraph==0.2.28
+  langgraph-checkpoint-sqlite==1.0.4
+  litellm==1.106.4
+  mcp==2.3.0
+  openpyxl==3.1.5
+  pandas==3.1.0
+  plotly==7.1.0
+  psycopg2-binary==2.9.13
+  pyarrow==26.0.0
+  pydantic==2.14.1
+  pytest==9.1.1
+  pytest-asyncio==1.4.1
+  pytest-cov==7.1.0
+  python-dotenv==1.2.4
+  requests==2.34.2
+  sentence-transformers==6.2.0
+  sqlalchemy==2.0.55
+  streamlit==1.66.1
+  uvicorn==0.54.0
+
+===== string references to first-party module paths (rename scale)
+  31 string references in 14 files: ['collector\\api.py', 'dashboard.py', 'settings\\services.py', 'tests\\conftest.py', 'tests\\test_collector.py', 'tests\\test_contracts.py', 'tests\\test_dashboard_smoke.py', 'tests\\test_docs.py', 'tests\\test_gateway.py', 'tests\\test_p0_security.py', 'tests\\test_reports.py', 'tests\\test_repositories.py', 'tests\\test_settings.py', 'tests\\test_workflow.py']
+  first-party import lines: 371
+
+===== data files
+  $ git -C c:\Users\sovan\Documents\Projects\TCS-CJI ls-files --error-unmatch c:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\data\cji_checkpoints.db
+  data/cji_checkpoints.db 18841600 bytes tracked=False
+  $ git -C c:\Users\sovan\Documents\Projects\TCS-CJI ls-files --error-unmatch c:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\data\events.parquet
+  data/events.parquet 2989013 bytes tracked=True
+  $ git -C c:\Users\sovan\Documents\Projects\TCS-CJI ls-files --error-unmatch c:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\data\last_run.json
+  data/last_run.json 7100 bytes tracked=False
+  tracker/tracker.js 7353 bytes
+  stray files: ['test_output.txt', 'test_results.txt']
+
+===== offline install feasibility (scratch venv)
+  $ C:\Users\sovan\AppData\Local\hermes\bin\uv.EXE venv C:\Users\sovan\.kiro\s11_scratch\venv --python 3.12 --offline
+  uv venv: 0 Using CPython 3.12.13
+Creating virtual environment at: s11_scratch\venv
+Activate with: s11_scratch\venv\Scripts\activate
+  $ C:\Users\sovan\AppData\Local\hermes\bin\uv.EXE pip freeze --python C:\Users\sovan\.venvs\cji-baseline-312\Scripts\python.exe
+  baseline freeze lines: 222
+  $ C:\Users\sovan\AppData\Local\hermes\bin\uv.EXE pip install --dry-run --offline --python C:\Users\sovan\.kiro\s11_scratch\venv\Scripts\python.exe -r C:\Users\sov
+  dry-run offline install of the baseline freeze: exit 2
+    error: Couldn't parse requirement in `s11_scratch\freeze.txt` at position 4364
+      Caused by: Expected one of `@`, `(`, `<`, `=`, `>`, `~`, `!`, `;`, found `P`
+        Using Python 3.12.13 environment at: C:\Users\sovan\.venvs\cji-baseline-312
+              ^
+  $ C:\Users\sovan\AppData\Local\hermes\bin\uv.EXE pip install --dry-run --offline --python C:\Users\sovan\.kiro\s11_scratch\venv\Scripts\python.exe setuptools>=69 
+  dry-run offline build backends: exit 1
+    Using Python 3.12.13 environment at: s11_scratch\venv
+      × No solution found when resolving dependencies:
+      ╰─▶ Because wheel was not found in the cache and you require wheel, we can
+          conclude that your requirements are unsatisfiable.
+    
+    hint: Packages were unavailable because the network was disabled. When the network is disabled, registry packages may only be read from the cache.

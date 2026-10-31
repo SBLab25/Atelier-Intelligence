@@ -1,0 +1,2 @@
+# Spec 10: report snapshots are compared byte for byte; never convert their line endings.
+cji_agent/tests/snapshots/*.html -text

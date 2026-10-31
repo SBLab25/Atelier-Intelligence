@@ -1,0 +1,6 @@
+# CJI dependencies (Spec 11): the exact tested set lives in requirements.lock (runtime + dev tools, with hashes).
+# Setup, from cji_agent/:
+#   pip install -r requirements.txt        (same as: pip install -r requirements.lock)
+#   pip install --no-deps -e .             (the cji package and its console scripts)
+# Declared ranges are in pyproject.toml.
+-r requirements.lock

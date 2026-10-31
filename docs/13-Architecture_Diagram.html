@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Diagram</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+        .mermaid {
+            background-color: #252526;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+flowchart TD
+    %% Styling Definitions
+    classDef txtHeader fill:none,stroke:none,color:#aaa,font-weight:bold,font-size:14px;
+    classDef classNew fill:#185340,stroke:#3b7b62,stroke-width:1px,color:white,border-radius:6px;
+    classDef classAPI fill:#184a7e,stroke:#346fab,stroke-width:1px,color:white,border-radius:6px;
+    classDef classDemo fill:none,stroke:#444,stroke-width:1px,stroke-dasharray: 4 4,color:#aaa;
+    classDef classMCP fill:#7d301f,stroke:#ad4f3c,stroke-width:1px,color:white,border-radius:6px;
+    classDef classSup fill:#3c3289,stroke:#554caa,stroke-width:1px,color:white,border-radius:6px;
+    classDef classDash fill:#8c5606,stroke:#bc7b17,stroke-width:1px,color:white,border-radius:6px;
+
+    %% Components
+    T["<b>tracker.js</b><br>browser script"]:::classNew
+    C["<b>Collector API</b><br>FastAPI + DuckDB"]:::classAPI
+    D["NEW components<br>demo mode uses<br>synthetic_data.py instead"]:::classDemo
+
+    MCP1["<b>Journey data MCP</b><br>mode-aware source<br><small>updated</small>"]:::classMCP
+    MCP2["<b>Friction engine MCP</b><br>pure scoring logic<br><small>unchanged</small>"]:::classMCP
+    MCP3["<b>Insight MCP</b><br>LLM + ChromaDB<br><small>unchanged</small>"]:::classMCP
+    MCP4["<b>Report MCP</b><br>HTML report<br><small>unchanged</small>"]:::classMCP
+
+    W1["<b>Data worker</b><br>mode-aware params"]:::classNew
+    W2["<b>Friction worker</b><br>unchanged"]:::classNew
+    W3["<b>Insight worker</b><br>unchanged"]:::classNew
+    W4["<b>Report worker</b><br>unchanged"]:::classNew
+
+    SUP["<b>LangGraph supervisor</b><br>rule-based routing, interrupt_before, checkpoints — unchanged"]:::classSup
+    DASH["<b>Dashboard / CLI</b><br>mode toggle added — rest unchanged"]:::classDash
+
+    T --> C
+    C -.-> D
+    
+    MCP1 --- W1
+    MCP2 --- W2
+    MCP3 --- W3
+    MCP4 --- W4
+
+    W1 --> SUP
+    W2 --> SUP
+    W3 --> SUP
+    W4 --> SUP
+
+    SUP --> DASH
+    </div>
+</body>
+</html>

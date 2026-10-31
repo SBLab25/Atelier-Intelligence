@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="280" skipped="0" tests="280" time="6.558" timestamp="2026-10-28T16:17:19.604852+05:30" hostname="Sovan"><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-journey_name]" time="1.540"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p0-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p1-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p2-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p3-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p4-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p5-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p6-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p7-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-insight.suggested_fix]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-friction.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p8-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-insight.suggested_fix]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-funnel.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-friction.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-narrative_model]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p9-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-journey_name]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-narrative]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-insight.suggested_fix]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-funnel.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-friction.step_id]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-narrative_model]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p10-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-journey_name]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-narrative]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-insight.suggested_fix]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-funnel.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-friction.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-narrative_model]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p11-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-journey_name]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-narrative]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-insight.suggested_fix]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-funnel.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-friction.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-narrative_model]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p12-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-journey_name]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-narrative]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-insight.suggested_fix]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-funnel.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-friction.step_id]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-narrative_model]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p13-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-journey_name]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-narrative]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-insight.root_cause]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-insight.suggested_fix]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-funnel.step_id]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-friction.step_id]" time="0.012"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p14-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p15-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p16-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p17-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-insight.step_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-insight.title]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p18-run_id]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-journey_name]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-narrative]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-insight.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-insight.title]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-insight.root_cause]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-insight.suggested_fix]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-funnel.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-friction.step_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-narrative_model]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_renders_inert_in_every_field[p19-run_id]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:144: in test_payload_renders_inert_in_every_field
+    html = html_of(export(**with_payload(field, payload)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_payload_text_is_escaped_not_dropped" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:154: in test_payload_text_is_escaped_not_dropped
+    html = html_of(export(**basic_input(narrative=PAYLOADS[0], insights=[
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_bidi_controls_are_character_references_in_attributes" time="0.001"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:162: in test_bidi_controls_are_character_references_in_attributes
+    from reporting.escape import attr
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_json_block_cannot_close_the_script_or_open_a_comment" time="0.002"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:169: in test_json_block_cannot_close_the_script_or_open_a_comment
+    from reporting.escape import json_block
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_json_block_rejects_nan" time="0.002"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:177: in test_json_block_rejects_nan
+    from reporting.escape import json_block
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_mode_is_allow_listed" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:185: in test_mode_is_allow_listed
+    html = html_of(export(**basic_input(mode='demo" onclick="x')))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_renderer_source_has_no_dangerous_sinks" time="0.001"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\sovan\\Documents\\Projects\\TCS-CJI\\cji_agent\\reporting\\render.py'">tests\test_reports.py:191: in test_renderer_source_has_no_dangerous_sinks
+    src = (APP_ROOT / "reporting" / "render.py").read_text(encoding="utf-8")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\sovan\\Documents\\Projects\\TCS-CJI\\cji_agent\\reporting\\render.py'</failure></testcase><testcase classname="tests.test_reports" name="test_basic_report_satisfies_the_contract" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:203: in test_basic_report_satisfies_the_contract
+    res = export(**basic_input())
+          ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_provenance_block_records_the_inputs" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:214: in test_provenance_block_records_the_inputs
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_footer_shows_the_provenance" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:234: in test_footer_shows_the_provenance
+    text = text_content(html_of(export(**basic_input(narrative_source="llm", narrative_model="m-1"))))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_missing_generated_at_is_shown_as_not_recorded" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:242: in test_missing_generated_at_is_shown_as_not_recorded
+    html = html_of(export(**basic_input(generated_at="")))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_generated_at_must_be_utc_iso" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:249: in test_generated_at_must_be_utc_iso
+    res = export(**basic_input(generated_at="yesterday &lt;b&gt;"))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_report_meaning_is_preserved" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:256: in test_report_meaning_is_preserved
+    html = html_of(export(**basic_input()))
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_friction_table_lists_scores_in_input_order" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:272: in test_friction_table_lists_scores_in_input_order
+    html = html_of(export(**basic_input()))
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_chart_has_one_bar_per_step_in_order_scaled_to_the_largest" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:283: in test_chart_has_one_bar_per_step_in_order_scaled_to_the_largest
+    html = html_of(export(**basic_input(funnel_data=[
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_chart_labels_are_shortened_but_the_title_keeps_the_full_step" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:296: in test_chart_labels_are_shortened_but_the_title_keeps_the_full_step
+    html = html_of(export(**basic_input(funnel_data=[{"step_id": long_step, "users": 1234567}])))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_chart_with_all_zero_users_has_zero_width_bars" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:304: in test_chart_with_all_zero_users_has_zero_width_bars
+    html = html_of(export(**basic_input(funnel_data=[{"step_id": "a", "users": 0}, {"step_id": "b", "users": 0}])))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_same_input_gives_byte_identical_files_and_names" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:314: in test_same_input_gives_byte_identical_files_and_names
+    first = export(**basic_input())
+            ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_rendering_does_not_depend_on_hash_seed_or_clock" time="0.577"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;&#10;    File &quot;C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\tests\test_reports.py&quot;, line 131, in render&#10;      from reporting import ReportInput, render as _render&#10;  ModuleNotFoundError: No module named 'reporting'&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['C:\\Users\\sovan\\.venvs\\cji-baseline-312\\Scripts\\python.exe', '-c', &quot;import sys, hashlib; ...ender\n    from reporting import ReportInput, render as _render\nModuleNotFoundError: No module named \'reporting\'\n').returncode">tests\test_reports.py:330: in test_rendering_does_not_depend_on_hash_seed_or_clock
+    assert out.returncode == 0, out.stderr[-2000:]
+E   AssertionError: Traceback (most recent call last):
+E       File "&lt;string&gt;", line 1, in &lt;module&gt;
+E       File "C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\tests\test_reports.py", line 131, in render
+E         from reporting import ReportInput, render as _render
+E     ModuleNotFoundError: No module named 'reporting'
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['C:\\Users\\sovan\\.venvs\\cji-baseline-312\\Scripts\\python.exe', '-c', "import sys, hashlib; ...ender\n    from reporting import ReportInput, render as _render\nModuleNotFoundError: No module named \'reporting\'\n').returncode</failure></testcase><testcase classname="tests.test_reports" name="test_snapshot[basic-basic_input]" time="0.002"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:338: in test_snapshot
+    html = render(make()).encode("utf-8")
+           ^^^^^^^^^^^^^^
+tests\test_reports.py:131: in render
+    from reporting import ReportInput, render as _render
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_snapshot[empty-empty_input]" time="0.002"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:338: in test_snapshot
+    html = render(make()).encode("utf-8")
+           ^^^^^^^^^^^^^^
+tests\test_reports.py:131: in render
+    from reporting import ReportInput, render as _render
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_snapshot[malicious-malicious_input]" time="0.002"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:338: in test_snapshot
+    html = render(make()).encode("utf-8")
+           ^^^^^^^^^^^^^^
+tests\test_reports.py:131: in render
+    from reporting import ReportInput, render as _render
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_empty_report" time="0.004"><failure message="AssertionError: {'report_path': None, 'error': &quot;[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...of-sovan\\\\pytest-83\\\\test_empty_report0\\\\reports\\\\cji_report_j_run-empty-1.html.33492.tmp'&quot;, 'file_size_kb': 0}&#10;assert None&#10; +  where None = &lt;built-in method get of dict object at 0x000001EF7D0AC340&gt;('report_path')&#10; +    where &lt;built-in method get of dict object at 0x000001EF7D0AC340&gt; = {'report_path': None, 'error': &quot;[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...of-sovan\\\\pytest-83\\\\test_empty_report0\\\\reports\\\\cji_report_j_run-empty-1.html.33492.tmp'&quot;, 'file_size_kb': 0}.get">tests\test_reports.py:355: in test_empty_report
+    html = html_of(export(**empty_input()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_reports.py:122: in html_of
+    assert res.get("report_path"), res
+E   AssertionError: {'report_path': None, 'error': "[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...of-sovan\\\\pytest-83\\\\test_empty_report0\\\\reports\\\\cji_report_j_run-empty-1.html.33492.tmp'", 'file_size_kb': 0}
+E   assert None
+E    +  where None = &lt;built-in method get of dict object at 0x000001EF7D0AC340&gt;('report_path')
+E    +    where &lt;built-in method get of dict object at 0x000001EF7D0AC340&gt; = {'report_path': None, 'error': "[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...of-sovan\\\\pytest-83\\\\test_empty_report0\\\\reports\\\\cji_report_j_run-empty-1.html.33492.tmp'", 'file_size_kb': 0}.get</failure></testcase><testcase classname="tests.test_reports" name="test_minimal_call_without_optional_arguments" time="0.004"><failure message="AssertionError: {'report_path': None, 'error': &quot;[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...t-83\\\\test_minimal_call_without_opti0\\\\reports\\\\cji_report_j_20261028_161725.html.33492.tmp'&quot;, 'file_size_kb': 0}&#10;assert None&#10; +  where None = &lt;built-in method get of dict object at 0x000001EF7D07A0C0&gt;('report_path')&#10; +    where &lt;built-in method get of dict object at 0x000001EF7D07A0C0&gt; = {'report_path': None, 'error': &quot;[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...t-83\\\\test_minimal_call_without_opti0\\\\reports\\\\cji_report_j_20261028_161725.html.33492.tmp'&quot;, 'file_size_kb': 0}.get">tests\test_reports.py:367: in test_minimal_call_without_optional_arguments
+    html = html_of(res)
+           ^^^^^^^^^^^^
+tests\test_reports.py:122: in html_of
+    assert res.get("report_path"), res
+E   AssertionError: {'report_path': None, 'error': "[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...t-83\\\\test_minimal_call_without_opti0\\\\reports\\\\cji_report_j_20261028_161725.html.33492.tmp'", 'file_size_kb': 0}
+E   assert None
+E    +  where None = &lt;built-in method get of dict object at 0x000001EF7D07A0C0&gt;('report_path')
+E    +    where &lt;built-in method get of dict object at 0x000001EF7D07A0C0&gt; = {'report_path': None, 'error': "[Errno 2] No such file or directory: 'C:\\\\Users\\\\sovan\\\\AppData\\\\Local\\\\Temp...t-83\\\\test_minimal_call_without_opti0\\\\reports\\\\cji_report_j_20261028_161725.html.33492.tmp'", 'file_size_kb': 0}.get</failure></testcase><testcase classname="tests.test_reports" name="test_large_input_is_truncated_visibly" time="0.012"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:376: in test_large_input_is_truncated_visibly
+    res = export(**basic_input(insights=many, narrative="N" * 10_000,
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_worst_case_within_limits_is_written_or_refused_explicitly" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:397: in test_worst_case_within_limits_is_written_or_refused_explicitly
+    res = export(**basic_input(
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_oversize_output_is_refused_and_no_file_is_left" time="0.003"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:409: in test_oversize_output_is_refused_and_no_file_is_left
+    import reporting.output as output
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-0]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-1]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-2]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-3]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-4]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-5]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-6]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-7]" time="0.010"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-8]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-9]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-10]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[insights-11]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-12]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-13]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-14]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-15]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-16]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[funnel_data-17]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[friction_scores-18]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[friction_scores-19]" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[friction_scores-20]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[narrative-21]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[narrative-22]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[narrative-23]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[journey_name-24]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[journey_name-25]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[journey_name-26]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[journey_name-27]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_malformed_input_fails_explicitly_without_a_file[narrative_source-28]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:443: in test_malformed_input_fails_explicitly_without_a_file
+    res = export(**basic_input(**{field: value}))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_input_error_lists_at_most_five_fields" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:453: in test_invalid_input_error_lists_at_most_five_fields
+    res = export(**basic_input(insights=[None] * 20))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_text_is_cleaned" time="0.005"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:460: in test_text_is_cleaned
+    html = html_of(export(**basic_input(narrative="a\x00b\x07c\r\nd\re\ud800f\x85g\x7fh\tok")))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[user_onboarding-user_onboarding]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[User Onboarding-user_onboarding]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[x/../../escaped-x_______escaped]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[x\\..\\..\\escaped-x_______escaped]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[/etc/passwd-_etc_passwd]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[C:\\Windows\\win.ini-c__windows_win_ini]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[a:b-a_b]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[CON-con]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[nul.html-nul_html]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[..-__]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[\u65e5\u672c-__]" time="0.004"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj-jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_file_name_is_a_slug_inside_the_reports_directory[a\x00b-ab]" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:478: in test_file_name_is_a_slug_inside_the_reports_directory
+    res = export(**basic_input(journey_name=journey))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[../../x]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[a b]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[run_1.2]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_invalid_run_id_uses_the_input_hash[&lt;script&gt;]" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:487: in test_invalid_run_id_uses_the_input_hash
+    from reporting import ReportInput
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_write_failure_is_explicit_and_leaves_no_temporary_file" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:498: in test_write_failure_is_explicit_and_leaves_no_temporary_file
+    import reporting.output as output
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_reports_directory_that_is_a_file_is_a_write_failure" time="0.003"><failure message="TypeError: export_report() got an unexpected keyword argument 'generated_at'">tests\test_reports.py:518: in test_reports_directory_that_is_a_file_is_a_write_failure
+    res = rs.export_report(**basic_input())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: export_report() got an unexpected keyword argument 'generated_at'</failure></testcase><testcase classname="tests.test_reports" name="test_path_check_refuses_names_outside_the_directory" time="0.004"><failure message="ModuleNotFoundError: No module named 'reporting'">tests\test_reports.py:524: in test_path_check_refuses_names_outside_the_directory
+    from reporting.output import ReportPathError, write_report
+E   ModuleNotFoundError: No module named 'reporting'</failure></testcase><testcase classname="tests.test_reports" name="test_dashboard_insights_page_escapes_report_content" time="0.002"><failure message="AssertionError: {html.escape(narrative)}&#10;assert '{html.escape(narrative)}' in '&quot;&quot;&quot;\nCJI Intelligence Hub — Dashboard\n==================================\nStyle: Inter font, #F9FAFB, clean white ca..., subprocess.TimeoutExpired) as e:\n                    st.error(f&quot;Pipeline could not run: {type(e).__name__}: {e}&quot;)\n'">tests\test_reports.py:540: in test_dashboard_insights_page_escapes_report_content
+    assert escaped in src, escaped
+E   AssertionError: {html.escape(narrative)}
+E   assert '{html.escape(narrative)}' in '"""\nCJI Intelligence Hub — Dashboard\n==================================\nStyle: Inter font, #F9FAFB, clean white ca..., subprocess.TimeoutExpired) as e:\n                    st.error(f"Pipeline could not run: {type(e).__name__}: {e}")\n'</failure></testcase></testsuite></testsuites>

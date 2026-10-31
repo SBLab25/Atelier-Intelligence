@@ -1,0 +1,56 @@
+gate-results.txt:
+   ﻿Spec 05 gate started 2026-10-28T01:52:30
+   pytest full (not integration)        exit=1        36s  log=gate-pytest-full.log
+   pytest Spec 05 tests                 exit=0        28s  log=gate-new-tests.log
+   golden snapshot                      exit=0         5s  log=gate-golden.log
+   golden identical to Spec 04: True
+   ruff check . (full list)             exit=1         0s  log=gate-ruff.log
+   ruff check new code                  exit=0         0s  log=gate-ruff-new.log
+   mypy .                               exit=1        43s  log=gate-mypy.log
+   mypy --strict repositories           exit=0         9s  log=gate-mypy-repositories-strict.log
+   bandit -r . (json)                   exit=1         3s  log=gate-bandit.json.log
+   static compare vs Spec 01            exit=0         0s  log=gate-static-compare.log
+   servers: 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+   demo pipeline                        exit=0        50s  log=gate-demo-pipeline.log
+   ingest probe                         exit=0        52s  log=gate-ingest-probe.log
+   mode mismatch (realtime CLI, demo servers) exit=0         4s  log=gate-mode-mismatch.log
+   ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+   git diff --check (cr-at-eol)         exit=0         0s  log=gate-diff-check.log
+   git diff --stat                      exit=0         0s  log=gate-diff-stat.log
+   tracked events.parquet unchanged: True
+   Spec 05 gate finished 2026-10-28T01:56:32
+full suite: 409/420 pass, 11 fail, 0 skipped (Spec 04: 344/355)
+failures identical to the F-01 set: True; new: []; fixed: []
+Spec 05 tests: 65/65 pass, 0 skipped; before migration: 42/65 (23 fail)
+PostgreSQL-backed tests run: 22 (names containing realtime/parity)
+ruff total findings: 233 (Spec 04: 246, baseline 266)
+mypy: Found 46 errors in 18 files (checked 70 source files) (Spec 04: 46, baseline 52)
+gate-ruff-new.log: All checks passed!
+gate-mypy-repositories-strict.log: Success: no issues found in 5 source files
+static compare:
+   file                                                ruff      mypy  bandit medium+ (before -> after)
+   mcp_servers\journey_data_server.py             14 -> 0      4 -> 1    {'B608': 9} -> {}
+   mcp_servers\ingestion_intelligence_server.py   23 -> 22     4 -> 4    {} -> {}
+   agents\workers.py                              20 -> 20     0 -> 0    {} -> {}
+   domain\runs.py                                  0 -> 0      0 -> 0    {} -> {}
+   tests\test_p0_security.py                       0 -> 0      0 -> 0    {} -> {}
+   tests\test_contracts.py                         0 -> 0      0 -> 0    {} -> {}
+   repositories\__init__.py                        0 -> 0      0 -> 0    {} -> {}
+   repositories\base.py                            0 -> 0      0 -> 0    {} -> {}
+   repositories\queries.py                         0 -> 0      0 -> 0    {} -> {}
+   repositories\duckdb_parquet.py                  0 -> 0      0 -> 0    {} -> {}
+   repositories\postgres.py                        0 -> 0      0 -> 0    {} -> {}
+   unchanged files delta: ruff -18, mypy -3
+   RESULT: no changed file is worse than baseline
+demo pipeline:
+   | [DONE] Report generated -> C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_015534.html
+   | [OK] data_worker: Collected 8 step metrics, 50 events
+   | [OK] friction_worker: Scored 8 steps, 4 critical
+   | [OK] insight_worker: Generated 4 insights, ranked 90 fixes
+   | [OK] report_worker: Report exported (4.5KB) ΓåÆ C:\Users\sovan\Documents\Projects\TCS-CJI\cji_agent\reports\cji_report_user_onboarding_20261028_015534
+ingest probe: 8005 posts 4, 404s 0, Max iterations 0, flagged True
+mode mismatch run:
+   | |     raise ModeMismatch(
+   | | agents.workers.ModeMismatch: journey-data server runs in demo mode; this run is realtime. Restart the servers
+   metrics collected in mismatch run: False
+diff --check log bytes: 0

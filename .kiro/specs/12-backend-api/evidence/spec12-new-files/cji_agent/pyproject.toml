@@ -1,0 +1,126 @@
+# CJI agent package (Spec 11). Install: see README "Local setup".
+#   pip install -r requirements.lock      exact tested set (runtime + dev tools), with hashes
+#   pip install --no-deps -e .            this package, editable
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cji-agent"
+version = "0.11.0"
+description = "Customer Journey Intelligence: turns user-behaviour events into friction scores, insights and reports."
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Private :: Do Not Upload",
+]
+# Direct dependencies: floor = tested version, cap below the next breaking release (OD-101).
+# The exact tested set, including transitive packages, is requirements.lock.
+dependencies = [
+    # workflow
+    "langchain-core>=0.3.86,<0.4",
+    "langgraph>=0.2.28,<0.3",
+    "langgraph-checkpoint-sqlite>=1.0.4,<2",
+    "aiosqlite>=0.20,<0.21",
+    # MCP servers and client
+    "mcp>=2.3,<3",
+    "fastmcp>=4.1.4,<5",
+    # storage
+    "duckdb>=1.5,<2",
+    "SQLAlchemy>=2.0.55,<2.1",          # 2.1 changes the postgresql:// default driver to psycopg 3
+    "psycopg2-binary>=2.9.13,<3",       # SQLAlchemy's postgresql:// driver (not imported directly)
+    "chromadb>=1.5.9,<2",
+    # data
+    "faker>=40,<41",
+    "pandas>=3.1,<4",
+    "numpy>=2.5,<3",
+    "pyarrow>=26,<27",                  # pandas Parquet engine (not imported directly)
+    "openpyxl>=3.1.5,<4",               # pandas Excel engine for ingestion uploads (not imported directly)
+    # collector
+    "fastapi>=0.162,<0.163",            # 0.x: a minor release may break
+    "starlette>=1.10,<2",
+    "uvicorn[standard]>=0.54,<0.55",
+    # settings and HTTP
+    "pydantic>=2.14,<3",
+    "python-dotenv>=1.2,<2",
+    "requests>=2.34,<3",
+    "httpx>=0.28.1,<0.29",
+    "typing-extensions>=4.16",
+    # dashboard
+    "streamlit>=1.66,<2",
+    "plotly>=7.1,<8",
+    # security floor for a transitive dependency (chromadb -> tokenizers -> huggingface-hub):
+    # CVE-2026-112940, CVE-2026-112913, CVE-2026-112907 are fixed in 4.2.1 (OD-101)
+    "filelock>=4.2.1",
+]
+
+[project.scripts]
+cji = "cji.main:main"
+cji-servers = "cji.run_servers:main"
+cji-settings = "cji.settings.__main__:main"
+cji-dashboard = "cji.dashboard_launcher:main"
+cji-collector = "cji.collector.serve:main"
+cji-api = "cji.api.serve:main"
+cji-api-token = "cji.api.tokens_cli:main"
+cji-ingest-json = "cji.tools.ingest_json:main"
+cji-snippet = "cji.tracker.snippet_generator:main"
+cji-generate-diverse = "cji.tools.generate_diverse:main"
+
+[dependency-groups]
+test = ["pytest>=9.1.1,<10", "pgserver>=0.1.4,<0.2", "jsonschema>=4.26,<5", "openapi-spec-validator>=0.9,<0.10"]
+lint = ["ruff>=0.17.3,<0.18", "mypy>=2.4,<3", "bandit>=1.9.4,<2", "pip-audit>=2.10.1,<3"]
+build = ["build>=1.6.1,<2"]
+dev = [{include-group = "test"}, {include-group = "lint"}, {include-group = "build"}]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cji*"]
+
+[tool.setuptools.package-data]
+cji = ["tracker/tracker.js"]
+
+# ── checks (run from cji_agent/): ruff check · mypy · bandit -c pyproject.toml -r src · pytest ──────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "e2e_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "integration: Tests requiring network, API keys, or long-running processes",
+    "slow: Tests taking > 10 seconds (excluded from quick runs)",
+    "realtime: Tests requiring a running collector on port 8000",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+addopts = "--tb=short -q"
+
+[tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests"]
+mypy_path = "src"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+# Strict for the packages that were strict-clean before Spec 11 (OD-104).
+module = ["cji.reporting", "cji.reporting.*", "cji.workflow", "cji.workflow.*", "cji.integrations",
+          "cji.integrations.*", "cji.repositories", "cji.repositories.*", "cji.domain.runs"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+check_untyped_defs = true
+warn_return_any = true
+no_implicit_reexport = true
+strict_equality = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]

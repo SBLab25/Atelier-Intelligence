@@ -1,0 +1,5 @@
+﻿Spec 02 gate (rerun) 2026-10-27T17:23:09
+resolved: psycopg2-binary==2.9.13, sqlalchemy==2.0.55
+tracked files still containing a cji_live_ key: 0
+git diff --check (cr-at-eol) exit=0
+finished 2026-10-27T17:25:24

@@ -1,0 +1,98 @@
+<testsuites id="" name="" tests="23" failures="0" skipped="4" errors="0" time="47.184661">
+<testsuite name="approval.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="3" failures="0" skipped="0" time="18.539" errors="0">
+<testcase name="approve a paused run and follow it to completion" classname="approval.spec.ts" time="6.395">
+</testcase>
+<testcase name="resume a failed run" classname="approval.spec.ts" time="6.066">
+</testcase>
+<testcase name="a conflict is shown next to the action" classname="approval.spec.ts" time="6.078">
+</testcase>
+</testsuite>
+<testsuite name="friction.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="2" failures="0" skipped="0" time="2.297" errors="0">
+<testcase name="operators drill into a step and page through its events" classname="friction.spec.ts" time="1.69">
+</testcase>
+<testcase name="viewers see the permission state instead of events" classname="friction.spec.ts" time="0.607">
+</testcase>
+</testsuite>
+<testsuite name="ingest.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="3" failures="0" skipped="0" time="3.315" errors="0">
+<testcase name="validate, review and append an event file" classname="ingest.spec.ts" time="1.967">
+</testcase>
+<testcase name="replace needs the confirmation" classname="ingest.spec.ts" time="0.773">
+</testcase>
+<testcase name="files of the wrong type are refused before upload" classname="ingest.spec.ts" time="0.575">
+</testcase>
+</testsuite>
+<testsuite name="insights.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="2" failures="0" skipped="0" time="8.183" errors="0">
+<testcase name="start a run and follow it to the approval step" classname="insights.spec.ts" time="6.716">
+</testcase>
+<testcase name="insights and narrative show their provenance and the usage totals" classname="insights.spec.ts" time="1.467">
+</testcase>
+</testsuite>
+<testsuite name="journey.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="1" failures="0" skipped="0" time="1.519" errors="0">
+<testcase name="funnel and step metrics match the API values" classname="journey.spec.ts" time="1.519">
+</testcase>
+</testsuite>
+<testsuite name="live.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="4" failures="0" skipped="4" time="0" errors="0">
+<testcase name="journey page shows the API&apos;s metrics unchanged" classname="live.spec.ts">
+<properties>
+<property name="serial" value="">
+</property>
+<property name="skip" value="live mode only (E2E_LIVE_API_URL, E2E_LIVE_TOKEN, E2E_LIVE_OPERATOR_TOKEN)">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="an operator starts a run, approves it and gets a report with provenance" classname="live.spec.ts">
+<properties>
+<property name="serial" value="">
+</property>
+<property name="skip" value="live mode only (E2E_LIVE_API_URL, E2E_LIVE_TOKEN, E2E_LIVE_OPERATOR_TOKEN)">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="a file is validated against the real parser without writing" classname="live.spec.ts">
+<properties>
+<property name="serial" value="">
+</property>
+<property name="skip" value="live mode only (E2E_LIVE_API_URL, E2E_LIVE_TOKEN, E2E_LIVE_OPERATOR_TOKEN)">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="viewers get the permission states on the live API" classname="live.spec.ts">
+<properties>
+<property name="serial" value="">
+</property>
+<property name="skip" value="live mode only (E2E_LIVE_API_URL, E2E_LIVE_TOKEN, E2E_LIVE_OPERATOR_TOKEN)">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="reports.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="2" failures="0" skipped="0" time="1.806" errors="0">
+<testcase name="list, preview in a sandbox and download a report" classname="reports.spec.ts" time="1.236">
+</testcase>
+<testcase name="an unknown report shows the API&apos;s problem" classname="reports.spec.ts" time="0.57">
+</testcase>
+</testsuite>
+<testsuite name="smoke.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="1" failures="0" skipped="0" time="3.48" errors="0">
+<testcase name="CJI frontend smoke test" classname="smoke.spec.ts" time="3.48">
+</testcase>
+</testsuite>
+<testsuite name="states.spec.ts" timestamp="2026-10-29T08:11:01.726Z" hostname="" tests="5" failures="0" skipped="0" time="4.298" errors="0">
+<testcase name="viewers see disabled actions with the reason" classname="states.spec.ts" time="1.359">
+</testcase>
+<testcase name="a 503 on run results is shown and recovers with Retry" classname="states.spec.ts" time="0.804">
+</testcase>
+<testcase name="a rate limit says how long to wait" classname="states.spec.ts" time="0.638">
+</testcase>
+<testcase name="not found and empty states" classname="states.spec.ts" time="0.769">
+</testcase>
+<testcase name="an expired token ends the session" classname="states.spec.ts" time="0.728">
+</testcase>
+</testsuite>
+</testsuites>

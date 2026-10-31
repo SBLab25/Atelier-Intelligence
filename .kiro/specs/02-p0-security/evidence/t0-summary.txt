@@ -1,0 +1,6 @@
+branch: phase-02-security  HEAD: 8523e47
+golden snapshot (unchanged code)               exit=0   log=t0-golden.log
+metrics: 8 funnel: 8 events: 50 20 20
+pytest baseline (expect 127 pass, 1 error)     exit=1   log=t0-pytest.log
+=========================== short test summary info ===========================
+ERROR tests/test_supervisor.py

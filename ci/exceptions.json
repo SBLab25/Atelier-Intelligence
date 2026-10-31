@@ -1,0 +1,4 @@
+{
+  "_comment": "Accepted dependency advisories (Spec 15, OD-164). Each entry needs id, package, reason, owner and expires (YYYY-MM-DD). Empty: no advisory has been accepted; every open advisory blocks the release until the owner decides.",
+  "exceptions": []
+}

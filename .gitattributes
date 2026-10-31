@@ -1,0 +1,44 @@
+# Set default line endings to LF for cross-platform consistency across teams
+* text=auto eol=lf
+
+# Explicit text files
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.sql text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
+*.env.example text eol=lf
+
+# Windows-specific automation scripts
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Spec 10: report snapshots are compared byte for byte; never convert their line endings.
+cji_agent/tests/snapshots/*.html -text
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.parquet binary
+*.db binary
+*.sqlite binary
+*.tar.gz binary
+*.zip binary

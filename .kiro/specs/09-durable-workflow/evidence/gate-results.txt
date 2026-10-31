@@ -1,0 +1,44 @@
+﻿Spec 09 gate started 2026-10-28T15:05:05
+pytest full (not integration)                    exit=0        87s  log=gate-pytest-full.log
+pytest Spec 09 tests                             exit=0        49s  log=gate-new-tests.log
+collector smoke (Spec 07 regression)             exit=0         8s  log=gate-collector-smoke.log
+golden snapshot                                  exit=0         3s  log=gate-golden.log
+golden identical to Spec 08: True
+ruff check . (full list)                         exit=1         0s  log=gate-ruff.log
+ruff check new code                              exit=0         0s  log=gate-ruff-new.log
+mypy .                                           exit=1        44s  log=gate-mypy.log
+mypy --strict workflow domain/runs.py            exit=0        41s  log=gate-mypy-workflow-strict.log
+mypy --strict integrations                       exit=0         6s  log=gate-mypy-integrations-strict.log
+mypy --strict repositories                       exit=0         5s  log=gate-mypy-repositories-strict.log
+bandit -r . (json)                               exit=1         3s  log=gate-bandit.json.log
+bandit workflow (text)                           exit=0         0s  log=gate-bandit-workflow.log
+static compare vs Spec 01                        exit=0         0s  log=gate-static-compare.log
+main.py --help                                   exit=0         0s  log=gate-help-main.log
+run_servers.py --help                            exit=0         0s  log=gate-help-run-servers.log
+python -m settings check (cli)                   exit=0         0s  log=gate-settings-check.log
+settings check: step timeout below MCP call timeout exit=2         0s  log=gate-settings-step-timeout.log
+CLI refuses unknown thread (--status/--approve/--resume) exit=0         4s  log=gate-cli-unknown.log
+servers (none): 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+demo pipeline --run --auto-approve (dashboard call) exit=0         7s  log=gate-demo-pipeline-none.log
+pause: --run without --auto-approve              exit=0         4s  log=gate-pause.log
+paused thread: c0dfe5fa-dcf4-49e3-88ef-aac628dd922a
+status of the paused run                         exit=0         2s  log=gate-status-paused.log
+--resume of a paused run is refused (exit 1)     exit=1         3s  log=gate-resume-paused.log
+approve                                          exit=0         3s  log=gate-approve.log
+approve again (no-op)                            exit=0         3s  log=gate-approve-again.log
+status after approval                            exit=0         2s  log=gate-status-approved.log
+report files for the approved run: 1
+servers (groq): 8001:LISTEN  8002:LISTEN  8003:LISTEN  8004:LISTEN  8005:LISTEN
+demo pipeline (groq, dummy key, offline)         exit=0        67s  log=gate-demo-pipeline.log
+kill during insight_worker, then resume          exit=0        73s  log=gate-kill-resume.log
+ingest probe                                     exit=0        78s  log=gate-ingest-probe.log
+mode mismatch (realtime CLI, demo servers; exit 1) exit=1         3s  log=gate-mode-mismatch.log
+ports after stop: 8001:-  8002:-  8003:-  8004:-  8005:-
+audit files: fields, secrets, correlation (Spec 08) exit=0         1s  log=gate-audit-check.log
+workflow audit: steps, runs, kill/resume         exit=0         1s  log=gate-audit-workflow.log
+new report files in reports/: 5
+git diff --check (cr-at-eol)                     exit=0         0s  log=gate-diff-check.log
+git diff --stat                                  exit=0         0s  log=gate-diff-stat.log
+git status (tracked)                             exit=0         0s  log=gate-git-status.log
+tracked events.parquet unchanged: True
+Spec 09 gate finished 2026-10-28T15:13:41
