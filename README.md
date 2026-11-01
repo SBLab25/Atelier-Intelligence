@@ -1,4 +1,4 @@
-# Customer Journey Intelligence (CJI)
+# Atelier Intelligence (Customer Journey Intelligence)
 
 > **Proof-of-concept system that turns user-behaviour events into friction scores, root-cause insights and a standalone HTML report, using a LangGraph multi-agent pipeline and five MCP servers.**
 
@@ -26,7 +26,7 @@ Commands below are run from `cji_agent/` unless stated. Comprehensive setup and 
 
 ---
 
-## Why CJI?
+## Why Atelier?
 
 Most analytics tools show *what* happened. CJI computes a deterministic **friction score** for every step of a user
 journey, then asks an LLM for the likely root cause and a prioritised fix, and summarises the result in a standalone
