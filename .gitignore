@@ -139,6 +139,7 @@ front-end/
 Thumbs.db
 desktop.ini
 .idea/
+opencode.jsonc
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json

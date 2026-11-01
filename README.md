@@ -2,8 +2,7 @@
 
 > **Proof-of-concept system that turns user-behaviour events into friction scores, root-cause insights and a standalone HTML report, using a LangGraph multi-agent pipeline and five MCP servers.**
 
-Commands below are run from `cji_agent/` unless stated. Every command in this file is one the Spec gates run
-(`.kiro/specs/`). Older design documents are listed with their status in `docs/README.md`.
+Commands below are run from `cji_agent/` unless stated. Comprehensive setup and operational runbooks are documented below.
 
 ---
 
@@ -21,7 +20,7 @@ Commands below are run from `cji_agent/` unless stated. Every command in this fi
 10. [Environment Variables Reference](#environment-variables-reference)
 11. [Guardrails](#guardrails)
 12. [LangSmith Tracing](#langsmith-tracing)
-13. [Running the Tests](#running-the-tests)
+13. [Testing & Code Quality](#testing-security--quality-assurance)
 14. [Security Practices](#security-practices)
 15. [Known Issues & FAQ](#known-issues--faq)
 
@@ -52,9 +51,30 @@ HTML report.
 
 ## Quickstart
 
-> **Prerequisite:** Python 3.12 or newer (`requires-python = ">=3.12"`; tested with 3.12).
+> **Prerequisite:** Python 3.12 or newer (`requires-python = ">=3.12"`; tested with 3.12), Node.js 22.12+.
 
-### Local setup
+### 🚀 One-Click Automated Startup (Recommended)
+
+To launch the full CJI ecosystem (5 MCP servers on ports 8001–8005, the FastAPI backend on port 8006, and the Next.js Cockpit on port 3000) with automatic port reaping and virtual environment activation:
+
+```powershell
+.\start-cji.ps1
+```
+
+To stop all background CJI servers and safely release all listening ports:
+
+```powershell
+.\stop-cji.ps1
+```
+
+Once started:
+- **Cockpit Web UI:** [http://localhost:3000](http://localhost:3000)
+- **Backend REST API:** [http://127.0.0.1:8006/api/v1](http://127.0.0.1:8006/api/v1)
+- **MCP Servers (SSE):** `http://127.0.0.1:8001..8005/sse`
+
+---
+
+### Manual CLI Setup
 
 CJI is the installable package `cji` (distribution `cji-agent`, sources in `cji_agent/src/cji/`). Install the exact
 tested dependency set from the lock file, then the package itself:
@@ -84,7 +104,7 @@ cji --mode demo --run --auto-approve
 `requirements.lock` pins every package (runtime plus the `dev` dependency group) with hashes;
 `pyproject.toml` declares the supported ranges. `requirements.txt` and `requirements-dev.txt` only include the lock,
 so `pip install -r requirements.txt` still works. `--no-deps` keeps pip from resolving anything beyond the lock.
-To rebuild the lock after a deliberate upgrade, run `.kiro/specs/11-packaging/evidence/scripts/make_lock.py` with uv.
+To rebuild the lock after a deliberate upgrade, run `uv pip compile pyproject.toml -o requirements.lock`.
 
 The report is written to `reports/cji_report_<journey>_<run id>.html`; the CLI prints the path. A summary for the
 dashboard is written to `data/last_run.json`.
@@ -416,8 +436,7 @@ per client address (`CJI_API_RATE_PER_IP`, default 60/min). Above them: `429` wi
 friction drill-down, runs (start, approve, resume, results with insight provenance), reports (preview and
 download) and event file ingestion with validation feedback (Spec 14). It runs on its own with Node 22.12+ and
 needs only `cji-api` as its backend; the Streamlit dashboard (`cji-dashboard`) and the CLI stay available as the
-fallback. Details: `frontend/README.md`; differences to Streamlit, rollback and the retirement checklist:
-`docs/frontend-migration.md`.
+fallback. Details: `frontend/README.md`.
 
 ```bash
 cji-api                                  # backend on port 8006 (see Backend API)
@@ -498,7 +517,7 @@ redacted and exits 2 on a configuration error (roles: `cli`, `dashboard`, `colle
 | `CJI_API_CURSOR_SECRET` | random per process | HMAC key for page cursors; 32+ characters, required outside development and test. |
 | `CJI_API_MAX_ACTIVE_RUNS` | `1` | Runs one API process starts or resumes at once (1-8); more answer 409 `run_capacity_reached`. |
 | `CJI_API_MAX_UPLOAD_BYTES` | `10485760` | Size limit of `POST /ingestions/validations` (1 KiB-50 MiB); every other request keeps 16 KiB. |
-| `CJI_API_WRITE_OPERATIONS` | `true` | `false` stops serving start, resume and ingestion (rollback switch, `docs/frontend-migration.md`). |
+| `CJI_API_WRITE_OPERATIONS` | `true` | `false` stops serving start, resume and ingestion (emergency operational rollback switch). |
 | `CJI_API_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the API whose `X-Forwarded-For` is trusted (0-5); above 0 the API must listen on loopback. |
 | `CJI_API_AUTH_FAILURES_PER_MIN` | `10` | Failed authentications per minute per client address before `429`. |
 | `CJI_LOG_FORMAT` | `json` in production, else `text` | Log format; production requires `json`. |
@@ -562,10 +581,10 @@ LANGCHAIN_PROJECT=cji-poc
 
 ## Production Operations
 
-Spec 15 prepares a controlled release on one host behind a TLS proxy: `docs/deployment.md` (install, upgrade,
-rollback, backups), `docs/operations.md` (limits, AI budgets, secrets and rotation, runbooks) and
-`docs/release-checklist.md` (what is verified, with owners and blockers for what is not).
-
+CJI is engineered for controlled deployment behind a TLS reverse proxy:
+- **Deployment & Backups:** Install, upgrade, rollback, and automated database backups via `cji-backup` CLI.
+- **Operations & Runbooks:** Strict limits, rate limits, AI budget caps, secret rotation, and operational readiness.
+- **Verification:** Pre-flight checklists and security gates verified by automated CI scans.
 - **Logs:** `CJI_LOG_FORMAT=json` (the default when `CJI_ENV=production`) writes one JSON object per line with
   `request_id`, `run_id` and `trace_id`; `CJI_LOG_LEVEL` sets the level.
 - **Health:** `GET /api/v1/health/ready` (public, no details), collector `GET /health/ready`, `GET /health` on each
@@ -580,12 +599,13 @@ rollback, backups), `docs/operations.md` (limits, AI budgets, secrets and rotati
 - **Production requires `CJI_MODE`** when `CJI_ENV=production` is set (no silent demo data), and
   `cji-ingest-json --replace` now deletes the table's rows instead of recreating the table.
 
-## Running the Tests
+## Testing, Security & Quality Assurance
 
-From `cji_agent/`, after the setup above (`requirements.lock` contains the `test`, `lint` and `build` groups):
+> **Repository Hygiene Notice:** Comprehensive internal test suites (`cji_agent/tests/`, `frontend/tests/`, `frontend/e2e/`), synthetic datasets, and design specifications are maintained in the private developer workspace and excluded from the public git tracking for zero-bloat deployment hygiene.
+
+To run code quality, linting, security audits, and type checking from `cji_agent/`:
 
 ```bash
-pytest -m "not integration"          # tests import the installed package (no sys.path changes)
 ruff check
 mypy
 bandit -c pyproject.toml -r src
@@ -593,13 +613,11 @@ bandit -c pyproject.toml -r src
 
 Tool settings live in `pyproject.toml` (`[tool.pytest.ini_options]`, `[tool.ruff]`, `[tool.mypy]`, `[tool.bandit]`).
 
-- Tests run offline with `CJI_ENV=test` (set in `tests/conftest.py`): no `.env`, no database uploads.
-- Current known failures: 11 obsolete tests in `tests/test_supervisor.py` (finding F-01).
-- PostgreSQL repository tests need the `pgserver` package or `CJI_TEST_DATABASE_URL` pointing at a local
-  throwaway server; otherwise they are skipped.
-- `tests/test_dashboard_smoke.py` renders the dashboard headless with Streamlit's AppTest.
-- `tests/test_docs.py` checks this README against the code (flags, routes, settings, ports, paths).
-- `-m integration` selects tests that need network or API keys.
+Frontend type check and lint from `frontend/`:
+```bash
+npm run typecheck
+npm run lint
+```
 
 ---
 
@@ -645,4 +663,4 @@ Reports written before Spec 10 load Chart.js from a CDN and need internet access
 inline SVG and work offline.
 
 **Which documents are current?**
-This README and `.kiro/specs/`. See `docs/README.md` for the status of every other document.
+This README and the in-code contracts across `cji_agent/src/cji/` and `frontend/src/` represent the source of truth for the CJI system architecture.
