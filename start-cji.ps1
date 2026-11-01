@@ -44,8 +44,8 @@ $apiCmd = if (Test-Path "$pyScripts\cji-api.exe") {
     "${actPrefix}& '$pyScripts\python.exe' -m cji.api.serve"
 }
 
-Start-Process powershell -WorkingDirectory "$root\cji_agent" -ArgumentList '-NoExit', '-Command', "`$host.UI.RawUI.WindowTitle='CJI MCP Servers :8001-8005'; $serversCmd"
-Start-Process powershell -WorkingDirectory "$root\cji_agent" -ArgumentList '-NoExit', '-Command', "`$host.UI.RawUI.WindowTitle='CJI API :8006'; $apiCmd"
+Start-Process powershell -WorkingDirectory "$root\cji_agent" -ArgumentList '-ExecutionPolicy', 'Bypass', '-NoExit', '-Command', "`$host.UI.RawUI.WindowTitle='CJI MCP Servers :8001-8005'; $serversCmd"
+Start-Process powershell -WorkingDirectory "$root\cji_agent" -ArgumentList '-ExecutionPolicy', 'Bypass', '-NoExit', '-Command', "`$host.UI.RawUI.WindowTitle='CJI API :8006'; $apiCmd"
 Start-Process powershell -WorkingDirectory "$root\frontend" -ArgumentList '-NoExit', '-Command', "`$host.UI.RawUI.WindowTitle='CJI frontend :3000'; npm.cmd run dev"
 
 Write-Host 'MCP:      http://127.0.0.1:8001..8005/sse (5 MCP servers)'
