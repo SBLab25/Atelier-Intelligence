@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; style-src &#x27;sha256-ArN2gwAa5zRF5bpqebBQG9f9U1Ngqq2bfJAGny7VaH4=&#x27;; img-src &#x27;none&#x27;; script-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CJI Report - onboarding</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 2rem; }
+h1, h2, h3 { color: #2c3e50; }
+.header { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; }
+.badge { display: inline-block; padding: 0.25em 0.5em; font-size: 0.8em; font-weight: bold; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; background-color: #6c757d; color: #fff; }
+.badge.critical { background-color: #dc3545; }
+.badge.demo { background-color: #17a2b8; }
+.badge.realtime { background-color: #28a745; }
+.narrative { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #007bff; margin-bottom: 2rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.note { color: #6c757d; font-size: 0.9em; font-style: italic; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+table, th, td { border: 1px solid #ddd; }
+th, td { padding: 12px; text-align: left; overflow-wrap: anywhere; }
+th { background-color: #f2f2f2; }
+.chart-container { width: 100%; max-width: 800px; margin: 2rem auto; }
+.chart text { font-size: 13px; fill: #333; }
+.insight-card { border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-wrap: anywhere; }
+.insight-card h4 { margin-top: 0; color: #d9534f; }
+.details { border-top: 2px solid #eee; margin-top: 2rem; padding-top: 1rem; font-size: 0.9em; color: #555; }
+.details dt { font-weight: bold; }
+.details dd { margin: 0 0 0.5rem 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<header class="header">
+<h1>Customer Journey Intelligence Report</h1>
+<p><strong>Journey:</strong> onboarding | <span class="badge realtime">REALTIME MODE</span> | <strong>Generated:</strong> not recorded</p>
+</header>
+<h2>Executive Summary</h2>
+<div class="narrative">Analysis of the onboarding journey revealed major friction points. Recommendations are provided.</div>
+<h2>Funnel Analysis</h2>
+<div class="chart-container">
+<svg class="chart" viewBox="0 0 860 348" width="100%" role="img" aria-label="Users entered per funnel step">
+<g><title>landing_page: 5,002 users</title><text class="label" x="170" y="31" text-anchor="end">landing_page</text><rect class="bar" x="180" y="12" width="600.0" height="28" fill="#007bff"/><text class="value" x="786.0" y="31">5,002</text></g>
+<g><title>sign_up_form: 4,227 users</title><text class="label" x="170" y="67" text-anchor="end">sign_up_form</text><rect class="bar" x="180" y="48" width="507.0" height="28" fill="#007bff"/><text class="value" x="693.0" y="67">4,227</text></g>
+<g><title>email_verification: 3,660 users</title><text class="label" x="170" y="103" text-anchor="end">email_verification</text><rect class="bar" x="180" y="84" width="439.0" height="28" fill="#007bff"/><text class="value" x="625.0" y="103">3,660</text></g>
+<g><title>profile_setup: 2,673 users</title><text class="label" x="170" y="139" text-anchor="end">profile_setup</text><rect class="bar" x="180" y="120" width="320.6" height="28" fill="#007bff"/><text class="value" x="506.6" y="139">2,673</text></g>
+<g><title>plan_selection: 817 users</title><text class="label" x="170" y="175" text-anchor="end">plan_selection</text><rect class="bar" x="180" y="156" width="98.0" height="28" fill="#007bff"/><text class="value" x="284.0" y="175">817</text></g>
+<g><title>payment_info: 1,055 users</title><text class="label" x="170" y="211" text-anchor="end">payment_info</text><rect class="bar" x="180" y="192" width="126.5" height="28" fill="#007bff"/><text class="value" x="312.5" y="211">1,055</text></g>
+<g><title>confirm_details: 682 users</title><text class="label" x="170" y="247" text-anchor="end">confirm_details</text><rect class="bar" x="180" y="228" width="81.8" height="28" fill="#007bff"/><text class="value" x="267.8" y="247">682</text></g>
+<g><title>onboarding_done: 628 users</title><text class="label" x="170" y="283" text-anchor="end">onboarding_done</text><rect class="bar" x="180" y="264" width="75.3" height="28" fill="#007bff"/><text class="value" x="261.3" y="283">628</text></g>
+<g><title>user_onboarding: 5,000 users</title><text class="label" x="170" y="319" text-anchor="end">user_onboarding</text><rect class="bar" x="180" y="300" width="599.8" height="28" fill="#007bff"/><text class="value" x="785.8" y="319">5,000</text></g>
+</svg>
+</div>
+<h2>Friction by step</h2>
+<table class="friction">
+<thead><tr><th>Step</th><th>Friction score</th><th>Critical</th></tr></thead>
+<tbody>
+<tr><td>profile_setup</td><td>43.0</td><td>—</td></tr>
+<tr><td>payment_info</td><td>31.0</td><td>—</td></tr>
+<tr><td>email_verification</td><td>25.0</td><td>—</td></tr>
+</tbody>
+</table>
+<h2>Top Prioritised Insights</h2>
+<div class="insights-container">
+<div class="insight-card">
+<h4>[Priority 1] - document_upload</h4>
+<p><strong>Issue:</strong> High Dropoff on Doc Upload</p>
+<p><strong>Root Cause:</strong> File size limit causes silent validation error.</p>
+<p><strong>Recommendation:</strong> Display explicit file size guidelines before upload.</p>
+</div>
+</div>
+<footer class="details">
+<h2>Report details</h2>
+<dl>
+<dt>Run</dt><dd>run-verify-test</dd>
+<dt>Schema</dt><dd>cji-report/1 (cji-report-renderer/1)</dd>
+<dt>Input SHA-256</dt><dd>24a5887cc29fb532b5d7275575374aaabaa6b21c6c33d38dcbd21bb81e16aa2a</dd>
+<dt>Narrative</dt><dd>unknown</dd>
+<dt>Shortened</dt><dd>nothing</dd>
+</dl>
+</footer>
+<script type="application/json" id="cji-report-data">{"counts":{"friction_rows":[3,3],"funnel_steps":[9,9],"insights":[1,1]},"funnel":[{"step_id":"landing_page","users":5002},{"step_id":"sign_up_form","users":4227},{"step_id":"email_verification","users":3660},{"step_id":"profile_setup","users":2673},{"step_id":"plan_selection","users":817},{"step_id":"payment_info","users":1055},{"step_id":"confirm_details","users":682},{"step_id":"onboarding_done","users":628},{"step_id":"user_onboarding","users":5000}],"generated_at":"","input_sha256":"24a5887cc29fb532b5d7275575374aaabaa6b21c6c33d38dcbd21bb81e16aa2a","journey":"onboarding","mode":"realtime","narrative":{"model":"","source":"unknown"},"renderer":"cji-report-renderer/1","run_id":"run-verify-test","schema":"cji-report/1","truncated":{}}</script>
+</body>
+</html>

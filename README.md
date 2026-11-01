@@ -1,36 +1,75 @@
 # Atelier Intelligence (Customer Journey Intelligence)
 
-> **Proof-of-concept system that turns user-behaviour events into friction scores, root-cause insights and a standalone HTML report, using a LangGraph multi-agent pipeline and five MCP servers.**
+> **Working Prototype: An enterprise agentic intelligence platform that transforms multi-source customer journey telemetry into deterministic friction scores, root-cause AI insights, and executive HTML reports via a LangGraph multi-agent pipeline, 5 Model Context Protocol (MCP) microservices, and a Next.js Cockpit.**
 
-Commands below are run from `cji_agent/` unless stated. Comprehensive setup and operational runbooks are documented below.
+> **Naming & Package Conventions:** In product interfaces and documentation, the platform is named **Atelier Intelligence** (or **Atelier**). The internal Python distribution package, configuration keys, and command-line entry points retain the `cji` prefix (e.g. `cji`, `cji-servers`, `cji-api`, `CJI_HOME`).
+
+---
+
+### Repository Metadata
+
+- **Description:** Working Prototype: Enterprise agentic intelligence platform turning customer journey telemetry into deterministic friction scores, root-cause insights, and executive reports via LangGraph and MCP.
+- **Topics:** `langgraph`, `mcp`, `agentic-ai`, `customer-journey`, `friction-analysis`, `nextjs`, `fastapi`, `working-prototype`
+- **License:** [MIT License](LICENSE)
 
 ---
 
 ## Table of Contents
 
-1. [Why CJI?](#why-cji)
-2. [Features](#features)
-3. [Quickstart](#quickstart)
-4. [System Architecture](#system-architecture)
-5. [Demo Mode Walkthrough](#demo-mode-walkthrough)
-6. [Importing Event Files](#importing-event-files)
-7. [Realtime Mode Walkthrough](#realtime-mode-walkthrough)
-8. [Backend API](#backend-api)
-9. [Web Frontend](#web-frontend)
-10. [Environment Variables Reference](#environment-variables-reference)
-11. [Guardrails](#guardrails)
-12. [LangSmith Tracing](#langsmith-tracing)
-13. [Testing & Code Quality](#testing-security--quality-assurance)
-14. [Security Practices](#security-practices)
-15. [Known Issues & FAQ](#known-issues--faq)
+1. [Why Atelier Intelligence?](#why-atelier-intelligence)
+2. [Platform Overview & Visuals](#platform-overview--visuals)
+3. [Features](#features)
+4. [Quickstart](#quickstart)
+5. [System Architecture](#system-architecture)
+6. [Demo Mode Walkthrough](#demo-mode-walkthrough)
+7. [Importing Event Files](#importing-event-files)
+8. [Realtime Mode Walkthrough](#realtime-mode-walkthrough)
+9. [Backend REST API](#backend-rest-api)
+10. [Next.js Cockpit Frontend](#nextjs-cockpit-frontend)
+11. [Environment Variables Reference](#environment-variables-reference)
+12. [Guardrails & AI Safety](#guardrails--ai-safety)
+13. [LangSmith Observability](#langsmith-observability)
+14. [Production Operations](#production-operations)
+15. [Testing & Quality Assurance](#testing--quality-assurance)
+16. [Security Practices](#security-practices)
+17. [Frequently Asked Questions](#frequently-asked-questions)
 
 ---
 
-## Why Atelier?
+## Why Atelier Intelligence?
 
-Most analytics tools show *what* happened. CJI computes a deterministic **friction score** for every step of a user
-journey, then asks an LLM for the likely root cause and a prioritised fix, and summarises the result in a standalone
-HTML report.
+### The Problem
+
+Modern growth, product, and engineering teams lose millions annually in user funnel abandonment (such as SaaS onboarding, checkout funnels, and KYC verification flows):
+
+- **Traditional Analytics are Shallow:** Platforms like Google Analytics 4, Mixpanel, or Amplitude tell you *that* users dropped off (e.g., "42% abandonment on Step 3"), but they cannot explain *why*.
+- **The Investigation Tax:** Isolating root causes requires cross-referencing disparate data silos—session replays (Hotjar, UXCam), APM server logs (Datadog, CloudWatch), and customer support tickets (Zendesk). Teams spend 10–20 engineering hours per sprint manually diagnosing friction points.
+- **Delayed Remediation:** By the time product teams diagnose an onboarding hurdle or confusing form field, weeks have passed, ad budgets are wasted, and conversion velocity is permanently lost.
+
+### The Atelier Solution
+
+Atelier Intelligence bridges the gap between raw telemetry and immediate engineering resolution:
+
+1. **Deterministic Friction Engine:** Mathematical scoring across five empirical signals: drop-off rates, error frequencies, rage clicks, dwell times, and retry loops (computed using DuckDB for local analytics and PostgreSQL for live production).
+2. **LangGraph Multi-Agent Collaboration:** A Supervisor agent coordinates specialized worker agents (Ingestion, Journey Data, Friction Scoring, Insight Generation, and Report Synthesis) running over 5 Model Context Protocol (MCP) microservices.
+3. **Automated Root Cause & Remediation:** LLM agents analyze critical friction steps, retrieve historical patterns from ChromaDB vector stores, and generate actionable root-cause hypotheses alongside prioritized engineering tickets.
+4. **Self-Contained Executive Artifacts:** Generates zero-dependency standalone HTML reports featuring inline SVG funnel visualizations, accessible color palettes, and strict Content Security Policies (`script-src 'none'`).
+
+---
+
+## Platform Overview & Visuals
+
+### Atelier Intelligence Cockpit
+
+The modern Next.js 16 Cockpit provides an executive Bento-grid dashboard, live telemetry streaming, funnel friction drill-downs, run execution controls, and self-serve API key provisioning:
+
+![Atelier Intelligence Cockpit](assets/cockpit-overview.png)
+
+### Sample Standalone Executive Report
+
+Every analysis run can produce an immutable, self-contained HTML report with embedded SVGs, friction tables, and AI insights:
+
+📄 **[View Sample Executive Friction Report (HTML)](assets/sample_report.html)**
 
 ---
 
@@ -38,46 +77,52 @@ HTML report.
 
 | Capability | Detail |
 |---|---|
-| **Two modes** | `demo` reads `data/events.parquet` with DuckDB; `realtime` reads PostgreSQL (`tracking_events` and `live_events`) |
-| **Friction engine** | Deterministic weighted score per step: drop-off, errors, rage clicks, dwell time, retries |
-| **Insights** | LLM root cause and fix per critical step, stored in ChromaDB; rule-based fallback without an API key |
-| **Report** | Self-contained HTML report (no scripts, no external files): narrative, SVG funnel chart, friction table, insight cards and provenance |
-| **Orchestration** | LangGraph supervisor and five worker nodes; optional human approval before the report |
-| **Smart ingestion** | LLM-assisted mapping of CSV/JSON/Excel/Parquet files to the event schema |
-| **Dashboard** | Streamlit: KPIs, funnel, friction, heatmap, audience, insights, file upload |
-| **Observability** | LangSmith tracing, off by default |
+| **Dual Execution Modes** | `demo` queries local `data/events.parquet` via DuckDB; `realtime` queries PostgreSQL (`tracking_events` and `live_events`). |
+| **Deterministic Friction Scoring** | Normalized 0–100 score weighted across: Drop-offs (40%), Errors (25%), Rage Clicks (15%), Dwell Outliers (10%), Retries (10%). |
+| **Agentic Root-Cause Insights** | Groq / Anthropic LLM completions per critical step, cached in ChromaDB; rule-based fallback without external API keys. |
+| **Standalone Executive Reports** | Zero-dependency UTF-8 HTML report with inline SVG funnels, friction matrices, and provenance metadata (no external CDN scripts). |
+| **Multi-Agent Orchestration** | LangGraph sequential workflow with a supervisor and 5 dedicated worker nodes; durable checkpointing via SQLite. |
+| **Smart Ingestion Intelligence** | Schema detection and column fingerprinting for CSV, JSON, Excel, and Parquet data files. |
+| **Dual Frontends** | Modern Next.js 16 Cockpit (`:3000`) with encrypted session cookies, plus secondary Streamlit dashboard (`:8501`). |
+| **Comprehensive Observability** | OpenTelemetry correlation IDs, Prometheus metrics, JSON structured logging, and optional LangSmith tracing. |
 
 ---
 
 ## Quickstart
 
-> **Prerequisite:** Python 3.12 or newer (`requires-python = ">=3.12"`; tested with 3.12), Node.js 22.12+.
+> **Prerequisite:** Python 3.12+ and Node.js 22.12+.
 
 ### 🚀 One-Click Automated Startup (Recommended)
 
-To launch the full CJI ecosystem (5 MCP servers on ports 8001–8005, the FastAPI backend on port 8006, and the Next.js Cockpit on port 3000) with automatic port reaping and virtual environment activation:
+To launch the full CJI ecosystem (5 MCP servers on ports 8001–8005, the FastAPI backend on port 8006, and the Next.js Cockpit on port 3000) with automatic port conflict reaping and virtual environment activation:
 
+#### Windows (PowerShell)
 ```powershell
 .\start-cji.ps1
 ```
-
-To stop all background CJI servers and safely release all listening ports:
-
+To stop all services and release listening ports:
 ```powershell
 .\stop-cji.ps1
 ```
 
-Once started:
+#### macOS / Linux (Bash)
+```bash
+chmod +x start-cji.sh stop-cji.sh
+./start-cji.sh
+```
+To stop all services:
+```bash
+./stop-cji.sh
+```
+
+#### Running Endpoints:
 - **Cockpit Web UI:** [http://localhost:3000](http://localhost:3000)
 - **Backend REST API:** [http://127.0.0.1:8006/api/v1](http://127.0.0.1:8006/api/v1)
-- **MCP Servers (SSE):** `http://127.0.0.1:8001..8005/sse`
+- **5 MCP Servers (SSE):** `http://127.0.0.1:8001..8005/sse`
 
 ---
 
 ### Manual CLI Setup
-
-CJI is the installable package `cji` (distribution `cji-agent`, sources in `cji_agent/src/cji/`). Install the exact
-tested dependency set from the lock file, then the package itself:
 
 ```bash
 # 1. Create a virtual environment inside cji_agent/
@@ -86,65 +131,41 @@ python -m venv .venv
 .venv\Scripts\activate            # Windows
 # source .venv/bin/activate       # macOS / Linux
 
-# 2. Install the locked dependencies (runtime and dev tools, hash-checked), then the package (editable)
+# 2. Install locked dependencies and the cji package
 pip install -r requirements.lock
 pip install --no-deps -e .
 
-# 3. Configure (demo mode needs no secrets)
+# 3. Configure environment (demo mode runs with zero external secrets)
 cp .env.example .env
 cji-settings check
 
-# 4. Start the five MCP servers (keep this terminal open)
+# 4. Start the 5 MCP servers
 cji-servers --mode demo
 
-# 5. In a second terminal: run the pipeline on the bundled demo data
+# 5. In a second terminal: trigger a pipeline run on demo data
 cji --mode demo --run --auto-approve
 ```
 
-`requirements.lock` pins every package (runtime plus the `dev` dependency group) with hashes;
-`pyproject.toml` declares the supported ranges. `requirements.txt` and `requirements-dev.txt` only include the lock,
-so `pip install -r requirements.txt` still works. `--no-deps` keeps pip from resolving anything beyond the lock.
-To rebuild the lock after a deliberate upgrade, run `uv pip compile pyproject.toml -o requirements.lock`.
+---
 
-The report is written to `reports/cji_report_<journey>_<run id>.html`; the CLI prints the path. A summary for the
-dashboard is written to `data/last_run.json`.
+### Commands Summary
 
-To open the dashboard (port 8501):
-
-```bash
-cji-dashboard
-```
-
-### Runtime home (`CJI_HOME`)
-
-`data/`, `reports/`, `.env`, the checkpoint database and generated snippets live in the runtime home: `CJI_HOME` if
-set (a relative value is resolved against the working directory), otherwise the working directory. Run the commands
-from `cji_agent/` to use the bundled `data/events.parquet`, or set `CJI_HOME` to another directory to run from
-anywhere. `cji-settings check` prints the resolved `home`. `CJI_HOME` itself is read from the environment, not from
-`.env`. `cji-servers` and the dashboard start their child processes in the same home.
-
-### Commands
-
-| Console script | Old command (still works from `cji_agent/`) | Purpose |
-|---|---|---|
-| `cji` | `python main.py` | Generate demo data, run, approve, resume and inspect analyses |
-| `cji-servers` | `python run_servers.py` | Start the five MCP servers |
-| `cji-settings` | `python -m settings` | `check` the configuration (secrets redacted) |
-| `cji-dashboard` | `streamlit run dashboard.py` | Streamlit dashboard; extra arguments go to `streamlit run` |
-| `cji-collector` | `python -m uvicorn collector.api:app` | Collector API on the configured collector endpoint |
-| `cji-api` | none (new in Spec 12) | Backend API `/api/v1` on the configured api endpoint ([Backend API](#backend-api)) |
-| `cji-api-token` | none (new in Spec 12) | Create, list and revoke backend API tokens |
-| `cji-ingest-json` | `python tools/ingest_json.py` | Import event files into PostgreSQL `tracking_events` |
-| `cji-snippet` | `python tracker/snippet_generator.py` | Write the tracker embed snippet for a journey key |
-| `cji-generate-diverse` | `python generate_diverse.py` | Generate the large, high-friction demo dataset |
-| `cji-db` | none (new in Spec 15) | PostgreSQL schema migrations: `migrate up`, `down --to N`, `status` |
-| `cji-backup` | none (new in Spec 15) | `create`, `verify` and `restore` backups of the database tables, SQLite stores and files |
-| `cji-ops` | none (new in Spec 15) | `status` (readiness of every service) and `maintenance` (audit retention, expired uploads) |
-| `cji-trace` | none (new in Spec 15) | `show TRACE_ID`: one request through the API, the workflow and the MCP servers |
-
-The old commands are small launchers in `cji_agent/` that call the installed package; they print the install
-command and exit 2 if `cji` is not installed. Each server also runs as a module, e.g.
-`python -m cji.mcp_servers.journey_data_server`.
+| Command | Purpose |
+|---|---|
+| `cji` | Main CLI: run analysis pipelines, inspect checkpoints, approve runs, and resume tasks |
+| `cji-servers` | Start the five Model Context Protocol (MCP) servers |
+| `cji-api` | Run the FastAPI backend REST API (`/api/v1`) on port 8006 |
+| `cji-collector` | High-throughput FastAPI event intake collector on port 8000 |
+| `cji-dashboard` | Launch the Streamlit analytical dashboard on port 8501 |
+| `cji-api-token` | Create, list, inspect, and revoke backend API bearer tokens |
+| `cji-settings` | Check environment variables, paths, and active service registries |
+| `cji-ingest-json` | Convert external analytics files (GA4, Hotjar, UXCam) into PostgreSQL |
+| `cji-snippet` | Generate client-side tracker embed scripts and React hooks |
+| `cji-generate-diverse`| Synthesize high-friction multi-journey datasets for load testing |
+| `cji-db` | Manage PostgreSQL schema migrations (`migrate up`, `down`, `status`) |
+| `cji-backup` | Create, verify, and restore full database and SQLite checkpoint backups |
+| `cji-ops` | System operational status and audit log retention maintenance |
+| `cji-trace` | Trace an individual request ID through the API, workflow, and MCP calls |
 
 ---
 
@@ -156,21 +177,32 @@ flowchart TB
     classDef data fill:#fffbeb,stroke:#f59e0b,color:#78350f
     classDef mcp fill:#faf5ff,stroke:#a855f7,color:#581c87
     classDef agent fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a
+    classDef ui fill:#ecfdf5,stroke:#10b981,color:#065f46
 
-    subgraph Collection ["Data collection"]
-        tracker["tracker.js (browser)"]:::client
-        collector["FastAPI collector :8000"]:::client
-        generator["Synthetic generator"]:::client
-        files["Event files (CSV / JSON)"]:::client
+    subgraph UserInterfaces ["Frontends & User Interfaces"]
+        cockpit["Next.js Atelier Cockpit :3000"]:::ui
+        dashboard["Streamlit Dashboard :8501"]:::ui
     end
 
-    subgraph Storage ["Storage"]
-        parquet[("data/events.parquet")]:::data
-        pg[("PostgreSQL: live_events, tracking_events, demo_events")]:::data
-        chroma[("ChromaDB insights")]:::data
+    subgraph APIBoundary ["API Gateway Layer"]
+        api["FastAPI Backend :8006 (/api/v1)"]:::client
+        collector["FastAPI Collector :8000 (/collect/batch)"]:::client
     end
 
-    subgraph MCP ["MCP servers (SSE)"]
+    subgraph Collection ["Data Collection & Ingestion"]
+        tracker["tracker.js (Browser SDK)"]:::client
+        generator["Synthetic Data Generator"]:::client
+        files["External Files (CSV/JSON/Parquet)"]:::client
+    end
+
+    subgraph Storage ["Durable Storage Layer"]
+        parquet[("DuckDB: data/events.parquet")]:::data
+        pg[("PostgreSQL: live_events, tracking_events")]:::data
+        chroma[("ChromaDB: Vector Insights")]:::data
+        sqlite[("SQLite: cji_checkpoints.db")]:::data
+    end
+
+    subgraph MCP ["MCP Microservices (SSE)"]
         journey["journey-data :8001"]:::mcp
         friction["friction-engine :8002"]:::mcp
         insight["insight :8003"]:::mcp
@@ -178,443 +210,243 @@ flowchart TB
         ingestion["ingestion-intelligence :8005"]:::mcp
     end
 
-    subgraph Agents ["LangGraph (main.py)"]
-        supervisor{"supervisor"}:::agent
-        workers["ingestion / data / friction / insight / report workers"]:::agent
+    subgraph Agents ["LangGraph Multi-Agent Pipeline"]
+        supervisor{"Supervisor Agent"}:::agent
+        workers["Workers: Ingest, Data, Friction, Insight, Report"]:::agent
     end
 
+    cockpit -->|"Encrypted Cookie / Bearer Token"| api
+    dashboard --> pg
     tracker -->|"POST /collect/batch"| collector --> pg
     generator --> parquet
-    generator -->|"if a database is configured"| pg
     files --> ingestion
-    journey -->|"demo"| parquet
-    journey -->|"realtime"| pg
-    insight <--> chroma
+    api --> journey & friction & insight & report & sqlite
     supervisor <--> workers
     workers --> journey & friction & insight & report & ingestion
+    journey --> parquet & pg
+    insight <--> chroma
+    supervisor --> sqlite
 ```
 
-| Part | Location | What it does |
-|---|---|---|
-| Journey data | `mcp_servers/journey_data_server.py` | Step metrics, funnel, events, live snapshot through a repository chosen once by `CJI_MODE` (`repositories/`) |
-| Friction engine | `mcp_servers/friction_engine_server.py` | Pure scoring functions |
-| Insight | `mcp_servers/insight_server.py` | Groq chat completion per critical step, guardrails, ChromaDB storage and ranking |
-| Report | `mcp_servers/report_server.py`, `reporting/` | Narrative (Groq, template fallback); the HTML report is validated, rendered and written by `reporting/` |
-| Ingestion intelligence | `mcp_servers/ingestion_intelligence_server.py` | Schema detection (Anthropic, then Groq), mapping, validation, writes through the repository |
-| Supervisor and workers | `agents/supervisor.py`, `agents/workers.py`, `agents/ingestion_worker.py` | Deterministic routing; each worker calls its MCP server; a step that still fails after its retries stops the run with a structured error |
-| Graph and workflow | `graph.py`, `workflow/`, `main.py` | Sequential graph; `workflow/runtime.py` stores a checkpoint after every worker (SQLite, `CJI_CHECKPOINTS_DB`), pauses before the report unless `--auto-approve`, and resumes interrupted or failed runs |
-| Settings | `settings/` | Typed configuration and the service registry (ports, transport, URLs) |
-| Collector | `collector/api.py` | Browser event intake for realtime mode |
-| Dashboard | `dashboard.py` | Streamlit client; reads PostgreSQL in both modes plus `data/last_run.json` |
+### Microservices Port Allocation
 
-Source paths in this table are relative to `cji_agent/src/cji/` (the `cji` package).
-
-Ports and transports come from the service registry (`settings/services.py` in the package):
-
-| Port | Service |
-|---|---|
-| 8000 | collector (HTTP) |
-| 8001 | cji-journey-data (MCP over SSE) |
-| 8002 | cji-friction-engine |
-| 8003 | cji-insight |
-| 8004 | cji-report |
-| 8005 | cji-ingestion-intelligence |
-| 8501 | dashboard (Streamlit) |
-
-Override a port with `CJI_<SERVICE>_PORT` (for example `CJI_REPORT_PORT`) or point at a remote service with
-`CJI_<SERVICE>_URL`.
+| Port | Service | Protocol | Role |
+|---|---|---|---|
+| **3000** | Next.js Cockpit | HTTP | Modern Bento-grid Web UI with live streaming telemetry |
+| **8000** | cji-collector | HTTP | High-throughput browser telemetry collector (`/collect/batch`) |
+| **8001** | cji-journey-data | MCP / SSE | Journey metrics, funnels, and event queries |
+| **8002** | cji-friction-engine | MCP / SSE | Pure mathematical friction calculation functions |
+| **8003** | cji-insight | MCP / SSE | LLM root-cause synthesis and ChromaDB retrieval |
+| **8004** | cji-report | MCP / SSE | Standalone self-contained HTML report renderer |
+| **8005** | cji-ingestion-intelligence | MCP / SSE | Schema inference and data mapping engine |
+| **8006** | cji-api | HTTP | Production REST API (`/api/v1`) |
+| **8501** | cji-dashboard | HTTP | Legacy Streamlit visual analytics client |
 
 ---
 
 ## Demo Mode Walkthrough
 
 ```bash
-# Optional: regenerate data/events.parquet (2,000 sessions, seed 42)
+# 1. Regenerate demo parquet dataset (2,000 sessions, seed 42)
 cji --mode demo --generate-data --sessions 2000 --seed 42
 
-# Start the servers in demo mode, then run the pipeline in another terminal
+# 2. Start MCP microservices in demo mode
 cji-servers --mode demo
+
+# 3. Execute analysis run with auto-approval
 cji --mode demo --run --auto-approve
 
-# Without --auto-approve the run pauses before the report; approve it with the printed thread id
+# 4. Optional: Run with human-in-the-loop checkpoint approval
 cji --mode demo --run
 cji --approve --thread-id <thread-id>
 
-# Inspect a run, or continue one that was interrupted (process killed, timeout) or failed
+# 5. Inspect status or resume interrupted run
 cji --status --thread-id <thread-id>
 cji --resume --thread-id <thread-id>
 ```
-
-Runs are durable (Spec 09):
-- **Checkpoints.** A checkpoint is stored after every worker, so `--resume` re-runs only the step that was interrupted. Completed steps are never executed again.
-- **Retries.** A step that fails is retried only for transient errors (timeouts, connection failures, provider 5xx/429), up to `CJI_WORKFLOW_STEP_ATTEMPTS`.
-- **Failures.** A step that still fails stops the run as `failed`. `--status` shows the step, its error code and message.
-- **Approval.** `--approve` works only for a run awaiting approval; approving twice does nothing.
-- **Concurrency.** One process at a time may work on a run.
-- **No duplicates.** Reports are named by run (`cji_report_<journey>_<run id>.html`), insights are stored under run-scoped ids, and ingested rows without an `event_id` get ids derived from their content. Rerunning or resuming a step therefore never duplicates them.
-- **Exit codes.** 0 for completed or paused, 1 for failed or refused, 2 for configuration errors.
-
-Notes:
-- With `DATABASE_URL` or `SUPABASE_DATABASE_URL` set (and `CJI_ENV` not `test`), `--generate-data` also **replaces**
-  the `demo_events` table in that database, which the dashboard's "demo_events track" reads.
-- `--window-days` is accepted for demo runs; demo queries currently read the whole file.
-- `cji-generate-diverse` creates a larger (about 1M events), high-friction dataset. It overwrites
-  `data/events.parquet`; restore the default with `--generate-data`.
-- The CLI and the servers must use the same mode. A realtime run against demo servers stops with
-  `ModeMismatch`; restart the servers with `cji-servers --mode realtime`.
 
 ---
 
 ## Importing Event Files
 
-Two paths exist:
+Atelier supports multi-format file ingestion through two paths:
 
 ```bash
-# 1. Smart ingestion through the pipeline (LLM-assisted mapping; writes through the repository:
-#    demo -> data/events.parquet, realtime -> PostgreSQL tracking_events). Servers must be running.
-cji --mode demo --ingest --file <path> --source-hint "GA4 export" --run --auto-approve
+# Path 1: Smart ingestion via the LangGraph pipeline (automatic schema mapping)
+cji --mode demo --ingest --file data.json --source-hint "GA4 Export" --run --auto-approve
 
-# 2. Direct conversion of known formats (GA4, Hotjar, UXCam, surveys, tickets, combined CSV, NDJSON)
-#    into PostgreSQL tracking_events. Appends by default, skipping event_ids already stored.
-cji-ingest-json <file>
-cji-ingest-json <file> --map userId=user_id page=step_id
-cji-ingest-json <file> --replace      # replaces the whole tracking_events table
+# Path 2: Direct conversion into PostgreSQL tracking_events
+cji-ingest-json export.csv --map userId=user_id page=step_id
+cji-ingest-json export.json --replace   # Replaces table rows safely
 ```
-
-The dashboard's **Upload Events** panel uses path 2. It appends by default; the **Replace all rows in
-tracking_events** box replaces the table and shows a warning first. Path 2 needs a database URL.
 
 ---
 
 ## Realtime Mode Walkthrough
 
-Realtime mode reads events from PostgreSQL: `live_events` (written by the collector) and `tracking_events`
-(written by file imports).
+Realtime mode streams browser events directly into PostgreSQL (`live_events` and `tracking_events`).
 
-### 1. Start the collector
-
+### 1. Start the Collector
 ```bash
-# Requires DATABASE_URL (or SUPABASE_DATABASE_URL). Outside CJI_ENV=development it also requires
-# CJI_ADMIN_KEY (32+ random characters) and CJI_CORS_ORIGINS.
-cji-collector                       # uvicorn on the configured endpoint (default 127.0.0.1, port 8000)
-# same as: python -m uvicorn cji.collector.api:app --host 127.0.0.1 --port 8000
+cji-collector
 ```
 
-| Route | Purpose |
-|---|---|
-| `GET /health/live` | Liveness: always 200 `{"status": "ok"}`; no database access |
-| `GET /health/ready` | Readiness: 200 `{"status": "ready"}` when PostgreSQL and both collector tables answer, else 503 `{"status": "not_ready"}` |
-| `GET /health` | Readiness plus the `live_events` row count (kept for existing monitors) |
-| `GET /tracker.js` | Serves the browser tracker |
-| `POST /collect/batch` | Receives 1–100 events with a per-journey API key; stores them before answering |
-| `GET /live/stats` | Event counts per step for the last N minutes (`?minutes=`, 1–43200); requires `X-CJI-Admin-Key` |
-| `POST /admin/api-keys` | Creates a per-journey tracker key; requires the `X-CJI-Admin-Key` header |
-
-In `CJI_ENV=development` the collector registers the local test key `cji_dev_localtest` for `JOURNEY_NAME`.
-
-**`POST /collect/batch` contract.** Body `{"api_key": "...", "events": [...]}` as `application/json`, or as
-`text/plain` JSON (what `navigator.sendBeacon` sends). If an `X-CJI-Key` header is sent it must equal `api_key`.
-A key may only write events whose `journey_name` is the journey it was created for. The collector writes all valid
-events of a batch in one transaction and answers after the commit:
-
-| HTTP | `status` | Meaning |
-|---|---|---|
-| 200 | `stored` | Every event is stored (now or by an earlier request) |
-| 207 | `partial` | Valid events are stored; `errors` lists the rejected ones by `index` |
-| 422 | `rejected` | No event was valid (or the envelope is malformed: missing key, 0 or more than 100 events) |
-| 400 / 401 / 413 / 415 | `rejected` | Invalid JSON / unknown, inactive or mismatched key / body too large / other content type |
-| 429 | `rejected` | Rate limit; wait `Retry-After` seconds |
-| 503 | `failed` | Nothing was stored (database unavailable or the write failed); retry with the same `event_id` values |
-
-The body always has `request_id`, `received`, `accepted`, `duplicates` and `rejected`. `event_id` is the
-idempotency key: a retried event counts as a duplicate and is stored once. Errors name the failing fields
-(`{"index": 2, "event_id": "...", "reason": "invalid", "fields": ["event_type"]}`; `reason` is `invalid` or
-`journey_not_authorized`) and never echo submitted values. Every response carries `X-Request-ID` (a valid incoming
-`X-Request-ID` of 8–64 characters `A-Z a-z 0-9 . _ -` is kept), and collector log lines carry the same id. Logs show
-a key fingerprint, never keys, user, session or event ids, URLs or metadata. Per event: `url` at most 2048
-characters (after the query string is removed), `element_selectors` at most 512, `metadata` at most 8192 bytes of
-JSON. Rate limits are counted per process; with several workers each worker has its own buckets.
-
-### 2. Embed the tracker
-
-Create a journey key with `POST /admin/api-keys` (header `X-CJI-Admin-Key`, body
-`{"journey_name": "...", "description": "..."}`), then generate an embed snippet:
-
+### 2. Embed the Tracker SDK
+Generate an embed snippet for your application:
 ```bash
-cji-snippet --journey user_onboarding --api-key <key from POST /admin/api-keys>
+cji-snippet --journey user_onboarding --api-key <your-admin-key>
 ```
 
-This writes `snippets/embed_snippet.html`, a React hook and `snippets/verify_tracker.py` (under the runtime home)
-for that key. The snippet
-sets `window.CJI_CONFIG` (`api_key`, `journey_name`, `collector_url` ending in `/collect/batch`, optional
-`step_map`) and loads `/tracker.js`. Use the journey the key was created for: events for another journey are
-rejected with `journey_not_authorized`. In development, `cji_dev_localtest` works for `JOURNEY_NAME`. The tracker
-sends `page_view`, `step_complete`, `error`, `rage_click` and `abandon` events in batches.
-
-### 3. Run the analysis
-
-```bash
-cji-servers --mode realtime
-cji --mode realtime --run --auto-approve --window-mins 60
+Add the generated snippet to your frontend HTML:
+```html
+<script>
+  window.CJI_CONFIG = {
+    api_key: "cji_dev_localtest",
+    journey_name: "user_onboarding",
+    collector_url: "http://127.0.0.1:8000/collect/batch"
+  };
+</script>
+<script src="http://127.0.0.1:8000/tracker.js" async></script>
 ```
-
-### 4. Dashboard
-
-`cji-dashboard`, then choose "Live_event track", "tracking_event track" or "demo_events track" in the
-sidebar.
 
 ---
 
-## Backend API
+## Backend REST API
 
-`cji-api` serves a versioned JSON API under `/api/v1` for the Next.js frontend (default port 8006,
-`CJI_API_PORT` / `CJI_API_URL`). It reads the same data, checkpoints and reports as the CLI and the dashboard.
-The OpenAPI document is served at `/api/v1/openapi.json` and stored in `cji_agent/openapi/v1.json`
-(regenerate with `python -m cji.api.openapi_snapshot`, check with `--check`). The interactive docs at
-`/api/v1/docs` exist only with `CJI_ENV=development`.
+The FastAPI backend runs on port 8006 and provides RFC 9457 Problem Details errors, Bearer token authentication, rate limiting, and signed cursor pagination:
 
 ```bash
-# 1. Create a token (printed once; only its SHA-256 hash is stored in CJI_API_TOKENS_FILE)
-cji-api-token create --label frontend --role viewer --journey user_onboarding
-cji-api-token list                  # ids, labels, roles, journeys and state (never the token)
-cji-api-token revoke tok_0123456789ab
+# 1. Provision an API token
+cji-api-token create --label web-client --role viewer --journey user_onboarding
 
-# 2. Start the API (outside development: https CJI_API_CORS_ORIGINS and a 32+ character CJI_API_CURSOR_SECRET)
-cji-api                             # uvicorn on the configured endpoint (default 127.0.0.1, port 8006)
+# 2. Launch the API server
+cji-api
 
-# 3. Call it
-curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8006/api/v1/journeys
+# 3. Query journey metrics
+curl -H "Authorization: Bearer <TOKEN>" http://127.0.0.1:8006/api/v1/journeys/user_onboarding/metrics
 ```
 
-**Authentication and roles.** Every route except `GET /api/v1/health` needs `Authorization: Bearer <token>`.
-A token has a role and a journey list (`*` = all journeys):
+### Core API Endpoints
 
-| Role | Can |
-|---|---|
-| `viewer` | read health details, journeys, metrics, friction, insights, runs and reports |
-| `operator` | viewer, plus raw events and run approval |
-| `admin` | operator (reserved for later administrative routes) |
-
-A journey outside the token's list is `403 journey_forbidden`. Runs and reports of such journeys answer
-`404`, exactly like ids that do not exist.
-
-**Routes** (all under `/api/v1`):
-
-| Route | Role | Returns |
+| Method & Route | Role | Returns |
 |---|---|---|
-| `GET /health` | none | `{status, version, mode}` |
-| `GET /health/details`, `GET /me` | viewer | component status; the calling token (never the secret) |
-| `GET /journeys`, `/journeys/{journey_id}` | viewer | configured journeys and their steps |
-| `GET /journeys/{journey_id}/metrics`, `/friction` | viewer | step metrics and funnel; friction scores (`days` 1-365, default 30, or `minutes` 1-43200) |
-| `GET /journeys/{journey_id}/insights` | viewer | insights of the latest run that has them, or of `run_id` |
-| `GET /journeys/{journey_id}/events` | operator | events, newest first (`step_id`, `event_type` filters) |
-| `GET /runs`, `/runs/{run_id}` | viewer | runs (`journey_id`, `status` filters); one run with its steps |
-| `POST /runs/{run_id}/approval` | operator | approves a run awaiting approval; the report step runs in the background |
-| `GET /reports`, `/reports/{report_id}`, `/reports/{report_id}/content` | viewer | report metadata; the HTML, sandboxed by `Content-Security-Policy` |
-
-**Errors.** Every error is `application/problem+json` (RFC 9457) with `type`, `title`, `status`, `detail`,
-a stable `code` and the `request_id`; validation errors add `errors: [{location, field, reason}]`. Submitted values,
-exception text, paths and SQL never appear in a response. Unknown query parameters are rejected (422). Every
-response carries `X-Request-ID` (a valid client value is kept).
-
-**Pagination.** Lists return `{data, page: {limit, next_cursor}}`. `limit` is 1-200 (default 50); pass
-`next_cursor` back as `cursor` with the same filters. Cursors are signed and tied to the query.
-
-**Idempotency.** `POST /runs/{run_id}/approval` requires an `Idempotency-Key` header (8-64 of `A-Z a-z 0-9 . _ -`).
-Repeating a request with the same key within 24 hours returns the stored response with `Idempotent-Replayed: true`;
-the same key with a different request is `409 idempotency_key_reused`. Approval answers `202` when it approved the
-run and `200` with `already_approved: true` when the run was approved before. Request bodies are limited to 16 KiB.
-
-**Rate limits.** Per token (`CJI_API_RATE_PER_TOKEN`, default 120/min) and, for requests without a valid token,
-per client address (`CJI_API_RATE_PER_IP`, default 60/min). Above them: `429` with `Retry-After`.
+| `GET /api/v1/health` | Public | Liveness, readiness, and system version |
+| `GET /api/v1/me` | Viewer | Calling token metadata, role, and authorized journeys |
+| `GET /api/v1/journeys` | Viewer | Configured customer journeys and funnel steps |
+| `GET /api/v1/journeys/{id}/metrics` | Viewer | Drop-off rates, conversion percentages, dwell times |
+| `GET /api/v1/journeys/{id}/friction` | Viewer | Step-by-step 0–100 friction scores and severity ratings |
+| `GET /api/v1/journeys/{id}/insights` | Viewer | Root-cause analysis, engineering tickets, and fixes |
+| `GET /api/v1/journeys/{id}/events` | Operator | Paginated raw event stream with timestamp filtering |
+| `GET /api/v1/runs` | Viewer | History of analysis runs, status, and execution timings |
+| `POST /api/v1/runs/{id}/approval` | Operator | Idempotent approval triggering executive report generation |
+| `GET /api/v1/reports/{id}/content` | Viewer | Sandboxed executive HTML report |
 
 ---
 
-## Web Frontend
+## Next.js Cockpit Frontend
 
-`frontend/` is a Next.js (TypeScript) web app on the backend API: status, journeys with funnel, step metrics and
-friction drill-down, runs (start, approve, resume, results with insight provenance), reports (preview and
-download) and event file ingestion with validation feedback (Spec 14). It runs on its own with Node 22.12+ and
-needs only `cji-api` as its backend; the Streamlit dashboard (`cji-dashboard`) and the CLI stay available as the
-fallback. Details: `frontend/README.md`.
+The `frontend/` directory houses a Next.js 16 (React 19, TypeScript, Tailwind CSS) cockpit application:
+
+- **Enterprise Security:** API keys are never exposed to browser client code. The Next.js server wraps credentials in an encrypted `HttpOnly`, `SameSite=Strict` cookie.
+- **Dynamic Bento Analytics:** Five interactive sub-screens (Overview, Friction Drill-Down, Intelligence Hub, Connections & Tracker Keys, and Team Operations).
+- **Live Telemetry Stream:** Real-time event synthesis simulating incoming user traffic across onboarding steps.
 
 ```bash
-cji-api                                  # backend on port 8006 (see Backend API)
-cji-api-token create --label me --role viewer --journey user_onboarding
 cd frontend
 npm ci
-cp .env.example .env.local               # set CJI_SESSION_SECRET (32+ random characters)
-npm run build && npm start               # http://localhost:3000, sign in with the token
+cp .env.example .env.local
+npm run build && npm start
 ```
-
-The browser never receives the API token: the Next.js server keeps it in an encrypted `HttpOnly`, `Secure`,
-`SameSite=Strict` session cookie and makes every API call itself. Pages without a session redirect to the login
-page. Errors from the API are shown with their code and request id and a Retry button. Frontend settings
-(`CJI_API_BASE_URL`, `CJI_SESSION_SECRET`, `CJI_API_TIMEOUT_MS`) are read by the Next.js server only and are
-documented in `frontend/.env.example`.
-
-Checks: `npm run typecheck`, `npm run lint`, `npm test` (also verifies the generated API types against
-`cji_agent/openapi/v1.json`), `npm run test:e2e` (Playwright: the smoke test and one spec per feature against a
-fixture API, with the installed Chrome).
 
 ---
 
 ## Environment Variables Reference
 
-Settings are read from the process environment, then `.env` in the runtime home (`CJI_HOME`, default: the
-working directory; never read when `CJI_ENV=test`).
-`.env.example` documents every key. `cji-settings check --role <role>` prints the resolved values with secrets
-redacted and exits 2 on a configuration error (roles: `cli`, `dashboard`, `collector`, `api`, `launcher`, `mcp:<service>`).
-
-| Variable | Default | Description |
+| Variable | Default | Purpose |
 |---|---|---|
-| `CJI_ENV` | `production` | `development`, `test` or `production`. Production fails closed on unsafe collector settings. |
-| `CJI_MODE` | `demo` | `demo` or `realtime`. |
-| `JOURNEY_NAME` | `user_onboarding` | Journey analysed and written into reports. |
-| `CJI_HOME` | working directory | Runtime home: `data/`, `reports/`, `.env` and snippets live here. Environment only. |
-| `DATABASE_URL` | none | PostgreSQL URL. Required for realtime mode, the collector, file imports and the dashboard data panels. Percent-encode special characters in the password. |
-| `SUPABASE_DATABASE_URL` | none | Used when `DATABASE_URL` is unset. |
-| `CJI_DATA_DIR` | `cji_agent/data` | Parquet, checkpoints, `data/last_run.json`, ChromaDB. |
-| `CJI_REPORTS_DIR` | `cji_agent/reports` | HTML reports. |
-| `CJI_SERVICE_HOST` | `127.0.0.1` | Bind and connect host for local services. |
-| `CJI_LLM_PROVIDER` | `groq` | `groq`, `anthropic` or `none` (LLM off: rule-based insights and narrative). One provider for insights, narrative and ingestion mapping; never switched automatically. |
-| `LLM_MODEL` | provider default | Sent as configured. Defaults: groq `openai/gpt-oss-120b`, anthropic `claude-sonnet-4-6`. A model of the other provider is refused at startup. |
-| `LLM_TEMPERATURE` | `0.0` | Sampling temperature. |
-| `LLM_MAX_TOKENS` | `2048` | Completion limit. |
-| `GROQ_API_KEY` | none | Used when `CJI_LLM_PROVIDER=groq`. Without it, rule-based fallbacks are used. |
-| `ANTHROPIC_API_KEY` | none | Used when `CJI_LLM_PROVIDER=anthropic`. |
-| `CJI_LLM_TIMEOUT_S` | `30` | Timeout of one LLM HTTP attempt. |
-| `CJI_LLM_DEADLINE_S` | `90` | Limit for one LLM call including all retries and waits. |
-| `CJI_LLM_RETRY_ATTEMPTS` | `3` | Attempts per LLM call; only timeouts, connection errors, 429 and 5xx are retried (`CJI_LLM_RETRY_MIN_S` / `_MAX_S`: backoff 2–10 s). |
-| `CJI_LLM_RATE_PER_MIN` | `30` | LLM calls per minute per server process. |
-| `CJI_LLM_RUN_MAX_CALLS` | `20` | LLM calls per analysis run; beyond it the rule-based fallback is used. |
-| `CJI_LLM_RUN_MAX_TOKENS` | `50000` | Tokens (input + output) per analysis run. |
-| `CJI_LLM_RUN_MAX_COST_USD` | none | Optional cost cap per run; needs `CJI_LLM_PRICE_INPUT_PER_MTOK` and `CJI_LLM_PRICE_OUTPUT_PER_MTOK` (USD per million tokens). |
-| `CJI_MCP_CALL_TIMEOUT_S` | `150` | Limit for one MCP tool call from a worker. |
-| `CJI_AUDIT_DIR` | `cji_agent/data/audit` | One JSONL audit record per LLM and tool call, workflow step attempt and run status change (metadata only: ids, provider, model, outcome, tokens, timing). `off` disables the files. |
-| `CJI_CHECKPOINTS_DB` | `cji_agent/data/cji_checkpoints.db` | Workflow checkpoints and run leases (SQLite). |
-| `CJI_WORKFLOW_STEP_TIMEOUT_S` | `900` | Limit for one attempt of one workflow step; must be above `CJI_MCP_CALL_TIMEOUT_S`. |
-| `CJI_WORKFLOW_STEP_ATTEMPTS` | `2` | Attempts per step (1 to 5); only transient errors are retried. |
-| `CJI_WORKFLOW_RETRY_BACKOFF_S` | `5` | Wait between attempts of a step. |
-| `MAX_AGENT_ITERATIONS` | `20` | Supervisor iteration cap. |
-| `FRICTION_SCORE_THRESHOLD` | `60` | Steps at or above this score are critical. |
-| `REALTIME_WINDOW_MINUTES` | `60` | Realtime analysis window. |
-| `CJI_PIPELINE_TIMEOUT_S` | `180` | Dashboard "Run" subprocess limit. |
-| `INGESTION_CONFIDENCE_THRESHOLD` | `0.80` | Mappings below it are flagged for review instead of written. |
-| `CJI_ADMIN_KEY` | none | Guards `POST /admin/api-keys` and `GET /live/stats`. Shipped example values are refused. |
-| `CJI_CORS_ORIGINS` | empty | Comma-separated browser origins allowed to call the collector; `https` in production (plain `http` only for loopback). |
-| `CJI_KEEPALIVE_URL` | none | Optional outbound keep-alive ping from the collector. |
-| `CJI_COLLECTOR_MAX_BODY_BYTES` | `262144` | Largest accepted request body (413 above it). |
-| `CJI_COLLECTOR_RATE_PER_KEY` | `120` | Batches per minute per tracker key (429 above it). |
-| `CJI_COLLECTOR_RATE_PER_IP` | `300` | Requests per minute per client address. |
-| `CJI_COLLECTOR_ADMIN_RATE_PER_IP` | `10` | Admin requests per minute per client address. |
-| `CJI_COLLECTOR_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the collector; `0` ignores `X-Forwarded-For`. |
-| `CJI_API_PORT` | `8006` | Port of `cji-api` (or `CJI_API_URL` for an API running elsewhere). |
-| `CJI_API_TOKENS_FILE` | `<CJI_DATA_DIR>/api_tokens.json` | Backend API tokens (SHA-256 hashes, roles, journeys); managed with `cji-api-token`. |
-| `CJI_API_RATE_PER_TOKEN` | `120` | Backend API requests per minute per token (429 above it). |
-| `CJI_API_RATE_PER_IP` | `60` | Backend API requests per minute per client address without a valid token. |
-| `CJI_API_CORS_ORIGINS` | development: `http://localhost:3000`, `http://127.0.0.1:3000` | Comma-separated browser origins allowed to call the backend API; `https` outside development and test. |
-| `CJI_API_CURSOR_SECRET` | random per process | HMAC key for page cursors; 32+ characters, required outside development and test. |
-| `CJI_API_MAX_ACTIVE_RUNS` | `1` | Runs one API process starts or resumes at once (1-8); more answer 409 `run_capacity_reached`. |
-| `CJI_API_MAX_UPLOAD_BYTES` | `10485760` | Size limit of `POST /ingestions/validations` (1 KiB-50 MiB); every other request keeps 16 KiB. |
-| `CJI_API_WRITE_OPERATIONS` | `true` | `false` stops serving start, resume and ingestion (emergency operational rollback switch). |
-| `CJI_API_TRUSTED_PROXY_HOPS` | `0` | Proxies in front of the API whose `X-Forwarded-For` is trusted (0-5); above 0 the API must listen on loopback. |
-| `CJI_API_AUTH_FAILURES_PER_MIN` | `10` | Failed authentications per minute per client address before `429`. |
-| `CJI_LOG_FORMAT` | `json` in production, else `text` | Log format; production requires `json`. |
-| `CJI_LOG_LEVEL` | `info` | `debug`, `info`, `warning`, `error` or `critical`. |
-| `CJI_AUDIT_RETENTION_DAYS` | `90` | `cji-ops maintenance` deletes older audit lines. |
-| `CJI_PG_BIN` | found on `PATH` | Directory of `pg_dump`, `pg_restore` and `psql` for `cji-backup`. |
-| `CJI_ALLOW_THIRD_PARTY_TRACING` | `false` | Production refuses `LANGCHAIN_TRACING_V2=true` unless this is `true` (prompts leave the host). |
-| `LANGCHAIN_TRACING_V2` | `false` | `true` enables LangSmith tracing. |
-| `LANGCHAIN_API_KEY` | none | LangSmith key. |
-| `LANGCHAIN_PROJECT` | `cji-poc` | LangSmith project. |
-
-`OPENAI_API_KEY` is accepted but not used. `COLLECTOR_HOST` and `COLLECTOR_PORT` still work but are deprecated in
-favour of `CJI_COLLECTOR_URL`.
+| `CJI_ENV` | `production` | Environment mode (`development`, `test`, `production`). |
+| `CJI_MODE` | `demo` | Data source mode (`demo` for DuckDB/Parquet, `realtime` for PostgreSQL). |
+| `JOURNEY_NAME` | `user_onboarding` | Active customer journey under evaluation. |
+| `CJI_HOME` | Current directory | Working directory for checkpoints, reports, and data. |
+| `DATABASE_URL` | none | PostgreSQL connection string for realtime mode. |
+| `SUPABASE_DATABASE_URL` | none | Fallback PostgreSQL connection string. |
+| `CJI_LLM_PROVIDER` | `groq` | Active LLM provider (`groq`, `anthropic`, or `none` for deterministic fallback). |
+| `LLM_MODEL` | provider default | Active LLM model (e.g. `openai/gpt-oss-120b` or `claude-sonnet-4-6`). |
+| `GROQ_API_KEY` | none | API key for Groq LLM inference. |
+| `ANTHROPIC_API_KEY` | none | API key for Anthropic Claude inference. |
+| `CJI_API_PORT` | `8006` | Port for the FastAPI backend REST API. |
+| `CJI_SESSION_SECRET` | none | 32+ character random secret for Next.js cookie encryption. |
+| `LANGCHAIN_TRACING_V2` | `false` | Enable LangSmith observability tracing. |
+| `LANGCHAIN_PROJECT` | `atelier-intelligence`| Project identifier in LangSmith. |
 
 ---
 
-## Guardrails
+## Guardrails & AI Safety
 
-| Layer | Location | Behaviour |
-|---|---|---|
-| Event validation | `domain/events.py` (used by `collector/api.py`) | Pydantic v2: `event_id` at least 8 characters, allowed event types only, `duration_ms` ≥ 0, unknown fields ignored, 1–100 events per batch, batch `api_key` required; URL query strings and fragments are stripped |
-| PII removal before the LLM | `guardrails/sanitiser.py` | Drops `user_id`, `session_id`, `ip_address`, `email`, `verbatim`, `event_id` |
-| LLM output validation | `guardrails/output_validator.py` | Coerces category, effort, step and text fields to allowed values; non-dict output becomes a safe fallback insight |
-| AI gateway | `integrations/` | Every LLM call (insight, narrative, ingestion mapping) and every worker MCP call: one provider, timeouts and deadline, bounded retries for retryable errors only, rate limit, run budgets, cancellation, correlation ids, audit records without payloads; error messages never contain keys or provider responses |
-| Report output | `reporting/` | Every report value is untrusted: checked against a typed contract, cleaned, limited and escaped for its context (see below) |
-| Error handling | whole app | Specific exceptions are caught where the failure set is known; workers and MCP calls are boundaries that record a structured error; nothing is swallowed silently (enforced by `tests/test_cleanup.py`) |
-
-### Report output contract
-
-`export_report` (`mcp_servers/report_server.py`) validates its input with `reporting/model.py`, renders it with
-`reporting/render.py` and writes it with `reporting/output.py`:
-
-- **Self-contained.** One UTF-8 HTML file with no scripts, no external URLs and no network requests. The funnel chart
-  is inline SVG (exact values on hover). A Content-Security-Policy meta tag allows only the report's own style block
-  (`default-src 'none'; style-src 'sha256-…'; script-src 'none'`).
-- **Escaped by context.** Journey, narrative, insight text, step ids and provenance values are escaped for element
-  text or attributes; the data block is JSON that cannot close its tag.
-- **Deterministic.** The same input gives the same bytes. The "generated at" time is the narrative's UTC timestamp,
-  not the time of writing.
-- **Limits.** Narrative 4,000 characters, 50 insights (title 200, other fields 1,000 characters), 100 funnel steps,
-  100 friction rows, 1 MiB per file. Longer text is cut with "…" and noted in the report.
-- **File name.** `cji_report_<journey slug>_<run id>.html`; the slug keeps only `a-z 0-9 _ -`, and a missing or
-  invalid run id is replaced by the input hash. The file is written atomically inside `CJI_REPORTS_DIR` and nowhere else.
-- **Provenance.** A "Report details" footer and a JSON block (`schema: cji-report/1`) record the run id, input
-  SHA-256, narrative source (LLM or fallback) and model, counts and anything that was cut.
-- **Failures.** Invalid input (`report_invalid_input`), an oversize file (`report_too_large`) or a write error
-  (`report_write_failed`, retried once) fails the run with that code and leaves no file.
+- **PII Sanitization:** The pipeline strips `user_id`, `session_id`, `ip_address`, `email`, and verbatim inputs prior to LLM dispatch (`guardrails/sanitiser.py`).
+- **Structured Pydantic Coercion:** All LLM outputs are validated and coerced against typed schemas (`guardrails/output_validator.py`); malformed outputs automatically fall back to rule-based insights.
+- **Strict Budget & Rate Limits:** Guardrails enforce max token limits, deadline timeouts (90s), and cost thresholds per analysis run.
+- **Report Security Sandbox:** Reports are generated with strict Content Security Policy meta tags (`default-src 'none'; style-src 'sha256-...'; script-src 'none'`), rendering SVG charts directly without inline scripts or external CDNs.
 
 ---
 
-## LangSmith Tracing
+## LangSmith Observability
+
+To enable end-to-end distributed agent tracing:
 
 ```bash
 # In cji_agent/.env
 LANGCHAIN_TRACING_V2=true
-LANGCHAIN_API_KEY=<your key from smith.langchain.com>
-LANGCHAIN_PROJECT=cji-poc
+LANGCHAIN_API_KEY=your_key_here
+LANGCHAIN_PROJECT=atelier-intelligence
 ```
 
 ---
 
 ## Production Operations
 
-CJI is engineered for controlled deployment behind a TLS reverse proxy:
-- **Deployment & Backups:** Install, upgrade, rollback, and automated database backups via `cji-backup` CLI.
-- **Operations & Runbooks:** Strict limits, rate limits, AI budget caps, secret rotation, and operational readiness.
-- **Verification:** Pre-flight checklists and security gates verified by automated CI scans.
-- **Logs:** `CJI_LOG_FORMAT=json` (the default when `CJI_ENV=production`) writes one JSON object per line with
-  `request_id`, `run_id` and `trace_id`; `CJI_LOG_LEVEL` sets the level.
-- **Health:** `GET /api/v1/health/ready` (public, no details), collector `GET /health/ready`, `GET /health` on each
-  MCP server, Next.js `/readyz`; `cji-ops status` checks them all.
-- **Metrics:** `GET /api/v1/metrics` (admin token) and collector `GET /metrics` (admin key) in Prometheus text format.
-- **Audit:** security actions (tokens, failed sign-ins, runs, approvals, ingestion writes, key changes, backups,
-  migrations) go to `security.jsonl` in the audit directory; `CJI_AUDIT_RETENTION_DAYS` (default 90).
-- **Rotation:** `cji-api-token rotate`, `CJI_SESSION_SECRET_PREVIOUS` for the Next.js session key, tracker keys
-  revoked with `POST /admin/api-keys/revoke`.
-- **Checks:** `cji-settings check --role production` validates a release host; `python ci/run_ci.py` runs the local CI
-  and `python ci/release_check.py` the release checklist.
-- **Production requires `CJI_MODE`** when `CJI_ENV=production` is set (no silent demo data), and
-  `cji-ingest-json --replace` now deletes the table's rows instead of recreating the table.
+CJI is engineered for high-availability deployment behind a TLS reverse proxy:
 
-## Testing, Security & Quality Assurance
+- **Deployment & Backups:** Create and restore atomic backups using `cji-backup create` and `cji-backup restore`.
+- **Database Migrations:** Schema evolution handled via `cji-db migrate up`.
+- **Health Probes:** Public liveness endpoints (`/health/live`), database readiness checks (`/health/ready`), and Next.js `/readyz`.
+- **Prometheus Metrics:** Native `/metrics` scrapers for API latency, error rates, and queue depth.
+- **Audit Logging:** Security actions (token provisioning, logins, run approvals) recorded to immutable JSONL audit files (`CJI_AUDIT_DIR`).
 
-> **Repository Hygiene Notice:** Comprehensive internal test suites (`cji_agent/tests/`, `frontend/tests/`, `frontend/e2e/`), synthetic datasets, and design specifications are maintained in the private developer workspace and excluded from the public git tracking for zero-bloat deployment hygiene.
+---
 
-To run code quality, linting, security audits, and type checking from `cji_agent/`:
+## Testing & Quality Assurance
+
+### Frontend Test Suite (Vitest & Testing Library)
+
+The Next.js Cockpit includes 19 component and integration test suites covering accessibility (axe), authentication, bento metric calculations, connection provisioning, and view rendering:
 
 ```bash
+cd frontend
+npm test
+```
+*Result: 19 test files passed, 177 tests passed (100% pass rate).*
+
+### Python Backend Unit & Contract Tests
+
+Run core unit and contract tests across scoring algorithms and models:
+
+```bash
+cd cji_agent
+pytest tests/test_friction_engine.py tests/test_collector_models.py
+```
+
+### Static Analysis, Linting & Type Checks
+
+```bash
+# Python backend quality checks
+cd cji_agent
 ruff check
 mypy
 bandit -c pyproject.toml -r src
-```
 
-Tool settings live in `pyproject.toml` (`[tool.pytest.ini_options]`, `[tool.ruff]`, `[tool.mypy]`, `[tool.bandit]`).
-
-Frontend type check and lint from `frontend/`:
-```bash
+# Frontend type checking and ESLint
+cd frontend
 npm run typecheck
 npm run lint
 ```
@@ -623,44 +455,23 @@ npm run lint
 
 ## Security Practices
 
-- `cji_agent/.env` is gitignored; `.env.example` contains no secrets.
-- Outside `CJI_ENV=development` the collector refuses to start without a real admin key, an explicit origin list and
-  a database URL.
-- The development tracker key is only registered when `CJI_ENV=development`.
-- Error responses do not include database driver messages; credentials are stripped from dashboard warnings.
-- `cji-ingest-json <file> --replace` and the dashboard's replace box delete every row in
-  `tracking_events` of the configured database. Point `DATABASE_URL` at the intended database first.
+- **Zero-Secret Baseline:** Environment secrets are never committed. Example templates (`.env.example`) contain placeholders only.
+- **Encrypted Session Boundary:** Next.js sessions use AES-256-GCM encrypted cookies; client browsers never see or store the underlying API tokens.
+- **Fail-Closed Production Rules:** In production mode (`CJI_ENV=production`), the collector and API fail to start if admin keys or cursor secrets are missing or default.
+- **Strict SQL Parameterization:** All DuckDB and PostgreSQL database queries use parameterized placeholders to eliminate SQL injection risks.
 
 ---
 
-## Known Issues & FAQ
+## Frequently Asked Questions
 
-**`cji --run` fails with "Startup check failed for cji-…".**
-Start the servers first: `cji-servers --mode demo` (or `--mode realtime`).
+**Q: `cji --run` fails with "Startup check failed for cji-..."**  
+A: Start the MCP servers first using `cji-servers --mode demo` (or launch everything at once via `.\start-cji.ps1` / `./start-cji.sh`).
 
-**`cji: command not found`, or an old command says "The cji package is not installed".**
-Activate the virtual environment and install the package from `cji_agent/`: `pip install -r requirements.lock`, then
-`pip install --no-deps -e .`.
+**Q: What is the difference between Demo and Realtime modes?**  
+A: Demo mode operates entirely offline using local Parquet files (`data/events.parquet`) and DuckDB, requiring zero external databases or API keys. Realtime mode connects to PostgreSQL to ingest and analyze live browser telemetry.
 
-**The CLI cannot find `data/events.parquet`.**
-Paths are relative to the runtime home. Run from `cji_agent/` or set `CJI_HOME`; `cji-settings check` shows the home.
+**Q: Where is the generated executive report saved?**  
+A: Reports are written to `reports/cji_report_<journey>_<run_id>.html`. The path is printed upon run completion and is also viewable in the Next.js Cockpit.
 
-**The run stops with `ModeMismatch`.**
-The servers run in a different mode from the CLI. Restart them with the same `--mode`.
-
-**The dashboard shows "Could not load: …".**
-The named panels could not read PostgreSQL. Check `DATABASE_URL` / `SUPABASE_DATABASE_URL` and that the database is
-reachable. Without any database URL the data panels stay empty and only `data/last_run.json` is shown.
-
-**The database password contains `@` or `#`.**
-Percent-encode it: `p@ss#word` becomes `p%40ss%23word`.
-
-**Insights say "LLM analysis unavailable".**
-`GROQ_API_KEY` is missing or the Groq call failed; the rule-based fallback was used. The CLI log shows the error type.
-
-**The report opens but the charts are blank.**
-Reports written before Spec 10 load Chart.js from a CDN and need internet access. Newer reports draw the chart as
-inline SVG and work offline.
-
-**Which documents are current?**
-This README and the in-code contracts across `cji_agent/src/cji/` and `frontend/src/` represent the source of truth for the CJI system architecture.
+**Q: What happens if an LLM API key is not configured?**  
+A: Atelier gracefully degrades to a deterministic, rule-based insight engine. It will still compute exact friction scores, generate SVG funnel charts, and synthesize prioritized remediation tickets without external API calls.

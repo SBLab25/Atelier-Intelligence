@@ -55,7 +55,7 @@ dist/
 *.egg
 .eggs/
 
-# ── Testing & Code Coverage ──────────────────────────────────────────────────
+# ── Testing & Code Coverage (Artifacts & Caches) ────────────────────────────
 .pytest_cache/
 .coverage
 .coverage.*
@@ -66,12 +66,6 @@ htmlcov/
 */.vitest-cache/
 test-results/
 playwright-report/
-tests/
-**/tests/
-e2e/
-**/e2e/
-*.test.*
-*.spec.*
 
 # ── Linters & Type Checkers ──────────────────────────────────────────────────
 .mypy_cache/
@@ -133,6 +127,7 @@ cji_agent/test_results.txt
 
 # ── Legacy Prototypes & Throwaways ───────────────────────────────────────────
 front-end/
+frontend/design-reference/
 
 # ── OS & IDE Metadata ─────────────────────────────────────────────────────────
 .DS_Store
