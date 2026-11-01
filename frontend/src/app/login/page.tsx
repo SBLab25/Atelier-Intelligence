@@ -5,6 +5,8 @@ import { safeNext } from "@/lib/redirects";
 import { getSession } from "@/lib/session";
 import { LoginScreen } from "@/cockpit/components/screens/LoginScreen";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign in · CJI Atelier",
   description: "Customer Journey Intelligence & Quantitative Sprint Cockpit Workspace Login.",

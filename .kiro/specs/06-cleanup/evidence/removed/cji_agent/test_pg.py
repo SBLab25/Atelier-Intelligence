@@ -1,1 +1,0 @@
-import os, dotenv, pandas as pd; from sqlalchemy import create_engine; dotenv.load_dotenv(); e = create_engine(os.environ['DATABASE_URL']); print(pd.read_sql('SELECT array_position(ARRAY[''A'',''B''], ''A'')', e.connect()))

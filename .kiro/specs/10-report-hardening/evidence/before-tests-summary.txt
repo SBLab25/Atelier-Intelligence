@@ -1,5 +1,0 @@
-Spec 10 T1: tests/test_reports.py run against the code as it was after Spec 09 (before any Spec 10 change).
-Command: python -m pytest -q -p no:cacheprovider -o addopts= --tb=short tests/test_reports.py
-Result: 280 tests, 0 passed, 280 failed (7.18 s). JUnit: before-tests-junit.xml.
-Why: the reporting package (contract, renderer, output) did not exist, export_report had no structured error
-codes, and the dashboard Insights page did not escape report content.

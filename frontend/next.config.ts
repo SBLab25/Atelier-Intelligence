@@ -9,8 +9,12 @@ const config: NextConfig = {
   allowedDevOrigins: [
     "localhost:3000",
     "127.0.0.1:3000",
+    "192.168.0.100:3000",
+    "192.168.0.100",
     "192.168.0.101:3000",
     "192.168.0.101",
+    "*.local:3000",
+    "*.local",
   ],
   // Spec 14 (OD-148): event files up to 10 MiB pass through the proxy and the Server Action (form overhead included).
   experimental: {
@@ -19,9 +23,12 @@ const config: NextConfig = {
       allowedOrigins: [
         "localhost:3000",
         "127.0.0.1:3000",
+        "192.168.0.100:3000",
+        "192.168.0.100",
         "192.168.0.101:3000",
         "192.168.0.101",
         "*.local:3000",
+        "*.local",
       ],
     },
     proxyClientMaxBodySize: "11mb",

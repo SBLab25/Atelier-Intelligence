@@ -10,7 +10,7 @@ vi.mock("@/lib/supabase-auth", () => {
           return Promise.resolve({
             rows: [
               {
-                api_key: "test-key-id",
+                api_key: "cji_live_mocked1234567890abcdef12345678",
                 journey_name: "checkout_funnel",
                 description: "Test Key",
                 created_at: new Date().toISOString(),

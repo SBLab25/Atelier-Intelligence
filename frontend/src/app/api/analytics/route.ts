@@ -288,90 +288,76 @@ async function resolveAnalytics(
     }
   }
 
-  // Machine Insights tailored to the exact table
+  // Machine Insights dynamically synthesized from the actual telemetry and friction scores
   const insightsList: LiveTelemetryPayload["insights"] = [];
-  if (table === "live_events") {
-    insightsList.push(
-      {
-        id: "ins-live-1",
-        title: "Live Stream Anomaly: High Rage Click Surge",
-        description: `Incoming live events on '${journeyId}' show elevated rage click activity (up to 50%) on payment_info and profile_setup stages.`,
-        severity: "critical",
-        confidence: 94,
-        recommendation: "Inspect payment gateway iframe latency and mobile touch responsiveness.",
-        detectedAt: "Just now",
-      },
-      {
-        id: "ins-live-2",
-        title: "Realtime Drop-off Spike at Profile Setup",
-        description: `4 out of 5 active sessions dropped during profile_setup in the live_events table.`,
-        severity: "urgent",
-        confidence: 89,
-        recommendation: "Allow skipping profile photo uploads during initial onboarding.",
-        detectedAt: "Live",
-      },
-      {
-        id: "ins-live-3",
-        title: "Active Event Stream Health",
-        description: `Supabase table 'live_events' is receiving real-time payloads. Monitored ${eventsData.data.length} live telemetry records.`,
-        severity: "minor",
-        confidence: 98,
-        recommendation: "Continuously poll or subscribe to Supabase Realtime channel.",
-        detectedAt: "Active",
-      }
-    );
-  } else if (table === "tracking_events") {
-    insightsList.push(
-      {
-        id: "ins-track-1",
-        title: "Severe Dwell Latency Bottleneck: Profile Setup",
-        description: `Historical baseline analysis across 5,000 sessions shows users spend 77.1 seconds on profile_setup, yielding a 69.4% drop-off cliff.`,
-        severity: "critical",
-        confidence: 96,
-        recommendation: "Refactor multi-step profile fields into an asynchronous progressive disclosure modal.",
-        detectedAt: "Baseline Audit",
-      },
-      {
-        id: "ins-track-2",
-        title: "Plan Selection Conversion Rebound",
-        description: `Users who surpass the initial verification checkpoint convert with high velocity, with 1,055 proceeding to checkout.`,
-        severity: "minor",
-        confidence: 91,
-        recommendation: "Introduce early plan feature highlights to pull top-of-funnel users forward.",
-        detectedAt: "Historical Trend",
-      },
-      {
-        id: "ins-track-3",
-        title: "Total Benchmark Sample: 5,000 Users",
-        description: `Tracking events repository confirms 628 completed end-to-end sessions (12.6% overall completion rate).`,
-        severity: "urgent",
-        confidence: 95,
-        recommendation: "Implement targeted retargeting emails for the 3,657 users who verified email but halted at profile.",
-        detectedAt: "Consolidated",
-      }
-    );
-  } else {
-    insightsList.push(
-      {
-        id: "ins-all-1",
-        title: "Unified Telemetry: 5,002 Total Sessions Synthesized",
-        description: `Combined synthesis of live_events and historical tracking_events confirms profile_setup as the universal primary bottleneck (989 user drop).`,
-        severity: "critical",
-        confidence: 97,
-        recommendation: "Deploy A/B test variant with simplified single-page profile entry.",
-        detectedAt: "Cross-Table Run",
-      },
-      {
-        id: "ins-all-2",
-        title: "Friction Index Divergence",
-        description: `Live streaming sessions exhibit 44/100 average friction compared to 11/100 in historical benchmark data.`,
-        severity: "urgent",
-        confidence: 92,
-        recommendation: "Review recent frontend deployments to isolate client bundle regressions.",
-        detectedAt: "Cross-Table Run",
-      }
-    );
+
+  const worstDropStep = [...funnel].sort((a, b) => (b.drop_off_pct ?? 0) - (a.drop_off_pct ?? 0))[0];
+  const worstErrorStep = [...steps].sort((a, b) => (b.error_rate_pct ?? 0) - (a.error_rate_pct ?? 0))[0];
+  const worstRageStep = [...steps].sort((a, b) => (b.avg_rage_clicks ?? 0) - (a.avg_rage_clicks ?? 0))[0];
+  const worstDwellStep = [...steps].sort((a, b) => (b.avg_dwell_ms ?? 0) - (a.avg_dwell_ms ?? 0))[0];
+
+  const totalUsersAnalyzed = funnel[0]?.users ?? 0;
+  const convertedUsersAnalyzed = funnel.length > 1 ? (funnel[funnel.length - 1]?.users ?? 0) : 0;
+
+  if (worstDropStep && (worstDropStep.drop_off_pct ?? 0) > 0) {
+    const stepLabel = worstDropStep.step_id.replace(/_/g, " ");
+    insightsList.push({
+      id: "ins-dynamic-drop",
+      title: `Critical Bottleneck: High Drop-off at ${stepLabel}`,
+      description: `Analysis across ${totalUsersAnalyzed.toLocaleString()} sessions in '${table}' identifies ${worstDropStep.step_id} with a ${worstDropStep.drop_off_pct.toFixed(1)}% abandonment cliff (${worstDropStep.users.toLocaleString()} entrants).`,
+      severity: worstDropStep.drop_off_pct >= 30 ? "critical" : "urgent",
+      confidence: 95,
+      recommendation: `Simplify input requirements and optimize page response latency on the ${worstDropStep.step_id} stage.`,
+      detectedAt: "Active Pipeline",
+    });
   }
+
+  if (worstErrorStep && (worstErrorStep.error_rate_pct ?? 0) > 0) {
+    const errorLabel = worstErrorStep.step_id.replace(/_/g, " ");
+    insightsList.push({
+      id: "ins-dynamic-error",
+      title: `Elevated Form / API Error Rate at ${errorLabel}`,
+      description: `Step '${worstErrorStep.step_id}' registers a ${worstErrorStep.error_rate_pct.toFixed(1)}% error rate with an average retry count of ${worstErrorStep.avg_retries.toFixed(1)} per user.`,
+      severity: worstErrorStep.error_rate_pct >= 15 ? "critical" : "urgent",
+      confidence: 92,
+      recommendation: `Implement proactive client-side validation and debounced server checks to minimize submission failures.`,
+      detectedAt: "Active Pipeline",
+    });
+  }
+
+  if (worstRageStep && (worstRageStep.avg_rage_clicks ?? 0) > 0.1) {
+    insightsList.push({
+      id: "ins-dynamic-rage",
+      title: `UI Frustration Anomaly: Rage Clicks on ${worstRageStep.step_id.replace(/_/g, " ")}`,
+      description: `Detected ${worstRageStep.avg_rage_clicks.toFixed(2)} rage clicks per user on stage '${worstRageStep.step_id}', pointing to unclickable elements or blocked interactive buttons.`,
+      severity: worstRageStep.avg_rage_clicks >= 0.5 ? "critical" : "urgent",
+      confidence: 89,
+      recommendation: `Audit tap targets, button hover/loading states, and mobile touch targets to eliminate phantom clicks.`,
+      detectedAt: "Active Pipeline",
+    });
+  } else if (worstDwellStep && (worstDwellStep.avg_dwell_ms ?? 0) > 30000) {
+    const dwellSec = Math.round(worstDwellStep.avg_dwell_ms / 1000);
+    insightsList.push({
+      id: "ins-dynamic-dwell",
+      title: `Dwell Latency Threshold Exceeded on ${worstDwellStep.step_id.replace(/_/g, " ")}`,
+      description: `Users spend an average of ${dwellSec} seconds on '${worstDwellStep.step_id}', indicating cognitive overload or multi-field fatigue.`,
+      severity: "urgent",
+      confidence: 90,
+      recommendation: `Break down complex form stages into progressive disclosure micro-steps.`,
+      detectedAt: "Active Pipeline",
+    });
+  }
+
+  // End-to-end Conversion health insight
+  insightsList.push({
+    id: "ins-dynamic-summary",
+    title: `End-to-End Funnel Synthesis (${table})`,
+    description: `Analyzed ${totalUsersAnalyzed.toLocaleString()} unique users on '${journeyId}'. ${convertedUsersAnalyzed.toLocaleString()} completed all stages (${completionPct.toFixed(1)}% overall funnel completion).`,
+    severity: completionPct < 15 ? "urgent" : "minor",
+    confidence: 98,
+    recommendation: `Focus sprint velocity on the top critical bottleneck (${criticalStepsList[0] || worstDropStep?.step_id || "profile_setup"}) to unlock conversion uplift.`,
+    detectedAt: "Telemetry Sync",
+  });
 
   // Reports
   const reportsList: LiveTelemetryPayload["reports"] = [];

@@ -1,5 +1,0 @@
-# Local CI output (Spec 15, ci/run_ci.py)
-/ci/out/
-# Run output at the repository root (Spec 06, OD-34)
-/*.log
-/main_log*.txt

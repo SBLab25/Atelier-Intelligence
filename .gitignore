@@ -100,6 +100,30 @@ ci/out/
 
 # ── Graphify Caches & Local Output ───────────────────────────────────────────
 graphify-out/
+.agents/
+
+# ── Local Development Specs, Datasets, Diagnostics & Internal Docs ───────────
+.kiro/
+.stitch/
+Dataset/
+dataset/
+Project Details/
+docs/
+Project_Memory.md
+project_memory.md
+Project_status.md
+project_status.md
+project_summary.md
+Summary.md
+kiro_upgrade_guide.md
+kiro_upgrade_prompts.md
+antigravity_upgrade_prompts.md
+free_plan_workflow.md
+MCP_SERVERS_AND_SUPABASE_ANALYTICS_REPORT.md
+mcp_servers_and_supabase_analytics_report.md
+refactoring.md
+cji_agent/test_output.txt
+cji_agent/test_results.txt
 
 # ── Legacy Prototypes & Throwaways ───────────────────────────────────────────
 front-end/

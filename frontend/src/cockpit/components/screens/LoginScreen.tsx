@@ -108,7 +108,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             sprintTarget: 100,
           });
         }
-        window.location.href = data.redirect || next || '/dashboard';
+        window.location.replace(data.redirect || next || '/dashboard');
         return;
       }
 
@@ -151,7 +151,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             sprintTarget: 100,
           });
         }
-        window.location.href = data.redirect || next || '/dashboard';
+        window.location.replace(data.redirect || next || '/dashboard');
         return;
       }
       setError('SSO verification encountered an issue. Please sign in with enterprise credentials.');
@@ -164,6 +164,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setError(null);
     setSuccessMessage(null);
 
@@ -193,7 +194,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             sprintTarget: 100,
           });
         }
-        window.location.href = data.redirect || next || '/dashboard';
+        window.location.replace(data.redirect || next || '/dashboard');
         return;
       }
 
@@ -272,7 +273,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           });
         }
         setTimeout(() => {
-          window.location.href = data.redirect || next || '/connections';
+          window.location.replace(data.redirect || next || '/connections');
         }, 800);
         return;
       }
@@ -556,7 +557,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
             {/* SIGN IN FORM */}
             {mode === 'signin' ? (
-              <form onSubmit={handleSignInSubmit} className="space-y-4">
+              <form method="POST" action="/api/auth/login" onSubmit={handleSignInSubmit} className="space-y-4">
+                <input type="hidden" name="next" value={next || "/dashboard"} />
                 <div>
                   <label className="block text-xs font-semibold text-primary mb-1.5" htmlFor="work-email">
                     User ID or Work Email
@@ -670,7 +672,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               </form>
             ) : (
               /* SIGN UP FORM */
-              <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
+              <form method="POST" action="/api/auth/login" onSubmit={handleSignUpSubmit} className="space-y-3.5">
+                <input type="hidden" name="isSignUp" value="true" />
+                <input type="hidden" name="next" value={next || "/connections"} />
                 <div>
                   <label className="block text-xs font-semibold text-primary mb-1" htmlFor="signup-name">
                     Full Name

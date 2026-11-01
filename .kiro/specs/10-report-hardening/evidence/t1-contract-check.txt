@@ -1,4 +1,0 @@
-last_run.json: mode=demo journey=user_onboarding insights=4 friction_scores=8
-contract: OK (4 insights, 8 friction rows, truncated={})
-insight keys seen: ['category', 'evidence', 'fix_effort', 'insight_id', 'priority', 'priority_score', 'root_cause', 'run_id', 'score', 'step_id', 'suggested_fix', 'title']
-priorities seen: ['2', '3']

@@ -356,6 +356,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
   const topBottleneck = sortedFriction[0];
   const topBottleneckName = topBottleneck?.step_id ?? criticalSteps[0] ?? funnelSteps[0]?.step_id ?? "profile_setup";
   const topFrictionScore = topBottleneck?.score ?? avgFrictionScore;
+  const topBottleneckMetric = stepsMetrics.find((st) => st.step_id === topBottleneckName);
+  const topDwellSec = topBottleneckMetric?.avg_dwell_ms ? (topBottleneckMetric.avg_dwell_ms / 1000) : 25;
+  const topDeviationPct = Math.round(((topDwellSec - 20) / 20) * 100);
+  const topRageClicks = topBottleneckMetric?.avg_rage_clicks ?? 0;
+  const topErrorRate = topBottleneckMetric?.error_rate_pct ?? 0;
 
   // Business, Funnel Flow & Simulation Calculations
   const aovBenchmark = selectedTable === "live_events" ? 95 : 120;
@@ -1456,8 +1461,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-on-surface-variant pt-2 border-t border-surface-container-high/60">
-                      <span>Users completing within 5m: <strong>58.4%</strong></span>
-                      <span>Lingering latency (&gt;15m): <strong className="text-red-700">18.2%</strong></span>
+                      <span>Overall Funnel Completion: <strong>{overallCompletionPct.toFixed(1)}%</strong></span>
+                      <span>Primary Bottleneck Dwell: <strong className={topDwellSec > 35 ? "text-red-700" : "text-primary"}>{topDwellSec.toFixed(1)}s</strong> ({topBottleneckName.replace(/_/g, ' ')})</span>
                     </div>
                   </div>
                 )}
@@ -1635,7 +1640,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                         </div>
                       </div>
                       <div className="text-[11px] text-on-surface-variant pt-2 border-t border-surface-container-high/60">
-                        Primary bottleneck drop: <strong>48.2%</strong> &bull; Dwell: 38s
+                        Primary bottleneck: <strong className="capitalize">{topBottleneckName.replace(/_/g, ' ')}</strong> &bull; Dwell: {topDwellSec.toFixed(1)}s
                       </div>
                     </div>
 
@@ -1662,7 +1667,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                         </div>
                       </div>
                       <div className="text-[11px] text-red-700 font-medium pt-2 border-t border-surface-container-high/60">
-                        ⚠️ Keyboard obscures submit button on profile_setup
+                        ⚠️ Technical friction observed on {topBottleneckName.replace(/_/g, ' ')}
                       </div>
                     </div>
 
@@ -2016,7 +2021,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                   Algorithmic Anomaly Diagnosis: Severe Cliff at [{topBottleneckName.replace(/_/g, ' ')}]
                 </h4>
                 <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                  Telemetry mathematically distinguishes this stage from natural attrition. Users experience a dwell spike of <strong>+208%</strong> coupled with <strong>1.82 rage clicks per session</strong>, proving users are not bouncing passively but are encountering technical friction or complex form inputs.
+                  Telemetry mathematically distinguishes this stage from natural attrition. Users experience a dwell deviation of <strong>{topDeviationPct > 0 ? `+${topDeviationPct}%` : `${topDeviationPct}%`}</strong> ({topDwellSec.toFixed(1)}s avg) coupled with <strong>{topRageClicks.toFixed(2)} rage clicks/usr</strong> and <strong>{topErrorRate.toFixed(1)}% error rate</strong>, proving users are not bouncing passively but are encountering technical friction or complex form inputs.
                 </p>
               </div>
             </div>
@@ -2267,86 +2272,48 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                {/* Action Ticket 1 */}
-                <div className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
-                        TICKET CJI-101
-                      </span>
-                      <span className="text-[11px] font-mono text-emerald-700 font-bold">
-                        +18.4% Uplift
-                      </span>
-                    </div>
-                    <h4 className="font-title-md text-sm font-bold text-primary">
-                      Decouple Profile Photo Upload from Stage
-                    </h4>
-                    <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                      Telemetry shows 69.4% of users abandon at <code>profile_setup</code> after taking &gt;50s to upload an avatar. Make avatar optional with a "Skip for Now" button.
-                    </p>
-                    <div className="mt-3 p-2 bg-surface-container-lowest rounded-md font-mono text-[10px] text-on-surface border border-surface-container-high">
-                      <code>{`// Recommended Fix:`}<br />{`const isOptional = true;`}<br />{`<Button variant="ghost">Skip</Button>`}</code>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
-                    <span>Effort: <strong>2 hrs</strong></span>
-                    <span className="text-red-700 font-semibold">Priority: P0 Critical</span>
-                  </div>
-                </div>
+                {(sortedFriction.length > 0 ? sortedFriction.slice(0, 3) : funnelSteps.slice(0, 3).map((s) => ({ step_id: s.step_id, score: Math.round(s.drop_off_pct) }))).map((item, idx) => {
+                  const stepFunnel = funnelSteps.find((f) => f.step_id === item.step_id);
+                  const stepMetric = stepsMetrics.find((m) => m.step_id === item.step_id);
+                  const dropPct = stepFunnel?.drop_off_pct ?? 20;
+                  const dwellS = stepMetric?.avg_dwell_ms ? (stepMetric.avg_dwell_ms / 1000).toFixed(1) : "25";
+                  const rageVal = stepMetric?.avg_rage_clicks ? stepMetric.avg_rage_clicks.toFixed(2) : "0.00";
+                  const errVal = stepMetric?.error_rate_pct ? stepMetric.error_rate_pct.toFixed(1) : "0.0";
+                  const uplift = Math.max(2.0, Math.round(dropPct * 0.35 * 10) / 10);
+                  const prioLabel = idx === 0 ? "Priority: P0 Critical" : idx === 1 ? "Priority: P1 High" : "Priority: P2 Medium";
+                  const prioClass = idx === 0 ? "text-red-700 font-semibold" : idx === 1 ? "text-amber-700 font-semibold" : "text-primary font-semibold";
 
-                {/* Action Ticket 2 */}
-                <div className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
-                        TICKET CJI-102
-                      </span>
-                      <span className="text-[11px] font-mono text-emerald-700 font-bold">
-                        +8.2% Uplift
-                      </span>
+                  return (
+                    <div key={`ticket-${item.step_id}`} className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
+                            TICKET CJI-10{idx + 1}
+                          </span>
+                          <span className="text-[11px] font-mono text-emerald-700 font-bold">
+                            +{uplift}% Uplift
+                          </span>
+                        </div>
+                        <h4 className="font-title-md text-sm font-bold text-primary capitalize">
+                          Remediate Bottleneck at {item.step_id.replace(/_/g, " ")}
+                        </h4>
+                        <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
+                          Telemetry identifies <strong>{dropPct.toFixed(1)}% abandonment</strong> at <code>{item.step_id}</code> with {dwellS}s average dwell, {errVal}% form errors, and {rageVal} rage clicks/user.
+                        </p>
+                        <div className="mt-3 p-2 bg-surface-container-lowest rounded-md font-mono text-[10px] text-on-surface border border-surface-container-high">
+                          <code>
+                            {`// Recommended Optimization:`}<br />
+                            {`optimizeStep("${item.step_id}", { asyncValidation: true, bypassOptional: true });`}
+                          </code>
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
+                        <span>Effort: <strong>{idx === 0 ? "2 hrs" : idx === 1 ? "3 hrs" : "1 hr"}</strong></span>
+                        <span className={prioClass}>{prioLabel}</span>
+                      </div>
                     </div>
-                    <h4 className="font-title-md text-sm font-bold text-primary">
-                      Debounce Field Validation &amp; Auto-Advance OTP
-                    </h4>
-                    <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                      Detected 1.82 rage clicks per session on email verification. External API checks execute on every keystroke, causing button freezes.
-                    </p>
-                    <div className="mt-3 p-2 bg-surface-container-lowest rounded-md font-mono text-[10px] text-on-surface border border-surface-container-high">
-                      <code>{`// Recommended Fix:`}<br />{`const debouncedCheck =`}<br />{`  useDebounce(verifyEmail, 350);`}</code>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
-                    <span>Effort: <strong>3 hrs</strong></span>
-                    <span className="text-amber-700 font-semibold">Priority: P1 High</span>
-                  </div>
-                </div>
-
-                {/* Action Ticket 3 */}
-                <div className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
-                        TICKET CJI-103
-                      </span>
-                      <span className="text-[11px] font-mono text-emerald-700 font-bold">
-                        +3.5% Uplift
-                      </span>
-                    </div>
-                    <h4 className="font-title-md text-sm font-bold text-primary">
-                      Pre-fetch Gateway Config &amp; Pricing Assets
-                    </h4>
-                    <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                      Preload Stripe / payment gateway assets during step 03 so <code>payment_info</code> iframe loads instantaneously without blank flash.
-                    </p>
-                    <div className="mt-3 p-2 bg-surface-container-lowest rounded-md font-mono text-[10px] text-on-surface border border-surface-container-high">
-                      <code>{`// Recommended Fix:`}<br />{`<link rel="prefetch"`}<br />{`  href="/api/checkout/config" />`}</code>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
-                    <span>Effort: <strong>1 hr</strong></span>
-                    <span className="text-primary font-semibold">Priority: P2 Medium</span>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </div>
 
