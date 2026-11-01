@@ -6,7 +6,7 @@ $root = $PSScriptRoot
 Write-Host "Checking for stale processes on CJI ports (8001-8006, 3000)..."
 foreach ($port in 8001, 8002, 8003, 8004, 8005, 8006, 3000) {
     $pids = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty OwningProcess -Unique
+    Select-Object -ExpandProperty OwningProcess -Unique
     if ($pids) {
         foreach ($p in $pids) {
             Stop-Process -Id $p -Force -ErrorAction SilentlyContinue
@@ -21,9 +21,11 @@ $baselineScripts = 'C:\Users\sovan\.venvs\cji-baseline-312\Scripts'
 
 $pyScripts = if (Test-Path "$localScripts\python.exe") {
     $localScripts
-} elseif (Test-Path "$baselineScripts\python.exe") {
+}
+elseif (Test-Path "$baselineScripts\python.exe") {
     $baselineScripts
-} else {
+}
+else {
     Write-Error "No valid Python virtual environment found in $localScripts or $baselineScripts."
     exit 1
 }
@@ -34,13 +36,15 @@ $actPrefix = if ($hasActivate) { "& '$activateScript'; " } else { "" }
 
 $serversCmd = if (Test-Path "$pyScripts\cji-servers.exe") {
     "${actPrefix}& '$pyScripts\cji-servers.exe'"
-} else {
+}
+else {
     "${actPrefix}& '$pyScripts\python.exe' -m cji.run_servers"
 }
 
 $apiCmd = if (Test-Path "$pyScripts\cji-api.exe") {
     "${actPrefix}& '$pyScripts\cji-api.exe'"
-} else {
+}
+else {
     "${actPrefix}& '$pyScripts\python.exe' -m cji.api.serve"
 }
 

@@ -66,6 +66,12 @@ htmlcov/
 */.vitest-cache/
 test-results/
 playwright-report/
+tests/
+**/tests/
+e2e/
+**/e2e/
+*.test.*
+*.spec.*
 
 # ── Linters & Type Checkers ──────────────────────────────────────────────────
 .mypy_cache/
