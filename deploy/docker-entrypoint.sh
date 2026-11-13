@@ -14,6 +14,28 @@ export PORT="${PORT:-10000}"
 
 mkdir -p "$CJI_HOME/data" "$CJI_HOME/reports" "$CJI_HOME/data/audit"
 
+# Sanitize CORS origins to prevent fail-closed validation crashes on wildcard '*' or trailing slashes
+eval "$(python3 - << 'EOF'
+import os
+
+for key in ("CJI_CORS_ORIGINS", "CJI_API_CORS_ORIGINS"):
+    val = os.environ.get(key, "").strip()
+    if not val:
+        continue
+    cleaned = []
+    for item in val.split(","):
+        item = item.strip()
+        if not item or item == "*":
+            continue
+        item = item.rstrip("/")
+        cleaned.append(item)
+    if cleaned:
+        print(f"export {key}='{','.join(cleaned)}'")
+    else:
+        print(f"unset {key}")
+EOF
+)"
+
 # 1. Apply any pending database migrations automatically
 if [ -n "$DATABASE_URL" ]; then
     echo "Checking and applying database migrations on PostgreSQL..."
@@ -23,11 +45,9 @@ fi
 # 2. Provision initial admin token for Cockpit UI if not already created
 TOKEN_FILE="$CJI_HOME/data/api_tokens.json"
 if [ ! -f "$TOKEN_FILE" ]; then
-    echo "Creating initial production API token for Next.js Cockpit..."
-    INITIAL_TOKEN=$(python -m cji.api.tokens_cli create --label production-cockpit --role admin --journey '*' || true)
     echo "=========================================================="
-    echo "🔑 INITIAL PRODUCTION COCKPIT API TOKEN:"
-    echo "$INITIAL_TOKEN"
+    echo "🔑 CREATING INITIAL PRODUCTION COCKPIT API TOKEN:"
+    python -m cji.api.tokens_cli create --label production-cockpit --role admin --journey '*' || echo "Warning: Failed to create token"
     echo "Save this token to sign in to your Next.js Cockpit UI."
     echo "=========================================================="
 fi
@@ -49,6 +69,16 @@ API_PID=$!
 echo "Starting Telemetry Collector (port 8000)..."
 python -m uvicorn cji.collector.api:app --host 127.0.0.1 --port 8000 &
 COLLECTOR_PID=$!
+
+# Wait for internal services to respond before binding Caddy to public port
+echo "Waiting for Telemetry Collector to be ready on port 8000..."
+for i in $(seq 1 30); do
+    if curl -s http://127.0.0.1:8000/health/ready > /dev/null 2>&1; then
+        echo "✅ Telemetry Collector is up and healthy."
+        break
+    fi
+    sleep 0.5
+done
 
 # Graceful termination handler
 cleanup() {
