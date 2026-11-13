@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: atelier-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    healthCheckPath: /health/ready
+    envVars:
+      - key: CJI_ENV
+        value: production
+      - key: CJI_MODE
+        value: realtime
+      - key: JOURNEY_NAME
+        value: user_onboarding
+      - key: CJI_LOG_FORMAT
+        value: json
+      - key: CJI_LLM_PROVIDER
+        value: groq
+      - key: LLM_MODEL
+        value: openai/gpt-oss-120b
+      - key: DATABASE_URL
+        sync: false # Paste your Supabase PostgreSQL connection string
+      - key: GROQ_API_KEY
+        sync: false # Paste your Groq API key
+      - key: CJI_ADMIN_KEY
+        generateValue: true # Render automatically generates a 32-character secret
+      - key: CJI_API_CURSOR_SECRET
+        generateValue: true # Render automatically generates a 32-character secret
+      - key: CJI_CORS_ORIGINS
+        sync: false # e.g. https://yourwebsite.com (website where tracker.js is installed)
+      - key: CJI_API_CORS_ORIGINS
+        sync: false # e.g. https://your-cockpit.vercel.app (your Next.js frontend origin)

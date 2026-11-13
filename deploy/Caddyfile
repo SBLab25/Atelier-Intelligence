@@ -1,0 +1,42 @@
+{
+    admin off
+    auto_https off
+}
+
+:{$PORT:10000} {
+    log {
+        output stdout
+        format json
+    }
+
+    # Telemetry Collector Endpoints (Port 8000)
+    handle /tracker.js* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /collect/* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /live/* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /admin/* {
+        reverse_proxy 127.0.0.1:8000
+    }
+
+    # Health Checks
+    handle /health* {
+        reverse_proxy 127.0.0.1:8000
+    }
+
+    # Backend REST API (Port 8006)
+    handle /api/v1/* {
+        reverse_proxy 127.0.0.1:8006
+    }
+
+    # Root Status Probe for Render / Uptime Monitors
+    handle {
+        respond `{"service":"Atelier Intelligence Backend & Collector Gateway","status":"healthy","version":"1.0.0","endpoints":{"tracker":"/tracker.js","collector":"/collect/batch","api":"/api/v1","health":"/health/ready"}}` 200 {
+            close
+        }
+    }
+}

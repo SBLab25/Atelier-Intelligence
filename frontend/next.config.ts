@@ -15,6 +15,8 @@ const config: NextConfig = {
     "192.168.0.101",
     "*.local:3000",
     "*.local",
+    "*.vercel.app",
+    "*.onrender.com",
   ],
   // Spec 14 (OD-148): event files up to 10 MiB pass through the proxy and the Server Action (form overhead included).
   experimental: {
@@ -29,6 +31,8 @@ const config: NextConfig = {
         "192.168.0.101",
         "*.local:3000",
         "*.local",
+        "*.vercel.app",
+        "*.onrender.com",
       ],
     },
     proxyClientMaxBodySize: "11mb",
