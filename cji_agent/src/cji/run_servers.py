@@ -26,6 +26,11 @@ def main(argv: list[str] | None = None) -> int:
         "--mode", choices=["demo", "realtime"], default=None,
         help="Override CJI_MODE for all servers (demo or realtime)."
     )
+    parser.add_argument(
+        "--threaded", action="store_true",
+        default=os.environ.get("CJI_THREADED_SERVERS", "0") in ("1", "true", "yes"),
+        help="Run all MCP servers inside worker threads in a single process to minimise memory usage."
+    )
     args = parser.parse_args(argv)
     configure_logging(fmt="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -44,6 +49,30 @@ def main(argv: list[str] | None = None) -> int:
 
     home = settings.storage.home
     env = {**os.environ, "CJI_HOME": str(home)}    # children resolve data/ and .env in the same home
+
+    if args.threaded:
+        import importlib
+        import threading
+        import time
+        from cji.mcp_servers._serve import serve
+
+        logger.info("Starting MCP servers in threaded low-memory mode...")
+        threads = []
+        for name, module_name in launch_plan():
+            endpoint = settings.services.get(name)
+            logger.info(f"Starting {module_name} in worker thread ({name} on {endpoint.host}:{endpoint.port}, {endpoint.transport})...")
+            mod = importlib.import_module(module_name)
+            t = threading.Thread(target=serve, args=(mod.mcp, name), daemon=True)
+            t.start()
+            threads.append((name, t))
+
+        logger.info("All MCP servers running in threaded mode. Press Ctrl+C to stop.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            logger.info("Shutting down threaded servers...")
+        return 0
 
     processes = []
     logger.info("Starting MCP servers...")

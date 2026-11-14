@@ -10,25 +10,63 @@ export CJI_SERVICE_HOST="127.0.0.1"
 export CJI_LOG_FORMAT="${CJI_LOG_FORMAT:-json}"
 export CJI_ENV="${CJI_ENV:-production}"
 export CJI_MODE="${CJI_MODE:-realtime}"
+export CJI_THREADED_SERVERS="1"
+export MALLOC_ARENA_MAX="2"
+export PYTHONNODEBUGRANGES="1"
 export PORT="${PORT:-10000}"
 
 mkdir -p "$CJI_HOME/data" "$CJI_HOME/reports" "$CJI_HOME/data/audit"
 
-# Sanitize CORS origins to prevent fail-closed validation crashes on wildcard '*' or trailing slashes
+# 1. Sanitize DATABASE_URL: auto-encode unescaped '@' characters in database password
+if [ -n "$DATABASE_URL" ]; then
+    FIXED_DB_URL=$(python3 - << 'EOF'
+import os, urllib.parse
+
+url = os.environ.get("DATABASE_URL", "").strip()
+prefix = ""
+for scheme in ("postgresql://", "postgres://"):
+    if url.startswith(scheme):
+        prefix = scheme
+        url = url[len(scheme):]
+        break
+
+if prefix and "@" in url:
+    parts = url.rsplit("@", 1)
+    if len(parts) == 2 and ":" in parts[0]:
+        user, pwd = parts[0].split(":", 1)
+        pwd = urllib.parse.quote(urllib.parse.unquote(pwd), safe="")
+        user = urllib.parse.quote(urllib.parse.unquote(user), safe=".")
+        print(f"{prefix}{user}:{pwd}@{parts[1]}")
+    else:
+        print(prefix + url)
+else:
+    print(prefix + url if prefix else url)
+EOF
+)
+    if [ -n "$FIXED_DB_URL" ]; then
+        export DATABASE_URL="$FIXED_DB_URL"
+    fi
+fi
+
+# 2. Sanitize CORS origins: remove '*' / trailing slashes and ensure non-empty for collector in production
 eval "$(python3 - << 'EOF'
 import os
 
 for key in ("CJI_CORS_ORIGINS", "CJI_API_CORS_ORIGINS"):
     val = os.environ.get(key, "").strip()
-    if not val:
-        continue
     cleaned = []
-    for item in val.split(","):
-        item = item.strip()
-        if not item or item == "*":
-            continue
-        item = item.rstrip("/")
-        cleaned.append(item)
+    if val:
+        for item in val.split(","):
+            item = item.strip()
+            if not item or item == "*":
+                continue
+            item = item.rstrip("/")
+            cleaned.append(item)
+    
+    # In production, collector requires at least one HTTPS origin
+    if key == "CJI_CORS_ORIGINS" and not cleaned:
+        cleaned = ["https://render.com", "https://vercel.app"]
+
     if cleaned:
         print(f"export {key}='{','.join(cleaned)}'")
     else:
@@ -36,13 +74,13 @@ for key in ("CJI_CORS_ORIGINS", "CJI_API_CORS_ORIGINS"):
 EOF
 )"
 
-# 1. Apply any pending database migrations automatically
+# 3. Apply any pending database migrations automatically
 if [ -n "$DATABASE_URL" ]; then
     echo "Checking and applying database migrations on PostgreSQL..."
     python -m cji.ops.db_cli migrate up || echo "Warning: Migration check encountered an issue, proceeding..."
 fi
 
-# 2. Provision initial admin token for Cockpit UI if not already created
+# 4. Provision initial admin token for Cockpit UI if not already created
 TOKEN_FILE="$CJI_HOME/data/api_tokens.json"
 if [ ! -f "$TOKEN_FILE" ]; then
     echo "=========================================================="
@@ -52,9 +90,9 @@ if [ ! -f "$TOKEN_FILE" ]; then
     echo "=========================================================="
 fi
 
-# 3. Start the 5 MCP Microservices (:8001-8005)
-echo "Starting 5 MCP microservices (ports 8001-8005)..."
-python -m cji.run_servers &
+# 5. Start the 5 MCP Microservices in threaded low-memory mode (:8001-8005)
+echo "Starting 5 MCP microservices in single-process threaded mode (ports 8001-8005)..."
+python -m cji.run_servers --threaded &
 MCP_PID=$!
 
 # Wait briefly for MCP servers to initialize

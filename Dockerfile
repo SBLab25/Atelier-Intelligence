@@ -7,7 +7,10 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PORT=10000 \
-    CJI_HOME=/app/cji_agent
+    CJI_HOME=/app/cji_agent \
+    MALLOC_ARENA_MAX=2 \
+    PYTHONNODEBUGRANGES=1 \
+    CJI_THREADED_SERVERS=1
 
 # Install essential system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
