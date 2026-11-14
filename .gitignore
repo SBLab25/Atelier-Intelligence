@@ -74,12 +74,12 @@ playwright-report/
 # ── Local Runtime Data & Databases ────────────────────────────────────────────
 *.db
 *.sqlite3
-data/
+/data/
 cji_agent/data/
-reports/
+/reports/
 cji_agent/reports/
-!data/.gitkeep
-!reports/.gitkeep
+!/data/.gitkeep
+!/reports/.gitkeep
 
 # ── Logs & Debug Files ────────────────────────────────────────────────────────
 *.log
