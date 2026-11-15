@@ -400,13 +400,20 @@ curl -X POST "${collectorHost}/collect/batch" \\
       };
 
       let res: Response;
-      let usedProxy = false;
       const payload = {
         api_key: apiKey,
         events: [pingEvent],
       };
 
       try {
+        // Primary path: Use server route to avoid browser CSP/CORS blocks
+        res = await fetch('/api/connections/ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        // Fallback: Direct browser fetch to collector host
         res = await fetch(`${collectorHost}/collect/batch`, {
           method: 'POST',
           headers: {
@@ -415,22 +422,12 @@ curl -X POST "${collectorHost}/collect/batch" \\
           },
           body: JSON.stringify(payload),
         });
-      } catch {
-        // Direct browser CORS or connection block: try via Next.js backend proxy
-        usedProxy = true;
-        res = await fetch('/api/connections/ping', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
       }
 
       if (res.ok) {
         setPingResult({
           ok: true,
-          message: usedProxy
-            ? `Telemetric ping delivered via server proxy! 1 event verified for '${pingEvent.journey_name}'. Note: Browser blocked direct CORS — add your domain to CJI_CORS_ORIGINS in Render.`
-            : `Telemetric ping delivered! 1 event verified for '${pingEvent.journey_name}' at ${collectorHost}.`,
+          message: `Telemetric ping delivered! 1 event verified for '${pingEvent.journey_name}' at ${collectorHost}.`,
           timestamp: new Date().toLocaleTimeString(),
         });
       } else {
