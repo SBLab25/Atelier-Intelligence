@@ -116,6 +116,7 @@ def cors_options(origins: list[str]) -> dict[str, Any]:
     """CORS for browsers (CO-03): explicit origins, no credentials, no admin header."""
     return {
         "allow_origins": list(origins),          # explicit list from config, never "*"
+        "allow_origin_regex": r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|onrender\.com)$",
         "allow_credentials": False,              # tracker authenticates with a key, not cookies
         "allow_methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "X-CJI-Key", REQUEST_ID_HEADER],

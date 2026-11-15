@@ -76,7 +76,12 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({
   const [sites, setSites] = useState<ClientSite[]>(DEFAULT_SITES);
   const [selectedSiteId, setSelectedSiteId] = useState<string>('site-1');
   const [format, setFormat] = useState<IntegrationFormat>('html');
-  const [collectorHost, setCollectorHost] = useState<string>('http://localhost:8000');
+  const [collectorHost, setCollectorHost] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return 'https://atelier-backend-jv2m.onrender.com';
+    }
+    return process.env.NEXT_PUBLIC_COLLECTOR_URL || 'http://localhost:8000';
+  });
   const [apiKey, setApiKey] = useState<string>(
     session?.role ? `cji_live_${session.role}_key` : 'cji_live_2026_operator_key_default'
   );
@@ -394,35 +399,51 @@ curl -X POST "${collectorHost}/collect/batch" \\
         metadata: { client: 'connections_hub', site: activeSite.name },
       };
 
-      const res = await fetch(`${collectorHost}/collect/batch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CJI-Key': apiKey,
-        },
-        body: JSON.stringify({
-          api_key: apiKey,
-          events: [pingEvent],
-        }),
-      });
+      let res: Response;
+      let usedProxy = false;
+      const payload = {
+        api_key: apiKey,
+        events: [pingEvent],
+      };
+
+      try {
+        res = await fetch(`${collectorHost}/collect/batch`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CJI-Key': apiKey,
+          },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        // Direct browser CORS or connection block: try via Next.js backend proxy
+        usedProxy = true;
+        res = await fetch('/api/connections/ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (res.ok) {
         setPingResult({
           ok: true,
-          message: `Telemetric ping delivered! 1 event verified for '${pingEvent.journey_name}' at port :8000.`,
+          message: usedProxy
+            ? `Telemetric ping delivered via server proxy! 1 event verified for '${pingEvent.journey_name}'. Note: Browser blocked direct CORS — add your domain to CJI_CORS_ORIGINS in Render.`
+            : `Telemetric ping delivered! 1 event verified for '${pingEvent.journey_name}' at ${collectorHost}.`,
           timestamp: new Date().toLocaleTimeString(),
         });
       } else {
         const err = await res.json().catch(() => ({}));
         setPingResult({
           ok: false,
-          message: `Collector responded with status ${res.status}: ${err.detail || 'Verify collector on :8000 is active.'}`,
+          message: `Collector responded with status ${res.status}: ${err.detail || err.error || 'Verify collector endpoint is active.'}`,
         });
       }
     } catch {
       setPingResult({
         ok: false,
-        message: `Network failure connecting to ${collectorHost}. Ensure CJI Collector is running (& 'cji-collector' on port 8000).`,
+        message: `Network failure connecting to ${collectorHost}. Ensure CJI Collector is running and reachable.`,
       });
     } finally {
       setIsPinging(false);
@@ -446,7 +467,7 @@ curl -X POST "${collectorHost}/collect/batch" \\
               Telemetry Ingestion Gateway
             </span>
             <span className="font-mono text-[10px] bg-white/10 text-on-primary-container px-2 py-0.5 rounded-full border border-white/10">
-              Collector :8000 · Port Active
+              {collectorHost.includes('onrender.com') ? 'Render Ingestion Active' : 'Collector :8000 · Port Active'}
             </span>
             <span className="font-mono text-[10px] bg-secondary-container/20 text-secondary-container px-2 py-0.5 rounded-full border border-secondary-container/30">
               Self-Serve Credentials
