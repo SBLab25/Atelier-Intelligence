@@ -64,6 +64,7 @@ export interface LiveTelemetryPayload {
     created_at: string;
     content_url: string;
   }>;
+  narrative?: string;
   availableJourneys: string[];
   lastUpdated: string;
 }
@@ -108,8 +109,26 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
   const fetchTelemetry = useCallback(async (minutes = windowMinutes, journey = selectedJourney, table = selectedTable) => {
     try {
       setIsLoading(true);
+      const headers: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        try {
+          const savedLlm = localStorage.getItem('cji_llm_config');
+          if (savedLlm) {
+            const parsed = JSON.parse(savedLlm);
+            if (parsed.apiKey) {
+              headers['x-groq-key'] = parsed.apiKey;
+              headers['x-llm-model'] = parsed.model || 'openai/gpt-oss-120b';
+              headers['x-llm-provider'] = parsed.provider || 'groq';
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
       const res = await fetch(`/api/analytics?journey_id=${encodeURIComponent(journey)}&minutes=${minutes}&table=${encodeURIComponent(table)}`, {
         cache: 'no-store',
+        headers,
       });
       if (res.ok) {
         const data: LiveTelemetryPayload = await res.json();
@@ -205,16 +224,35 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
     try {
       setTimeout(() => setAnalysisPhase("2/5: Journey Funnel Aggregation"), 350);
       setTimeout(() => setAnalysisPhase("3/5: Friction Scoring Engine (Threshold: 60)"), 700);
-      setTimeout(() => setAnalysisPhase("4/5: Machine Intelligence Inference"), 1050);
+      setTimeout(() => setAnalysisPhase("4/5: Machine Intelligence Inference (Groq LLM)"), 1050);
       setTimeout(() => setAnalysisPhase("5/5: Compiling Tactical Executive Report"), 1400);
+
+      let llmConfig: any = undefined;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (typeof window !== 'undefined') {
+        try {
+          const savedLlm = localStorage.getItem('cji_llm_config');
+          if (savedLlm) {
+            llmConfig = JSON.parse(savedLlm);
+            if (llmConfig?.apiKey) {
+              headers['x-groq-key'] = llmConfig.apiKey;
+              headers['x-llm-model'] = llmConfig.model || 'openai/gpt-oss-120b';
+              headers['x-llm-provider'] = llmConfig.provider || 'groq';
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
 
       const res = await fetch('/api/analytics', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           journey_id: selectedJourney,
           table: selectedTable,
           minutes: windowMinutes,
+          llm_config: llmConfig,
         }),
       });
 
@@ -224,8 +262,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
         const criticalCount = data.friction?.criticalSteps?.length ?? 0;
         const totalSteps = data.metrics?.funnel?.length ?? 0;
         const sessionCount = data.metrics?.funnel?.[0]?.users ?? 0;
+        const hasGroq = data.insights?.some((i) => i.detectedAt?.includes("Groq"));
         setAnalysisNotification(
-          `Analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
+          hasGroq
+            ? `Groq Machine Intelligence analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
+            : `Analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
         );
       } else {
         await fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
@@ -2161,8 +2202,13 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-secondary-container/30 text-secondary">
-                    CONFIDENCE: 94.6%
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${telemetry?.insights?.some(i => i.detectedAt?.includes("Groq"))
+                    ? "bg-secondary-container text-on-secondary-container"
+                    : "bg-surface-container-high text-on-surface-variant"
+                    }`}>
+                    {telemetry?.insights?.some(i => i.detectedAt?.includes("Groq"))
+                      ? (telemetry.insights.find(i => i.detectedAt?.includes("Groq"))?.detectedAt?.toUpperCase() || "GROQ LLM INFERENCE")
+                      : "LOCAL TELEMETRY HEURISTICS"}
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800">
                     REALTIME SYNCED
@@ -2171,37 +2217,42 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
               </div>
 
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                By correlating <strong>{totalSessionsCount.toLocaleString()}</strong> sessions across table <code>{selectedTable}</code> with behavioral telemetry, the agent determined that user abandonment at <strong>[{topBottleneckName.replace(/_/g, ' ')}]</strong> is not user disinterest, but an avoidable engineering cliff. Micro-vectors register <strong>1.82 rage clicks</strong> and a <strong>+208% dwell spike</strong>, proving interaction stalls.
+                {telemetry?.narrative || (
+                  <>
+                    By correlating <strong>{totalSessionsCount.toLocaleString()}</strong> sessions across table <code>{selectedTable}</code> with behavioral telemetry, the agent determined that user abandonment at <strong>[{topBottleneckName.replace(/_/g, ' ')}]</strong> is an addressable engineering cliff. Primary signals register elevated dwell times and rage clicks across input stages.
+                  </>
+                )}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-1">
-                <div className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-red-700">
-                    <span className="material-symbols-outlined text-[15px]">report_problem</span>
-                    <span>1. Synchronous Blocking</span>
-                  </div>
-                  <p className="text-[11px] text-on-surface-variant mt-1">
-                    Profile setup forces avatar uploads synchronously before enabling the submit CTA, stalling mobile users on cellular connections.
-                  </p>
-                </div>
-                <div className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700">
-                    <span className="material-symbols-outlined text-[15px]">bolt</span>
-                    <span>2. Validation Storms</span>
-                  </div>
-                  <p className="text-[11px] text-on-surface-variant mt-1">
-                    Email and credential verification executes validation APIs on every keystroke without debouncing, freezing the input field.
-                  </p>
-                </div>
-                <div className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                    <span className="material-symbols-outlined text-[15px]">trending_up</span>
-                    <span>3. Modeled Recovery</span>
-                  </div>
-                  <p className="text-[11px] text-on-surface-variant mt-1">
-                    Implementing the 3 action tickets below recovers an estimated <strong>+{simRecoveredUsers.toLocaleString()} users</strong> (+${simRecoveredValue.toLocaleString()} pipeline).
-                  </p>
-                </div>
+                {(telemetry?.insights && telemetry.insights.length >= 3 ? telemetry.insights.slice(0, 3) : [
+                  {
+                    title: "1. Synchronous Blocking",
+                    description: "Stage forces resource upload synchronously before enabling submission, causing interaction drop-offs.",
+                  },
+                  {
+                    title: "2. Validation Latency",
+                    description: "Credential verification triggers repeated un-debounced network checks on keystroke inputs.",
+                  },
+                  {
+                    title: "3. Modeled Recovery",
+                    description: `Implementing prescriptive action tickets below recovers an estimated +${simRecoveredUsers.toLocaleString()} users.`,
+                  },
+                ]).map((item: any, idx: number) => {
+                  const icons = ["report_problem", "bolt", "trending_up"];
+                  const colors = ["text-red-700", "text-amber-700", "text-emerald-700"];
+                  return (
+                    <div key={item.id || idx} className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+                      <div className={`flex items-center gap-1.5 text-xs font-bold ${colors[idx % colors.length]}`}>
+                        <span className="material-symbols-outlined text-[15px]">{icons[idx % icons.length]}</span>
+                        <span className="truncate">{item.title}</span>
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant mt-1 line-clamp-3">
+                        {item.description}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -2869,7 +2920,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                     <span>Executive Summary</span>
                   </h4>
                   <p className="text-on-surface-variant leading-relaxed">
-                    Automated journey intelligence audit performed across Supabase table <strong>[{selectedTable}]</strong> for workflow <strong>[{selectedJourney}]</strong>. Evaluated over <strong>{totalSessionsCount.toLocaleString()}</strong> user sessions. The overall funnel conversion retention is recorded at <strong>{overallCompletionPct.toFixed(1)}%</strong>, with an average friction index of <strong>{avgFrictionScore}/100</strong>.
+                    {telemetry?.narrative || `Automated journey intelligence audit performed across Supabase table [${selectedTable}] for workflow [${selectedJourney}]. Evaluated over ${totalSessionsCount.toLocaleString()} user sessions. The overall funnel conversion retention is recorded at ${overallCompletionPct.toFixed(1)}%, with an average friction index of ${avgFrictionScore}/100.`}
                   </p>
                 </div>
 
@@ -2942,6 +2993,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 Format: Executive HTML / Markdown
               </span>
               <div className="flex items-center gap-2">
+                <a
+                  href={selectedReport.content_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/30 px-3.5 py-2 rounded-full text-xs font-semibold flex items-center gap-1 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  <span>Open HTML Report</span>
+                </a>
                 <button
                   onClick={handleDownloadPdf}
                   className="bg-surface-container-high hover:bg-surface-container-highest text-primary px-4 py-2 rounded-full text-xs font-semibold cursor-pointer"

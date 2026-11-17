@@ -64,11 +64,222 @@ export interface LiveTelemetryPayload {
     created_at: string;
     content_url: string;
   }>;
+  narrative?: string | undefined;
   availableJourneys: string[];
   lastUpdated: string;
 }
 
 const MASTER_TOKEN = process.env.CJI_INTERNAL_OPERATOR_TOKEN || "session_operator_key";
+
+export const runtimeHtmlReports = new Map<string, string>();
+
+interface CustomLlmConfig {
+  provider?: string | undefined;
+  apiKey?: string | undefined;
+  model?: string | undefined;
+  baseUrl?: string | undefined;
+}
+
+interface GroqResponsePayload {
+  insights?: Array<{
+    id?: string;
+    title?: string;
+    description?: string;
+    severity?: "critical" | "urgent" | "minor";
+    confidence?: number;
+    recommendation?: string;
+  }>;
+  narrative?: string;
+}
+
+async function generateGroqInsights(
+  apiKey: string,
+  model: string,
+  journeyId: string,
+  table: string,
+  funnel: any[],
+  steps: any[],
+  friction: any,
+  completionPct: number
+): Promise<{ insights: LiveTelemetryPayload["insights"]; narrative?: string | undefined } | null> {
+  const cleanKey = apiKey.trim();
+  if (!cleanKey) return null;
+
+  let resolvedModel = model?.trim() || process.env.GROQ_MODEL || process.env.LLM_MODEL || "openai/gpt-oss-120b";
+  const url = "https://api.groq.com/openai/v1/chat/completions";
+
+  const systemPrompt = `You are CJI Strategic Machine Intelligence, an expert AI customer journey telemetry analyst powered by Groq.
+You analyze customer journeys, conversion drop-off cliffs, latency dwell times, error spikes, and rage clicks.
+Respond ONLY with a valid JSON object matching this exact schema:
+{
+  "insights": [
+    {
+      "id": "ins-groq-1",
+      "title": "Short title describing root cause (max 10 words)",
+      "description": "2-3 sentences explaining WHY this friction/drop-off occurs based on telemetry evidence",
+      "severity": "critical" | "urgent" | "minor",
+      "confidence": 95,
+      "recommendation": "1-2 sentences of actionable engineering or UX remediation ticket"
+    }
+  ],
+  "narrative": "A 2-3 paragraph executive summary evaluating journey funnel health, primary abandonment cliffs, and ROI of engineering remediation."
+}`;
+
+  const userPrompt = JSON.stringify({
+    journey_name: journeyId,
+    table_source: table,
+    overall_funnel_completion_pct: completionPct,
+    funnel_steps: funnel.slice(0, 8),
+    step_telemetry: steps.slice(0, 8),
+    friction_scores: friction?.scores?.slice(0, 8) || [],
+    critical_steps: friction?.criticalSteps || [],
+  }, null, 2);
+
+  const callGroq = async (modelToUse: string) => {
+    return await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${cleanKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: modelToUse,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Analyze this customer journey dataset and generate strategic machine insights:\n\n${userPrompt}` },
+        ],
+        temperature: 0.2,
+        response_format: { type: "json_object" },
+      }),
+    });
+  };
+
+  try {
+    let res = await callGroq(resolvedModel);
+    // If the requested model is not found (404), fall back to openai/gpt-oss-120b
+    if (!res.ok && res.status === 404 && resolvedModel !== "openai/gpt-oss-120b") {
+      resolvedModel = "openai/gpt-oss-120b";
+      res = await callGroq(resolvedModel);
+    }
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.warn(`Groq API returned error status ${res.status}:`, errText);
+      return null;
+    }
+
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) return null;
+
+    const parsed: GroqResponsePayload = JSON.parse(content);
+    const rawInsights = Array.isArray(parsed.insights) ? parsed.insights : [];
+    const formattedInsights: LiveTelemetryPayload["insights"] = rawInsights.map((ins, idx) => ({
+      id: ins.id || `ins-groq-${idx + 1}-${Date.now().toString(36)}`,
+      title: String(ins.title || "Strategic Machine Insight"),
+      description: String(ins.description || "Identified behavioral bottleneck in telemetry stream."),
+      severity: (ins.severity === "critical" || ins.severity === "urgent" || ins.severity === "minor") ? ins.severity : "urgent",
+      confidence: typeof ins.confidence === "number" ? Math.min(99, Math.max(70, ins.confidence)) : 94,
+      recommendation: String(ins.recommendation || "Review and optimize step flow."),
+      detectedAt: `Groq (${resolvedModel})`,
+    }));
+
+    return {
+      insights: formattedInsights,
+      narrative: typeof parsed.narrative === "string" ? parsed.narrative : undefined,
+    };
+  } catch (err) {
+    console.warn("Groq inference error:", err);
+    return null;
+  }
+}
+
+function buildReportHtml(
+  reportId: string,
+  journeyId: string,
+  table: string,
+  narrative: string,
+  insights: LiveTelemetryPayload["insights"],
+  funnel: any[],
+  _steps: any[],
+  friction: any,
+  completionPct: number
+): string {
+  const safeJourney = journeyId.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const safeNarrative = narrative.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const insightsHtml = insights.map((ins) => `
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 11px; color: #a1a1aa; font-family: monospace;">${ins.detectedAt || "Groq Intelligence"}</span>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 9999px; ${ins.severity === 'critical' ? 'background: rgba(239,68,68,0.2); color: #f87171;' : 'background: rgba(245,158,11,0.2); color: #fbbf24;'}">${ins.severity}</span>
+      </div>
+      <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #f4f4f5;">${ins.title}</h3>
+      <p style="margin: 0 0 10px 0; font-size: 13px; color: #d4d4d8; line-height: 1.5;">${ins.description}</p>
+      <div style="background: rgba(99,102,241,0.1); border-left: 3px solid #6366f1; padding: 8px 12px; font-size: 12px; color: #c7d2fe;">
+        <strong>Recommendation:</strong> ${ins.recommendation}
+      </div>
+    </div>
+  `).join("");
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CJI Tactical Executive Report · ${safeJourney}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 32px 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 24px; }
+    .badge { display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 600; border-radius: 9999px; background: rgba(99,102,241,0.2); color: #818cf8; margin-bottom: 12px; }
+    h1 { margin: 0 0 6px 0; font-size: 26px; }
+    .narrative-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 28px; line-height: 1.6; font-size: 14px; color: #e4e4e7; }
+    .section-title { font-size: 18px; margin: 24px 0 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 700; color: #6366f1; }
+    .stat-lbl { font-size: 11px; color: #a1a1aa; text-transform: uppercase; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">Groq Strategic Machine Intelligence · Autonomous CIO Report</div>
+      <h1>Customer Journey Intelligence Report: ${safeJourney}</h1>
+      <p style="color: #a1a1aa; font-size: 13px; margin: 4px 0 0 0;">Report ID: <code>${reportId}</code> · Source: <code>${table}</code> · Generated: ${new Date().toUTCString()}</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val">${completionPct.toFixed(1)}%</div>
+        <div class="stat-lbl">Funnel Conversion</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${funnel[0]?.users?.toLocaleString() || 0}</div>
+        <div class="stat-lbl">Total Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${friction?.criticalSteps?.length || 0}</div>
+        <div class="stat-lbl">Critical Bottlenecks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${insights.length}</div>
+        <div class="stat-lbl">Identified Insights</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Executive Summary</h2>
+    <div class="narrative-box">
+      ${safeNarrative.replace(/\n\n/g, "</p><p>")}
+    </div>
+
+    <h2 class="section-title">Strategic Insights & Action Items</h2>
+    ${insightsHtml}
+  </div>
+</body>
+</html>`;
+}
 
 // In-memory cache for on-demand generated tactical reports so they persist across subtabs
 const runtimeCompiledReports: Array<{
@@ -84,7 +295,8 @@ async function resolveAnalytics(
   requestedJourney: string | null,
   table: "live_events" | "tracking_events" | "all",
   minutes: number,
-  isExplicitRun = false
+  isExplicitRun = false,
+  customLlmConfig?: CustomLlmConfig
 ): Promise<LiveTelemetryPayload> {
   const session = await getSession();
   const token = session?.token || MASTER_TOKEN;
@@ -289,7 +501,7 @@ async function resolveAnalytics(
   }
 
   // Machine Insights dynamically synthesized from the actual telemetry and friction scores
-  const insightsList: LiveTelemetryPayload["insights"] = [];
+  const fallbackInsights: LiveTelemetryPayload["insights"] = [];
 
   const worstDropStep = [...funnel].sort((a, b) => (b.drop_off_pct ?? 0) - (a.drop_off_pct ?? 0))[0];
   const worstErrorStep = [...steps].sort((a, b) => (b.error_rate_pct ?? 0) - (a.error_rate_pct ?? 0))[0];
@@ -301,63 +513,93 @@ async function resolveAnalytics(
 
   if (worstDropStep && (worstDropStep.drop_off_pct ?? 0) > 0) {
     const stepLabel = worstDropStep.step_id.replace(/_/g, " ");
-    insightsList.push({
+    fallbackInsights.push({
       id: "ins-dynamic-drop",
       title: `Critical Bottleneck: High Drop-off at ${stepLabel}`,
       description: `Analysis across ${totalUsersAnalyzed.toLocaleString()} sessions in '${table}' identifies ${worstDropStep.step_id} with a ${worstDropStep.drop_off_pct.toFixed(1)}% abandonment cliff (${worstDropStep.users.toLocaleString()} entrants).`,
       severity: worstDropStep.drop_off_pct >= 30 ? "critical" : "urgent",
       confidence: 95,
       recommendation: `Simplify input requirements and optimize page response latency on the ${worstDropStep.step_id} stage.`,
-      detectedAt: "Active Pipeline",
+      detectedAt: "Local Telemetry Heuristics",
     });
   }
 
   if (worstErrorStep && (worstErrorStep.error_rate_pct ?? 0) > 0) {
     const errorLabel = worstErrorStep.step_id.replace(/_/g, " ");
-    insightsList.push({
+    fallbackInsights.push({
       id: "ins-dynamic-error",
       title: `Elevated Form / API Error Rate at ${errorLabel}`,
       description: `Step '${worstErrorStep.step_id}' registers a ${worstErrorStep.error_rate_pct.toFixed(1)}% error rate with an average retry count of ${worstErrorStep.avg_retries.toFixed(1)} per user.`,
       severity: worstErrorStep.error_rate_pct >= 15 ? "critical" : "urgent",
       confidence: 92,
       recommendation: `Implement proactive client-side validation and debounced server checks to minimize submission failures.`,
-      detectedAt: "Active Pipeline",
+      detectedAt: "Local Telemetry Heuristics",
     });
   }
 
   if (worstRageStep && (worstRageStep.avg_rage_clicks ?? 0) > 0.1) {
-    insightsList.push({
+    fallbackInsights.push({
       id: "ins-dynamic-rage",
       title: `UI Frustration Anomaly: Rage Clicks on ${worstRageStep.step_id.replace(/_/g, " ")}`,
       description: `Detected ${worstRageStep.avg_rage_clicks.toFixed(2)} rage clicks per user on stage '${worstRageStep.step_id}', pointing to unclickable elements or blocked interactive buttons.`,
       severity: worstRageStep.avg_rage_clicks >= 0.5 ? "critical" : "urgent",
       confidence: 89,
       recommendation: `Audit tap targets, button hover/loading states, and mobile touch targets to eliminate phantom clicks.`,
-      detectedAt: "Active Pipeline",
+      detectedAt: "Local Telemetry Heuristics",
     });
   } else if (worstDwellStep && (worstDwellStep.avg_dwell_ms ?? 0) > 30000) {
     const dwellSec = Math.round(worstDwellStep.avg_dwell_ms / 1000);
-    insightsList.push({
+    fallbackInsights.push({
       id: "ins-dynamic-dwell",
       title: `Dwell Latency Threshold Exceeded on ${worstDwellStep.step_id.replace(/_/g, " ")}`,
       description: `Users spend an average of ${dwellSec} seconds on '${worstDwellStep.step_id}', indicating cognitive overload or multi-field fatigue.`,
       severity: "urgent",
       confidence: 90,
       recommendation: `Break down complex form stages into progressive disclosure micro-steps.`,
-      detectedAt: "Active Pipeline",
+      detectedAt: "Local Telemetry Heuristics",
     });
   }
 
   // End-to-end Conversion health insight
-  insightsList.push({
+  fallbackInsights.push({
     id: "ins-dynamic-summary",
     title: `End-to-End Funnel Synthesis (${table})`,
     description: `Analyzed ${totalUsersAnalyzed.toLocaleString()} unique users on '${journeyId}'. ${convertedUsersAnalyzed.toLocaleString()} completed all stages (${completionPct.toFixed(1)}% overall funnel completion).`,
     severity: completionPct < 15 ? "urgent" : "minor",
     confidence: 98,
     recommendation: `Focus sprint velocity on the top critical bottleneck (${criticalStepsList[0] || worstDropStep?.step_id || "profile_setup"}) to unlock conversion uplift.`,
-    detectedAt: "Telemetry Sync",
+    detectedAt: "Local Telemetry Heuristics",
   });
+
+  // Resolve Groq AI API Key and Model (from BYOK header/body or server environment)
+  const groqApiKey = customLlmConfig?.apiKey?.trim()
+    || process.env.GROQ_API_KEY?.trim()
+    || process.env.CJI_GROQ_API_KEY?.trim()
+    || "";
+  const groqModel = customLlmConfig?.model?.trim()
+    || process.env.GROQ_MODEL?.trim()
+    || process.env.LLM_MODEL?.trim()
+    || "openai/gpt-oss-120b";
+
+  let groqResult: { insights: LiveTelemetryPayload["insights"]; narrative?: string | undefined } | null = null;
+  if (groqApiKey) {
+    groqResult = await generateGroqInsights(
+      groqApiKey,
+      groqModel,
+      journeyId,
+      table,
+      funnel,
+      steps,
+      frictionData,
+      completionPct
+    );
+  }
+
+  const insightsList: LiveTelemetryPayload["insights"] = (groqResult?.insights && groqResult.insights.length > 0)
+    ? groqResult.insights
+    : fallbackInsights;
+
+  const executiveNarrative = groqResult?.narrative || `Automated journey intelligence audit performed across Supabase table [${table}] for workflow [${journeyId}]. Evaluated over ${totalUsersAnalyzed.toLocaleString()} user sessions. The overall funnel conversion retention is recorded at ${completionPct.toFixed(1)}%, with an average friction score of ${overallFriction}/100. Primary drop-off concentration occurs at ${criticalStepsList[0] || worstDropStep?.step_id || "profile_setup"}.`;
 
   // Reports
   const reportsList: LiveTelemetryPayload["reports"] = [];
@@ -374,22 +616,31 @@ async function resolveAnalytics(
     }
   }
 
+  // Compile real HTML report with Groq narrative and store in memory
+  const reportId = `rep_${journeyId}_${table}_${Date.now().toString(36)}`;
+  const reportHtml = buildReportHtml(
+    reportId,
+    journeyId,
+    table,
+    executiveNarrative,
+    insightsList,
+    funnel,
+    steps,
+    frictionData,
+    completionPct
+  );
+  runtimeHtmlReports.set(reportId, reportHtml);
+  runtimeHtmlReports.set(`rep_${journeyId}_${table}`, reportHtml);
+
   // If explicit run or no reports yet, compile a fresh tactical report
   if (isExplicitRun || reportsList.length === 0) {
-    const freshReport: {
-      report_id: string;
-      run_id: string | null;
-      journey_id: string | null;
-      size_bytes: number;
-      created_at: string;
-      content_url: string;
-    } = {
-      report_id: `rep_${journeyId}_${table}_${Date.now().toString(36)}`,
+    const freshReport = {
+      report_id: reportId,
       run_id: runId || `run_${Date.now().toString(36)}`,
       journey_id: journeyId,
-      size_bytes: table === "tracking_events" ? 18450 : table === "all" ? 19200 : 5420,
+      size_bytes: Buffer.byteLength(reportHtml, "utf-8"),
       created_at: new Date().toISOString(),
-      content_url: `/reports/rep_${journeyId}_${table}`,
+      content_url: `/reports/${reportId}`,
     };
     runtimeCompiledReports.unshift(freshReport);
   }
@@ -463,6 +714,7 @@ async function resolveAnalytics(
       ],
     insights: insightsList,
     reports: reportsList,
+    narrative: groqResult?.narrative || executiveNarrative,
     availableJourneys,
     lastUpdated: new Date().toISOString(),
   };
@@ -474,8 +726,18 @@ export async function GET(request: NextRequest) {
   const requestedJourney = searchParams.get("journey_id");
   const table = (searchParams.get("table") ?? "live_events") as "live_events" | "tracking_events" | "all";
 
+  const customKey = request.headers.get("x-groq-key") || undefined;
+  const customModel = request.headers.get("x-llm-model") || undefined;
+  const customProvider = request.headers.get("x-llm-provider") || undefined;
+
+  const customLlmConfig: CustomLlmConfig | undefined = customKey ? {
+    provider: customProvider || "groq",
+    apiKey: customKey,
+    model: customModel,
+  } : undefined;
+
   try {
-    const payload = await resolveAnalytics(requestedJourney, table, minutes, false);
+    const payload = await resolveAnalytics(requestedJourney, table, minutes, false, customLlmConfig);
     return NextResponse.json(payload);
   } catch (err) {
     return NextResponse.json(
@@ -504,12 +766,31 @@ export async function POST(request: NextRequest) {
   let minutes = 60;
   let requestedJourney: string | null = null;
   let table: "live_events" | "tracking_events" | "all" = "live_events";
+  let customLlmConfig: CustomLlmConfig | undefined = undefined;
+
+  const customHeaderKey = request.headers.get("x-groq-key") || undefined;
+  const customHeaderModel = request.headers.get("x-llm-model") || undefined;
+  const customHeaderProvider = request.headers.get("x-llm-provider") || undefined;
 
   try {
     const body = await request.json().catch(() => ({}));
     if (body.minutes !== undefined) minutes = Number(body.minutes);
     if (body.journey_id) requestedJourney = String(body.journey_id);
     if (body.table) table = body.table as "live_events" | "tracking_events" | "all";
+    if (body.llm_config && typeof body.llm_config === "object") {
+      customLlmConfig = {
+        provider: body.llm_config.provider || customHeaderProvider || "groq",
+        apiKey: body.llm_config.apiKey || customHeaderKey,
+        model: body.llm_config.model || customHeaderModel,
+        baseUrl: body.llm_config.baseUrl,
+      };
+    } else if (customHeaderKey) {
+      customLlmConfig = {
+        provider: customHeaderProvider || "groq",
+        apiKey: customHeaderKey,
+        model: customHeaderModel,
+      };
+    }
   } catch {
     const { searchParams } = request.nextUrl;
     if (searchParams.get("minutes")) minutes = Number(searchParams.get("minutes"));
@@ -518,7 +799,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const payload = await resolveAnalytics(requestedJourney, table, minutes, true);
+    const payload = await resolveAnalytics(requestedJourney, table, minutes, true, customLlmConfig);
     return NextResponse.json(payload);
   } catch (err) {
     return NextResponse.json(
