@@ -3,10 +3,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Task } from '../../types';
 
+export type AnalyticsTableId = "veriscape_trial_events" | "live_events" | "tracking_events" | "all";
+
 export interface LiveTelemetryPayload {
   journeyId: string;
-  selectedTable?: "live_events" | "tracking_events" | "all";
+  selectedTable?: AnalyticsTableId;
   windowMinutes: number;
+  windowLabel?: string;
+  totalEventsInWindow?: number;
   mode: "realtime" | "demo";
   isLiveSupabase: boolean;
   status: "connected" | "fallback" | "error";
@@ -60,13 +64,34 @@ export interface LiveTelemetryPayload {
     report_id: string;
     run_id: string | null;
     journey_id: string | null;
+    table?: AnalyticsTableId;
+    window_label?: string;
     size_bytes: number;
     created_at: string;
     content_url: string;
+    narrative?: string;
+    insights?: LiveTelemetryPayload["insights"];
+    summary?: {
+      totalSessions: number;
+      totalEvents: number;
+      completionPct: number;
+      avgFriction: number;
+      criticalCount: number;
+      topBottleneck: string;
+    };
   }>;
   narrative?: string;
   availableJourneys: string[];
   lastUpdated: string;
+}
+
+function formatWindowLabel(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes <= 0 || minutes >= 525600) return "All";
+  if (minutes < 60) return `${minutes}m`;
+  if (minutes === 60) return "1h";
+  if (minutes < 1440) return `${Math.round(minutes / 60)}h`;
+  if (minutes === 1440) return "24h";
+  return `${Math.round(minutes / 1440)}d`;
 }
 
 export interface AnalyticsScreenProps {
@@ -78,10 +103,10 @@ export interface AnalyticsScreenProps {
 export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemetry }) => {
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'journey' | 'friction' | 'insights' | 'reports'>('overview');
   const [platform, setPlatform] = useState<'all' | 'web' | 'app' | 'checkout'>('all');
-  const [selectedTable, setSelectedTable] = useState<'live_events' | 'tracking_events' | 'all'>('live_events');
+  const [selectedTable, setSelectedTable] = useState<AnalyticsTableId>('veriscape_trial_events');
   const [windowMinutes, setWindowMinutes] = useState<number>(60);
-  const [selectedJourney, setSelectedJourney] = useState<string>('user_onboarding');
-  const [insightFilter, setInsightFilter] = useState<'high' | 'all' | 'archived'>('high');
+  const [selectedJourney, setSelectedJourney] = useState<string>('quest_journey');
+  const [insightFilter, setInsightFilter] = useState<'high' | 'all' | 'archived'>('all');
 
   // Journey Funnel Advanced Analysis States
   const [journeyViewMode, setJourneyViewMode] = useState<'all' | 'waterfall' | 'sankey' | 'cdf' | 'cards' | 'cohorts'>('all');
@@ -104,9 +129,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
   // Live Telemetry State
   const [telemetry, setTelemetry] = useState<LiveTelemetryPayload | null>(initialTelemetry ?? null);
   const [isLoading, setIsLoading] = useState(false);
+  const fetchSeqRef = React.useRef(0);
 
-  // Dedicated data fetching tied to (table, journey, minutes)
+  // Dedicated data fetching tied to (table, journey, minutes) with stale-response protection
   const fetchTelemetry = useCallback(async (minutes = windowMinutes, journey = selectedJourney, table = selectedTable) => {
+    const seq = ++fetchSeqRef.current;
     try {
       setIsLoading(true);
       const headers: Record<string, string> = {};
@@ -130,22 +157,30 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
         cache: 'no-store',
         headers,
       });
+      if (seq !== fetchSeqRef.current) return; // Discard stale response
       if (res.ok) {
         const data: LiveTelemetryPayload = await res.json();
+        if (seq !== fetchSeqRef.current) return;
         setTelemetry(data);
-        if (data.availableJourneys && data.availableJourneys.length > 0 && !data.availableJourneys.includes(journey)) {
-          setSelectedJourney(data.availableJourneys[0] ?? 'user_onboarding');
+        if (data.journeyId && data.journeyId !== journey) {
+          setSelectedJourney(data.journeyId);
         }
       }
     } catch (e) {
-      console.warn("Could not fetch live analytics telemetry:", e);
+      if (seq === fetchSeqRef.current) {
+        console.warn("Could not fetch live analytics telemetry:", e);
+      }
     } finally {
-      setIsLoading(false);
+      if (seq === fetchSeqRef.current) {
+        setIsLoading(false);
+      }
     }
   }, [windowMinutes, selectedJourney, selectedTable]);
 
   // Initial fetch and dependency changes
   useEffect(() => {
+    setSelectedReport(null);
+    setSelectedInsight(null);
     void fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
   }, [windowMinutes, selectedJourney, selectedTable, fetchTelemetry]);
 
@@ -316,66 +351,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
     window.print();
   };
 
-  // Resolved dynamic values strictly from API telemetry
+  // Resolved dynamic values strictly from live API telemetry (zero hardcoded funnels)
   const isSupabaseLive = Boolean(telemetry?.isLiveSupabase);
+  const activeWindowLabel = telemetry?.windowLabel ?? formatWindowLabel(windowMinutes);
   const stepsMetrics = telemetry?.metrics?.steps ?? [];
-
-  const funnelSteps = telemetry?.metrics?.funnel && telemetry.metrics.funnel.length > 0
-    ? telemetry.metrics.funnel
-    : selectedTable === "live_events"
-      ? [
-        { step_id: "landing_page", users: 24, drop_off_pct: 16.7 },
-        { step_id: "sign_up_form", users: 20, drop_off_pct: 25.0 },
-        { step_id: "profile_setup", users: 15, drop_off_pct: 53.3 },
-        { step_id: "payment_info", users: 7, drop_off_pct: 28.6 },
-        { step_id: "checkout_complete", users: 5, drop_off_pct: 0.0 },
-      ]
-      : selectedTable === "all"
-        ? [
-          { step_id: "landing_page", users: 5024, drop_off_pct: 15.5 },
-          { step_id: "sign_up_form", users: 4243, drop_off_pct: 13.4 },
-          { step_id: "email_verification", users: 3672, drop_off_pct: 27.0 },
-          { step_id: "profile_setup", users: 2683, drop_off_pct: 69.3 },
-          { step_id: "plan_selection", users: 823, drop_off_pct: 10.0 },
-          { step_id: "payment_info", users: 741, drop_off_pct: 7.6 },
-          { step_id: "confirm_details", users: 685, drop_off_pct: 7.6 },
-          { step_id: "onboarding_done", users: 633, drop_off_pct: 0.0 },
-        ]
-        : [
-          { step_id: "landing_page", users: 5000, drop_off_pct: 15.5 },
-          { step_id: "sign_up_form", users: 4223, drop_off_pct: 13.4 },
-          { step_id: "email_verification", users: 3657, drop_off_pct: 27.0 },
-          { step_id: "profile_setup", users: 2668, drop_off_pct: 69.4 },
-          { step_id: "plan_selection", users: 816, drop_off_pct: 10.0 },
-          { step_id: "payment_info", users: 734, drop_off_pct: 7.4 },
-          { step_id: "confirm_details", users: 680, drop_off_pct: 7.6 },
-          { step_id: "onboarding_done", users: 628, drop_off_pct: 0.0 },
-        ];
-
-  const frictionScores = telemetry?.friction?.scores && telemetry.friction.scores.length > 0
-    ? telemetry.friction.scores
-    : funnelSteps.map((s) => {
-      const matchingStep = stepsMetrics.find((st) => st.step_id === s.step_id);
-      const drop = s.drop_off_pct ?? 0;
-      const err = matchingStep?.error_rate_pct ?? 0;
-      const rage = matchingStep?.avg_rage_clicks ?? 0;
-      const score = Math.min(100, Math.max(0, Math.round(drop * 0.6 + err * 2.0 + rage * 18)));
-      const signals: string[] = [];
-      if (drop >= 30) signals.push("high_dropoff");
-      if (err >= 5) signals.push("error_spike");
-      if (rage >= 0.5) signals.push("rage_clicks");
-      if ((matchingStep?.avg_dwell_ms ?? 0) >= 60000) signals.push("dwell_deviation");
-      return {
-        step_id: s.step_id,
-        score,
-        is_critical: score >= 35,
-        signals,
-        confidence: "high",
-      };
-    });
-
+  const funnelSteps = telemetry?.metrics?.funnel ?? [];
+  const frictionScores = telemetry?.friction?.scores ?? [];
   const criticalSteps = telemetry?.friction?.criticalSteps ?? frictionScores.filter((s) => s.is_critical).map((s) => s.step_id);
   const totalSessionsCount = funnelSteps[0]?.users ?? 0;
+  const totalEventsInWindow = telemetry?.totalEventsInWindow ?? (telemetry?.events?.length ?? 0);
   const overallCompletionPct = telemetry?.metrics?.overallCompletionPct ?? (
     funnelSteps.length > 1 && (funnelSteps[0]?.users ?? 0) > 0
       ? Math.round(((funnelSteps[funnelSteps.length - 1]?.users ?? 0) / (funnelSteps[0]?.users ?? 1)) * 1000) / 10
@@ -390,29 +374,30 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
 
   const availableJourneys = telemetry?.availableJourneys?.length
     ? telemetry.availableJourneys
-    : ["user_onboarding", "my_vercel_site", "onboarding", "all"];
+    : [selectedJourney, "all"];
 
-  // Top bottleneck step
+  // Top bottleneck step derived strictly from current table + window telemetry
   const sortedFriction = [...frictionScores].sort((a, b) => b.score - a.score);
   const topBottleneck = sortedFriction[0];
-  const topBottleneckName = topBottleneck?.step_id ?? criticalSteps[0] ?? funnelSteps[0]?.step_id ?? "profile_setup";
+  const topBottleneckName = topBottleneck?.step_id ?? criticalSteps[0] ?? funnelSteps[0]?.step_id ?? "none";
   const topFrictionScore = topBottleneck?.score ?? avgFrictionScore;
+  const topBottleneckSignals = topBottleneck?.signals ?? [];
   const topBottleneckMetric = stepsMetrics.find((st) => st.step_id === topBottleneckName);
-  const topDwellSec = topBottleneckMetric?.avg_dwell_ms ? (topBottleneckMetric.avg_dwell_ms / 1000) : 25;
-  const topDeviationPct = Math.round(((topDwellSec - 20) / 20) * 100);
+  const topDwellSec = topBottleneckMetric?.avg_dwell_ms ? (topBottleneckMetric.avg_dwell_ms / 1000) : 0;
+  const topDeviationPct = topDwellSec > 0 ? Math.round(((topDwellSec - 20) / 20) * 100) : 0;
   const topRageClicks = topBottleneckMetric?.avg_rage_clicks ?? 0;
   const topErrorRate = topBottleneckMetric?.error_rate_pct ?? 0;
 
   // Business, Funnel Flow & Simulation Calculations
-  const aovBenchmark = selectedTable === "live_events" ? 95 : 120;
+  const aovBenchmark = selectedTable === "veriscape_trial_events" ? 45 : selectedTable === "live_events" ? 95 : 120;
   const totalEntrants = funnelSteps[0]?.users ?? 0;
-  const totalConverted = funnelSteps[funnelSteps.length - 1]?.users ?? 0;
+  const totalConverted = funnelSteps.length > 0 ? (funnelSteps[funnelSteps.length - 1]?.users ?? 0) : 0;
   const totalLostUsers = Math.max(0, totalEntrants - totalConverted);
   const totalPipelineLost = totalLostUsers * aovBenchmark;
 
   // Step with highest absolute volume drop
   let maxVolumeDrop = 0;
-  let worstStepLossName = funnelSteps[1]?.step_id ?? "profile_setup";
+  let worstStepLossName = funnelSteps[1]?.step_id ?? funnelSteps[0]?.step_id ?? "none";
   funnelSteps.forEach((s, idx) => {
     if (idx > 0) {
       const prev = funnelSteps[idx - 1]?.users ?? s.users;
@@ -492,7 +477,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 {isSupabaseLive ? `Live Supabase [${selectedTable}]` : 'Connected Supabase PostgreSQL'}
               </span>
               <span className="text-[11px] font-mono text-on-surface-variant px-1.5 py-0.5 rounded-md bg-surface-container-lowest">
-                {selectedTable === "tracking_events" ? "365d" : `${windowMinutes}m`}
+                {activeWindowLabel} &bull; {totalEventsInWindow.toLocaleString()} evts
               </span>
             </div>
 
@@ -503,11 +488,12 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 aria-label="Source Table"
                 value={selectedTable}
                 onChange={(e) => {
-                  const newTable = e.target.value as 'live_events' | 'tracking_events' | 'all';
+                  const newTable = e.target.value as AnalyticsTableId;
                   setSelectedTable(newTable);
                 }}
                 className="bg-surface-container-low text-primary font-semibold rounded-lg px-2.5 py-1.5 border border-surface-container-high text-xs outline-none focus:ring-2 focus:ring-secondary cursor-pointer shadow-2xs"
               >
+                <option value="veriscape_trial_events">veriscape_trial_events (50k VeriScape Trial)</option>
                 <option value="live_events">live_events (Realtime Stream)</option>
                 <option value="tracking_events">tracking_events (Historical Telemetry)</option>
                 <option value="all">Unified (All Tables Combined)</option>
@@ -617,6 +603,39 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
           </div>
         )}
 
+        {/* Empty-Window Guidance Banner (shown honestly when a filter window has 0 matching events) */}
+        {telemetry && !isLoading && funnelSteps.length === 0 && (
+          <div className="relative z-10 p-4 bg-amber-50/90 border border-amber-300/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950">
+            <div className="flex items-start gap-2.5">
+              <span className="material-symbols-outlined text-[18px] text-amber-700 mt-0.5">schedule</span>
+              <div>
+                <div className="font-semibold">
+                  0 events found in [{selectedTable}] for journey [{selectedJourney}] within the last {activeWindowLabel}
+                </div>
+                <p className="text-amber-900/80 mt-0.5">
+                  This table has no records inside the selected lookback window. Expand the time filter or switch to <strong>veriscape_trial_events</strong> (50,000 events across all windows).
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setWindowMinutes(43200)}
+                className="px-3 py-1.5 rounded-full bg-amber-200/80 hover:bg-amber-300/80 text-amber-950 font-semibold cursor-pointer"
+              >
+                Try 30d
+              </button>
+              <button
+                type="button"
+                onClick={() => setWindowMinutes(525600)}
+                className="px-3 py-1.5 rounded-full bg-primary text-on-primary font-semibold cursor-pointer"
+              >
+                Show All Time
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Top Bento Meta Header: Sub-Navigation */}
         <section className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-space-md">
           {/* Pill Sub-Navigation Bar */}
@@ -715,7 +734,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
             </div>
             <div className="mt-space-md flex items-center justify-between text-xs text-on-surface-variant pt-space-xs border-t border-surface-container-high/60">
               <span className="text-emerald-700 font-semibold font-mono">Source: [{selectedTable}]</span>
-              <span>Window: {selectedTable === "tracking_events" ? "365d" : `${windowMinutes}m`}</span>
+              <span>Window: {activeWindowLabel} ({totalEventsInWindow.toLocaleString()} evts)</span>
             </div>
           </div>
 
@@ -1991,43 +2010,49 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-surface-container-high/60 font-mono text-[11px]">
-                    {funnelSteps.map((step, idx) => {
+                    {funnelSteps.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-6 px-4 text-center text-on-surface-variant font-sans text-xs">
+                          No step vectors recorded in <strong>{selectedTable}</strong> ({selectedJourney}) for window <strong>{activeWindowLabel}</strong>.
+                        </td>
+                      </tr>
+                    ) : funnelSteps.map((step, idx) => {
                       const sMetric = stepsMetrics.find((st) => st.step_id === step.step_id);
                       const fItem = frictionScores.find((f) => f.step_id === step.step_id);
-                      const fScore = fItem?.score ?? (step.drop_off_pct >= 30 ? 68 : 14);
-                      const dwellSec = sMetric?.avg_dwell_ms ? (sMetric.avg_dwell_ms / 1000) : (idx === 3 ? 77.1 : 16.5);
+                      const fScore = fItem?.score ?? 0;
+                      const dwellSec = sMetric?.avg_dwell_ms ? (sMetric.avg_dwell_ms / 1000) : 0;
                       const expectedDwell = 20.0;
-                      const deviationPct = Math.round(((dwellSec - expectedDwell) / expectedDwell) * 100);
-                      const rageClicks = sMetric?.avg_rage_clicks ?? (idx === 3 ? 1.82 : 0.05);
-                      const errorRate = sMetric?.error_rate_pct ?? (idx === 3 ? 14.8 : 1.2);
+                      const deviationPct = dwellSec > 0 ? Math.round(((dwellSec - expectedDwell) / expectedDwell) * 100) : 0;
+                      const rageClicks = sMetric?.avg_rage_clicks ?? 0;
+                      const errorRate = sMetric?.error_rate_pct ?? 0;
                       const deadClickRate = Math.round((step.drop_off_pct * 0.15) * 10) / 10;
                       const isSevere = fScore >= 35;
 
                       return (
                         <tr key={`vector-${step.step_id}`} className="hover:bg-surface-container-low transition-colors">
                           <td className="py-2.5 px-4 font-semibold text-primary capitalize font-sans text-xs">
-                            {idx + 1}. {step.step_id.replace(/_/g, ' ')}
+                            {idx + 1}. {step.step_id.replace(/[_-]/g, ' ')}
                           </td>
                           <td className="py-2.5 px-4">
-                            {dwellSec.toFixed(1)}s
+                            {dwellSec > 0 ? `${dwellSec.toFixed(1)}s` : "—"}
                           </td>
                           <td className="py-2.5 px-4">
                             <span className={`px-2 py-0.5 rounded-full font-semibold ${deviationPct > 100 ? 'bg-red-100 text-red-800' : deviationPct > 30 ? 'bg-amber-100 text-amber-800' : 'text-emerald-700'
                               }`}>
-                              {deviationPct > 0 ? `+${deviationPct}%` : `${deviationPct}%`}
+                              {dwellSec > 0 ? (deviationPct > 0 ? `+${deviationPct}%` : `${deviationPct}%`) : "0%"}
                             </span>
                           </td>
                           <td className="py-2.5 px-4">
                             <div className="flex items-center gap-1.5">
-                              <span className={rageClicks >= 0.5 ? 'text-red-700 font-bold' : 'text-on-surface'}>
+                              <span className={rageClicks >= 0.3 ? 'text-red-700 font-bold' : 'text-on-surface'}>
                                 {rageClicks.toFixed(2)}/usr
                               </span>
-                              {rageClicks >= 0.5 && <span className="text-[10px] text-red-600">⚡</span>}
+                              {rageClicks >= 0.3 && <span className="text-[10px] text-red-600">⚡</span>}
                             </div>
                           </td>
                           <td className="py-2.5 px-4">
                             <span className={errorRate >= 5 ? 'text-red-700 font-bold' : 'text-on-surface'}>
-                              {errorRate}%
+                              {errorRate.toFixed(1)}%
                             </span>
                           </td>
                           <td className="py-2.5 px-4 text-on-surface-variant">
@@ -2053,16 +2078,28 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
             </div>
 
             {/* Algorithmic Anomaly Diagnosis Callout */}
-            <div className="p-space-md bg-tertiary-container/10 border border-tertiary-container/30 rounded-xl flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-red-100 text-red-800 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-[18px]">warning</span>
+            <div className={`p-space-md rounded-xl flex items-start gap-3 border ${funnelSteps.length === 0 ? 'bg-surface-container-low border-surface-container-high' : topFrictionScore >= 35 ? 'bg-tertiary-container/10 border-tertiary-container/30' : 'bg-emerald-50/70 border-emerald-200'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${funnelSteps.length === 0 ? 'bg-surface-container-high text-on-surface-variant' : topFrictionScore >= 35 ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                <span className="material-symbols-outlined text-[18px]">
+                  {funnelSteps.length === 0 ? 'hourglass_empty' : topFrictionScore >= 35 ? 'warning' : 'verified'}
+                </span>
               </div>
               <div>
-                <h4 className="font-title-md text-sm font-bold text-red-800">
-                  Algorithmic Anomaly Diagnosis: Severe Cliff at [{topBottleneckName.replace(/_/g, ' ')}]
+                <h4 className={`font-title-md text-sm font-bold ${funnelSteps.length === 0 ? 'text-primary' : topFrictionScore >= 35 ? 'text-red-800' : 'text-emerald-800'}`}>
+                  {funnelSteps.length === 0
+                    ? `No Friction Anomalies in [${selectedTable}] (${activeWindowLabel})`
+                    : topFrictionScore >= 35
+                      ? `Algorithmic Anomaly Diagnosis (${selectedTable} · ${activeWindowLabel}): Severe Cliff at [${topBottleneckName.replace(/[_-]/g, ' ')}]`
+                      : `Flow Health Diagnosis (${selectedTable} · ${activeWindowLabel}): Optimal Friction Profile`}
                 </h4>
                 <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                  Telemetry mathematically distinguishes this stage from natural attrition. Users experience a dwell deviation of <strong>{topDeviationPct > 0 ? `+${topDeviationPct}%` : `${topDeviationPct}%`}</strong> ({topDwellSec.toFixed(1)}s avg) coupled with <strong>{topRageClicks.toFixed(2)} rage clicks/usr</strong> and <strong>{topErrorRate.toFixed(1)}% error rate</strong>, proving users are not bouncing passively but are encountering technical friction or complex form inputs.
+                  {funnelSteps.length === 0 ? (
+                    <>No events matched <strong>{selectedJourney}</strong> inside <code>{selectedTable}</code> over the last <strong>{activeWindowLabel}</strong>. Expand the time filter to evaluate historical friction vectors.</>
+                  ) : (
+                    <>
+                      Across <strong>{totalEventsInWindow.toLocaleString()}</strong> events in <code>{selectedTable}</code> ({activeWindowLabel}), stage <strong>{topBottleneckName.replace(/[_-]/g, ' ')}</strong> scores <strong>{topFrictionScore}/100</strong> with triggered signals: <code>{topBottleneckSignals.join(', ') || 'none'}</code>. Measured vectors show <strong>{topDwellSec.toFixed(1)}s avg dwell</strong> ({topDeviationPct > 0 ? `+${topDeviationPct}%` : `${topDeviationPct}%`} vs 20s benchmark), <strong>{topRageClicks.toFixed(2)} rage clicks/usr</strong>, and <strong>{topErrorRate.toFixed(1)}% error rate</strong>.
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -2194,10 +2231,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                   </div>
                   <div>
                     <h3 className="font-title-md text-sm font-bold text-primary">
-                      LangGraph Autonomous Root-Cause Synthesis
+                      Autonomous Root-Cause Synthesis
                     </h3>
                     <span className="text-[11px] text-on-surface-variant font-mono">
-                      Agent Orchestrator &bull; Multi-Model Synthesis across [{selectedTable}]
+                      Table: [{selectedTable}] &bull; Journey: [{selectedJourney}] &bull; Window: [{activeWindowLabel}] ({totalEventsInWindow.toLocaleString()} events)
                     </span>
                   </div>
                 </div>
@@ -2208,10 +2245,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                     }`}>
                     {telemetry?.insights?.some(i => i.detectedAt?.includes("Groq"))
                       ? (telemetry.insights.find(i => i.detectedAt?.includes("Groq"))?.detectedAt?.toUpperCase() || "GROQ LLM INFERENCE")
-                      : "LOCAL TELEMETRY HEURISTICS"}
+                      : "TELEMETRY ENGINE"}
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800">
-                    REALTIME SYNCED
+                    {activeWindowLabel.toUpperCase()} SYNCED
                   </span>
                 </div>
               </div>
@@ -2219,49 +2256,38 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 {telemetry?.narrative || (
                   <>
-                    By correlating <strong>{totalSessionsCount.toLocaleString()}</strong> sessions across table <code>{selectedTable}</code> with behavioral telemetry, the agent determined that user abandonment at <strong>[{topBottleneckName.replace(/_/g, ' ')}]</strong> is an addressable engineering cliff. Primary signals register elevated dwell times and rage clicks across input stages.
+                    Evaluated <strong>{totalEventsInWindow.toLocaleString()}</strong> events ({totalSessionsCount.toLocaleString()} entrants) in table <code>{selectedTable}</code> for journey <code>{selectedJourney}</code> ({activeWindowLabel} window).
                   </>
                 )}
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-1">
-                {(telemetry?.insights && telemetry.insights.length >= 3 ? telemetry.insights.slice(0, 3) : [
-                  {
-                    title: "1. Synchronous Blocking",
-                    description: "Stage forces resource upload synchronously before enabling submission, causing interaction drop-offs.",
-                  },
-                  {
-                    title: "2. Validation Latency",
-                    description: "Credential verification triggers repeated un-debounced network checks on keystroke inputs.",
-                  },
-                  {
-                    title: "3. Modeled Recovery",
-                    description: `Implementing prescriptive action tickets below recovers an estimated +${simRecoveredUsers.toLocaleString()} users.`,
-                  },
-                ]).map((item: any, idx: number) => {
-                  const icons = ["report_problem", "bolt", "trending_up"];
-                  const colors = ["text-red-700", "text-amber-700", "text-emerald-700"];
-                  return (
-                    <div key={item.id || idx} className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
-                      <div className={`flex items-center gap-1.5 text-xs font-bold ${colors[idx % colors.length]}`}>
-                        <span className="material-symbols-outlined text-[15px]">{icons[idx % icons.length]}</span>
-                        <span className="truncate">{item.title}</span>
+              {(telemetry?.insights?.length ?? 0) > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-space-sm pt-1">
+                  {(telemetry?.insights ?? []).slice(0, 3).map((item, idx) => {
+                    const icons = ["report_problem", "bolt", "trending_up"];
+                    const colors = ["text-red-700", "text-amber-700", "text-emerald-700"];
+                    return (
+                      <div key={item.id || idx} className="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+                        <div className={`flex items-center gap-1.5 text-xs font-bold ${colors[idx % colors.length]}`}>
+                          <span className="material-symbols-outlined text-[15px]">{icons[idx % icons.length]}</span>
+                          <span className="truncate">{item.title}</span>
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant mt-1 line-clamp-3">
+                          {item.description}
+                        </p>
                       </div>
-                      <p className="text-[11px] text-on-surface-variant mt-1 line-clamp-3">
-                        {item.description}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Strategic Machine Intelligence Insights Cards (3 Cards) */}
+            {/* Strategic Machine Intelligence Insights Cards */}
             <div className="flex flex-col gap-space-sm">
               <div className="flex items-center justify-between">
                 <h3 className="font-title-md text-sm font-bold text-primary flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-secondary text-[18px]">auto_awesome</span>
-                  <span>Synthesized Strategic Insights</span>
+                  <span>Synthesized Strategic Insights ({selectedTable} &bull; {activeWindowLabel})</span>
                 </h3>
                 <span className="text-xs text-on-surface-variant font-mono">
                   {telemetry?.insights?.length ?? 0} insights generated
@@ -2275,7 +2301,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                     <div key={ins.id} className="bg-surface-container-low p-space-md rounded-xl flex flex-col justify-between border border-surface-container-high hover:border-secondary transition-colors">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-on-surface-variant">{ins.detectedAt}</span>
+                          <span className="text-xs text-on-surface-variant truncate max-w-[180px]">{ins.detectedAt}</span>
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ins.severity === 'critical'
                             ? 'bg-red-100 text-red-800 border border-red-200'
                             : ins.severity === 'urgent'
@@ -2308,64 +2334,73 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
               </div>
             </div>
 
-            {/* Prioritized Engineering Action Tickets (CJI-101, CJI-102, CJI-103) */}
+            {/* Prioritized Engineering Action Tickets */}
             <div className="flex flex-col gap-space-sm pt-2 border-t border-surface-container-high/40">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-title-md text-sm font-bold text-primary flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-secondary text-[18px]">build_circle</span>
-                    <span>Prioritized Engineering Remediation Tickets</span>
+                    <span>Prioritized Engineering Remediation Tickets ({selectedTable})</span>
                   </h3>
                   <p className="text-xs text-on-surface-variant">
-                    Prescriptive developer tickets ready for sprint planning, complete with code fixes and expected conversion uplift.
+                    Prescriptive developer tickets derived from active friction signals across <strong>{selectedJourney}</strong> ({activeWindowLabel}).
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                {(sortedFriction.length > 0 ? sortedFriction.slice(0, 3) : funnelSteps.slice(0, 3).map((s) => ({ step_id: s.step_id, score: Math.round(s.drop_off_pct) }))).map((item, idx) => {
-                  const stepFunnel = funnelSteps.find((f) => f.step_id === item.step_id);
-                  const stepMetric = stepsMetrics.find((m) => m.step_id === item.step_id);
-                  const dropPct = stepFunnel?.drop_off_pct ?? 20;
-                  const dwellS = stepMetric?.avg_dwell_ms ? (stepMetric.avg_dwell_ms / 1000).toFixed(1) : "25";
-                  const rageVal = stepMetric?.avg_rage_clicks ? stepMetric.avg_rage_clicks.toFixed(2) : "0.00";
-                  const errVal = stepMetric?.error_rate_pct ? stepMetric.error_rate_pct.toFixed(1) : "0.0";
-                  const uplift = Math.max(2.0, Math.round(dropPct * 0.35 * 10) / 10);
-                  const prioLabel = idx === 0 ? "Priority: P0 Critical" : idx === 1 ? "Priority: P1 High" : "Priority: P2 Medium";
-                  const prioClass = idx === 0 ? "text-red-700 font-semibold" : idx === 1 ? "text-amber-700 font-semibold" : "text-primary font-semibold";
+              {sortedFriction.length === 0 ? (
+                <div className="p-6 text-center bg-surface-container-low rounded-xl border border-surface-container-high text-xs text-on-surface-variant">
+                  No remediation tickets generated because 0 events were recorded in [{selectedTable}] during [{activeWindowLabel}].
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                  {sortedFriction.slice(0, 3).map((item, idx) => {
+                    const stepFunnel = funnelSteps.find((f) => f.step_id === item.step_id);
+                    const stepMetric = stepsMetrics.find((m) => m.step_id === item.step_id);
+                    const matchingInsight = (telemetry?.insights ?? []).find(
+                      (ins) =>
+                        ins.title.toLowerCase().includes(item.step_id.toLowerCase().replace(/[_-]/g, " ")) ||
+                        ins.description.toLowerCase().includes(item.step_id.toLowerCase())
+                    ) ?? (telemetry?.insights ?? [])[idx];
+                    const dropPct = stepFunnel?.drop_off_pct ?? 0;
+                    const dwellS = stepMetric?.avg_dwell_ms ? (stepMetric.avg_dwell_ms / 1000).toFixed(1) : "0.0";
+                    const rageVal = stepMetric?.avg_rage_clicks ? stepMetric.avg_rage_clicks.toFixed(2) : "0.00";
+                    const errVal = stepMetric?.error_rate_pct ? stepMetric.error_rate_pct.toFixed(1) : "0.0";
+                    const uplift = Math.max(1.5, Math.round(dropPct * 0.35 * 10) / 10);
+                    const prioLabel = item.score >= 60 ? "Priority: P0 Critical" : item.score >= 35 ? "Priority: P1 High" : "Priority: P2 Monitor";
+                    const prioClass = item.score >= 60 ? "text-red-700 font-semibold" : item.score >= 35 ? "text-amber-700 font-semibold" : "text-primary font-semibold";
 
-                  return (
-                    <div key={`ticket-${item.step_id}`} className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
-                            TICKET CJI-10{idx + 1}
-                          </span>
-                          <span className="text-[11px] font-mono text-emerald-700 font-bold">
-                            +{uplift}% Uplift
-                          </span>
+                    return (
+                      <div key={`ticket-${selectedTable}-${activeWindowLabel}-${item.step_id}`} className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-container text-on-primary">
+                              TICKET CJI-10{idx + 1}
+                            </span>
+                            <span className="text-[11px] font-mono text-emerald-700 font-bold">
+                              +{uplift}% Est. Uplift
+                            </span>
+                          </div>
+                          <h4 className="font-title-md text-sm font-bold text-primary capitalize">
+                            Remediate {item.step_id.replace(/[_-]/g, " ")} (Score {item.score}/100)
+                          </h4>
+                          <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
+                            [{selectedTable} &bull; {activeWindowLabel}] records <strong>{dropPct.toFixed(1)}% drop-off</strong> on <code>{item.step_id}</code> with {dwellS}s avg dwell, {errVal}% errors, and {rageVal} rage clicks/user.
+                          </p>
+                          <div className="mt-3 p-2.5 bg-surface-container-lowest rounded-md text-[11px] text-on-surface border border-surface-container-high leading-relaxed">
+                            <strong className="text-primary">Action:</strong>{" "}
+                            {matchingInsight?.recommendation || `Audit triggered signals (${item.signals.join(", ") || "latency"}) on ${item.step_id}.`}
+                          </div>
                         </div>
-                        <h4 className="font-title-md text-sm font-bold text-primary capitalize">
-                          Remediate Bottleneck at {item.step_id.replace(/_/g, " ")}
-                        </h4>
-                        <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
-                          Telemetry identifies <strong>{dropPct.toFixed(1)}% abandonment</strong> at <code>{item.step_id}</code> with {dwellS}s average dwell, {errVal}% form errors, and {rageVal} rage clicks/user.
-                        </p>
-                        <div className="mt-3 p-2 bg-surface-container-lowest rounded-md font-mono text-[10px] text-on-surface border border-surface-container-high">
-                          <code>
-                            {`// Recommended Optimization:`}<br />
-                            {`optimizeStep("${item.step_id}", { asyncValidation: true, bypassOptional: true });`}
-                          </code>
+                        <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
+                          <span>Signals: <strong>{item.signals.length}</strong></span>
+                          <span className={prioClass}>{prioLabel}</span>
                         </div>
                       </div>
-                      <div className="mt-4 pt-3 border-t border-surface-container-high/60 flex items-center justify-between text-xs text-on-surface-variant font-mono">
-                        <span>Effort: <strong>{idx === 0 ? "2 hrs" : idx === 1 ? "3 hrs" : "1 hr"}</strong></span>
-                        <span className={prioClass}>{prioLabel}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Agent Multi-Step Execution Audit Trail */}
@@ -2540,14 +2575,21 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                   {telemetry.reports.map((rep, idx) => (
                     <div key={rep.report_id + idx} className="p-space-md bg-surface-container-low rounded-xl border border-surface-container-high flex items-center justify-between hover:border-secondary/50 transition-colors">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary shrink-0">
                           <span className="material-symbols-outlined text-[20px]">description</span>
                         </div>
                         <div className="min-w-0">
-                          <div className="font-semibold text-primary text-sm truncate max-w-xs">{rep.report_id}</div>
-                          <div className="text-xs text-on-surface-variant">
-                            {new Date(rep.created_at).toLocaleString()} &bull; {(rep.size_bytes / 1024).toFixed(1)} KB &bull; <span className="font-mono text-primary font-medium">{rep.journey_id ?? selectedJourney}</span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-semibold text-primary text-sm truncate max-w-[200px]">{rep.report_id}</span>
+                            {rep.window_label && (
+                              <span className="px-1.5 py-0.5 rounded-md bg-secondary-container/25 text-secondary font-mono text-[10px] font-bold">
+                                {rep.window_label}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-on-surface-variant mt-0.5">
+                            {new Date(rep.created_at).toLocaleString()} &bull; {(rep.size_bytes / 1024).toFixed(1)} KB &bull; <span className="font-mono text-primary font-medium">{rep.table ?? selectedTable}</span> / <span className="font-mono">{rep.journey_id ?? selectedJourney}</span>
                           </div>
                         </div>
                       </div>
@@ -2899,7 +2941,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                   <div>
                     <h3 className="font-headline-sm text-lg font-bold text-primary">Tactical Analytics Report</h3>
                     <p className="text-xs text-on-surface-variant font-mono">
-                      {selectedReport.report_id} &bull; {new Date(selectedReport.created_at).toLocaleString()}
+                      {selectedReport.report_id} &bull; {selectedReport.table ?? selectedTable} ({selectedReport.window_label ?? activeWindowLabel}) &bull; {new Date(selectedReport.created_at).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -2917,10 +2959,10 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 <div className="p-4 bg-surface-container-low rounded-xl border border-surface-container-high">
                   <h4 className="font-semibold text-primary text-sm mb-1.5 flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-secondary text-[16px]">summarize</span>
-                    <span>Executive Summary</span>
+                    <span>Executive Summary ({selectedReport.table ?? selectedTable} &bull; {selectedReport.window_label ?? activeWindowLabel})</span>
                   </h4>
                   <p className="text-on-surface-variant leading-relaxed">
-                    {telemetry?.narrative || `Automated journey intelligence audit performed across Supabase table [${selectedTable}] for workflow [${selectedJourney}]. Evaluated over ${totalSessionsCount.toLocaleString()} user sessions. The overall funnel conversion retention is recorded at ${overallCompletionPct.toFixed(1)}%, with an average friction index of ${avgFrictionScore}/100.`}
+                    {selectedReport.narrative || telemetry?.narrative || `Automated journey intelligence audit performed across Supabase table [${selectedReport.table ?? selectedTable}] for workflow [${selectedReport.journey_id ?? selectedJourney}] (${selectedReport.window_label ?? activeWindowLabel}). Evaluated ${(selectedReport.summary?.totalSessions ?? totalSessionsCount).toLocaleString()} entrant sessions. Funnel completion: ${(selectedReport.summary?.completionPct ?? overallCompletionPct).toFixed(1)}%, avg friction: ${selectedReport.summary?.avgFriction ?? avgFrictionScore}/100.`}
                   </p>
                 </div>
 
@@ -2928,15 +2970,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 <div className="grid grid-cols-3 gap-2">
                   <div className="p-3 bg-surface-container-low rounded-xl text-center">
                     <div className="text-[11px] text-on-surface-variant">Conversion Rate</div>
-                    <div className="text-base font-bold text-primary mt-0.5">{overallCompletionPct.toFixed(1)}%</div>
+                    <div className="text-base font-bold text-primary mt-0.5">{(selectedReport.summary?.completionPct ?? overallCompletionPct).toFixed(1)}%</div>
                   </div>
                   <div className="p-3 bg-surface-container-low rounded-xl text-center">
                     <div className="text-[11px] text-on-surface-variant">Avg Friction Score</div>
-                    <div className="text-base font-bold text-primary mt-0.5">{avgFrictionScore}/100</div>
+                    <div className="text-base font-bold text-primary mt-0.5">{selectedReport.summary?.avgFriction ?? avgFrictionScore}/100</div>
                   </div>
                   <div className="p-3 bg-surface-container-low rounded-xl text-center">
                     <div className="text-[11px] text-on-surface-variant">Critical Bottlenecks</div>
-                    <div className="text-base font-bold text-tertiary-container mt-0.5">{criticalSteps.length}</div>
+                    <div className="text-base font-bold text-tertiary-container mt-0.5">{selectedReport.summary?.criticalCount ?? criticalSteps.length}</div>
                   </div>
                 </div>
 
@@ -2958,7 +3000,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                           const isCrit = criticalSteps.includes(s.step_id) || s.drop_off_pct > 30;
                           return (
                             <tr key={s.step_id}>
-                              <td className="p-2.5 font-medium text-primary capitalize">{idx + 1}. {s.step_id.replace(/_/g, ' ')}</td>
+                              <td className="p-2.5 font-medium text-primary capitalize">{idx + 1}. {s.step_id.replace(/[_-]/g, ' ')}</td>
                               <td className="p-2.5 font-mono">{s.users.toLocaleString()}</td>
                               <td className="p-2.5 font-mono font-semibold text-tertiary-container">{s.drop_off_pct}%</td>
                               <td className="p-2.5">
@@ -2976,13 +3018,18 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                   </div>
                 </div>
 
-                {/* Recommendations */}
+                {/* Recommendations derived strictly from this report's insights */}
                 <div className="p-4 bg-surface-container-low rounded-xl border border-surface-container-high">
                   <h4 className="font-semibold text-primary text-sm mb-2">Prioritized Engineering Action Items</h4>
                   <ul className="space-y-1.5 text-on-surface-variant list-disc pl-4">
-                    <li>Optimize stage <strong>{topBottleneckName.replace(/_/g, ' ')}</strong> (Friction score: {topFrictionScore}/100) to recover drop-offs.</li>
-                    <li>Debounce external API and network latency checks to eliminate rage click loops.</li>
-                    <li>Configure client-side telemetry events with <code>useCJITracker</code> across active checkout and registration forms.</li>
+                    {(selectedReport.insights && selectedReport.insights.length > 0
+                      ? selectedReport.insights
+                      : telemetry?.insights ?? []
+                    ).map((ins: any, idx: number) => (
+                      <li key={ins.id || idx}>
+                        <strong className="text-primary">{ins.title}:</strong> {ins.recommendation}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

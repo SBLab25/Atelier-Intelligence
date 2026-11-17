@@ -48,6 +48,10 @@ _LIVE = (
     "SELECT user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
     "0 AS duration_ms, metadata::text AS metadata, account_id FROM live_events"
 )
+_VERISCAPE_TRIAL = (
+    "SELECT user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
+    "COALESCE(duration_ms, 0) AS duration_ms, metadata::text AS metadata, account_id FROM veriscape_trial_events"
+)
 # Event pages for the API (Spec 12) also need the event id and URL; the sources above stay unchanged.
 _TRACKING_PAGE = (
     "SELECT event_id, user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, url, account_id "
@@ -57,12 +61,18 @@ _LIVE_PAGE = (
     "SELECT event_id, user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
     "0 AS duration_ms, url, account_id FROM live_events"
 )
+_VERISCAPE_TRIAL_PAGE = (
+    "SELECT event_id, user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
+    "COALESCE(duration_ms, 0) AS duration_ms, url, account_id FROM veriscape_trial_events"
+)
 LIVE_ONLY_LABEL = "Live_event track"         # dashboard selections (unchanged behaviour)
 TRACKING_ONLY_LABEL = "tracking_event track"
 
 
 def realtime_source(journey_id: str, table: str | None = None, account_id: str | None = None) -> str:
-    if table in ("live_events", "live") or journey_id in (LIVE_ONLY_LABEL, "live_events"):
+    if table in ("veriscape_trial_events", "veriscape_trial"):
+        base = f"({_VERISCAPE_TRIAL}) AS unified_events"
+    elif table in ("live_events", "live") or journey_id in (LIVE_ONLY_LABEL, "live_events"):
         base = f"({_LIVE}) AS unified_events"
     elif table in ("tracking_events", "tracking") or journey_id in (TRACKING_ONLY_LABEL, "tracking_events"):
         base = f"({_TRACKING}) AS unified_events"
@@ -71,7 +81,7 @@ def realtime_source(journey_id: str, table: str | None = None, account_id: str |
     elif journey_id == TRACKING_ONLY_LABEL:
         base = f"({_TRACKING}) AS unified_events"
     else:
-        base = f"(SELECT * FROM ({_TRACKING}) UNION ALL SELECT * FROM ({_LIVE})) AS unified_events"  # nosec B608
+        base = f"(SELECT * FROM ({_TRACKING}) UNION ALL SELECT * FROM ({_LIVE}) UNION ALL SELECT * FROM ({_VERISCAPE_TRIAL})) AS unified_events"  # nosec B608
     if account_id and account_id not in ("*", "all"):
         safe_acc = account_id.replace("'", "''")
         return f"(SELECT * FROM {base} WHERE (account_id = '{safe_acc}' OR account_id IS NULL)) AS tenant_events"
@@ -80,7 +90,9 @@ def realtime_source(journey_id: str, table: str | None = None, account_id: str |
 
 def realtime_page_source(journey_id: str, table: str | None = None, account_id: str | None = None) -> str:
     """Like realtime_source, with event_id and url (for keyset pages of events, Spec 12)."""
-    if table in ("live_events", "live") or journey_id in (LIVE_ONLY_LABEL, "live_events"):
+    if table in ("veriscape_trial_events", "veriscape_trial"):
+        base = f"({_VERISCAPE_TRIAL_PAGE}) AS unified_events"
+    elif table in ("live_events", "live") or journey_id in (LIVE_ONLY_LABEL, "live_events"):
         base = f"({_LIVE_PAGE}) AS unified_events"
     elif table in ("tracking_events", "tracking") or journey_id in (TRACKING_ONLY_LABEL, "tracking_events"):
         base = f"({_TRACKING_PAGE}) AS unified_events"
@@ -89,7 +101,7 @@ def realtime_page_source(journey_id: str, table: str | None = None, account_id: 
     elif journey_id == TRACKING_ONLY_LABEL:
         base = f"({_TRACKING_PAGE}) AS unified_events"
     else:
-        base = f"(SELECT * FROM ({_TRACKING_PAGE}) UNION ALL SELECT * FROM ({_LIVE_PAGE})) AS unified_events"  # nosec B608
+        base = f"(SELECT * FROM ({_TRACKING_PAGE}) UNION ALL SELECT * FROM ({_LIVE_PAGE}) UNION ALL SELECT * FROM ({_VERISCAPE_TRIAL_PAGE})) AS unified_events"  # nosec B608
     if account_id and account_id not in ("*", "all"):
         safe_acc = account_id.replace("'", "''")
         return f"(SELECT * FROM {base} WHERE (account_id = '{safe_acc}' OR account_id IS NULL)) AS tenant_events"

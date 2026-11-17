@@ -41,11 +41,11 @@ from ._deps import (
 router = APIRouter(tags=["journeys"])
 logger = logging.getLogger("cji.api")
 
-Days = Annotated[int, Query(ge=1, le=365, description="Window in days (demo data)")]
-Minutes = Annotated[int | None, Query(ge=1, le=43200, description="Window in minutes (realtime data)")]
+Days = Annotated[int, Query(ge=1, le=3650, description="Window in days (demo data)")]
+Minutes = Annotated[int | None, Query(ge=1, le=5256000, description="Window in minutes (realtime data)")]
 StepFilter = Annotated[str | None, Query(min_length=1, max_length=128, description="Only events of this step")]
 TypeFilter = Annotated[str | None, Query(min_length=1, max_length=64, description="Only events of this type")]
-TableFilter = Annotated[str | None, Query(description="Source table: live_events, tracking_events, or all")]
+TableFilter = Annotated[str | None, Query(description="Source table: veriscape_trial_events, live_events, tracking_events, or all")]
 _SHORT_OFFSET = re.compile(r"([+-]\d\d)$")
 
 
