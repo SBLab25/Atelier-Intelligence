@@ -24,11 +24,9 @@ from .base import (
     TimeWindow,
     WriteResult,
 )
-from .duckdb_parquet import DuckDbParquetRepository
 from .postgres import PostgresEventRepository
 
 __all__ = [
-    "DuckDbParquetRepository",
     "EventRepository",
     "LiveSnapshot",
     "NotSupported",
@@ -46,12 +44,10 @@ _current: EventRepository | None = None
 
 
 def event_repository(settings: Settings) -> EventRepository:
-    """The repository for the configured mode. Realtime requires a database URL."""
-    if settings.app.mode == "demo":
-        return DuckDbParquetRepository(settings.storage.events_parquet)
+    """The repository for CJI. Requires a database URL."""
     url = settings.database.url_value()
     if not url:
-        raise ConfigError([database_missing("CJI_MODE=realtime (event repository)")], env=settings.app.env)
+        raise ConfigError([database_missing("CJI (event repository)")], env=settings.app.env)
     return PostgresEventRepository(url)
 
 

@@ -106,7 +106,7 @@ async def data_worker(state: Dict[str, Any]) -> Dict[str, Any]:
       - Funnel drop-off
       - Sample raw events
     """
-    mode = state.get("mode", "demo")
+    mode = state.get("mode", "realtime")
     days = state.get("analysis_window_days", 30)
     mins = state.get("analysis_window_mins", 60)
 
@@ -115,14 +115,6 @@ async def data_worker(state: Dict[str, Any]) -> Dict[str, Any]:
         sys_info = await call_tool(session, "get_system_info")
         logger.info(f"System info: {sys_info.get('mode', 'unknown')} mode, "
                     f"{sys_info.get('total_events', 0)} events")
-
-        # Never analyse a store other than the one this run asked for (Spec 05).
-        server_mode = sys_info.get("mode")
-        if server_mode and server_mode != mode:
-            raise ModeMismatch(
-                f"journey-data server runs in {server_mode} mode; this run is {mode}. "
-                f"Restart the servers with: python run_servers.py --mode {mode}"
-            )
 
         # The server's repository applies its own window semantics; send both values.
         window_args = {"days_back": days, "minutes_back": mins}
@@ -320,7 +312,7 @@ async def report_worker(state: Dict[str, Any]) -> Dict[str, Any]:
     event_summary = state.get("event_summary", {})
     funnel_data = event_summary.get("funnel", [])
     journey_name = state.get("journey_name", "onboarding")
-    mode = state.get("mode", "demo")
+    mode = state.get("mode", "realtime")
 
     # Compute avg score and critical count
     if friction_scores:

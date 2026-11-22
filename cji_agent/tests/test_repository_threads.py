@@ -12,20 +12,19 @@ from tests._api_harness import copy_demo_data
 JOURNEY = "user_onboarding"
 
 
-def test_concurrent_reads_on_one_demo_repository(tmp_path):
-    from cji.repositories import DuckDbParquetRepository, TimeWindow
+def test_concurrent_reads_on_one_demo_repository(api_db_url):
+    from cji.repositories import PostgresEventRepository, TimeWindow
 
-    repo = DuckDbParquetRepository(copy_demo_data(tmp_path))
+    repo = PostgresEventRepository(api_db_url)
     try:
-        expected = repo.step_metrics(JOURNEY, TimeWindow())
-        repo.close()                          # the first concurrent call opens the connection
+        expected = repo.step_metrics(JOURNEY, TimeWindow(days_back=30))
 
         def read(i: int) -> object:
             if i % 3 == 0:
-                return repo.funnel(JOURNEY, ["landing_page"], TimeWindow())
+                return repo.funnel(JOURNEY, ["landing_page"], TimeWindow(days_back=30))
             if i % 3 == 1:
                 return repo.events_page(JOURNEY, limit=5, after=None, step_id=None, event_type=None)
-            return repo.step_metrics(JOURNEY, TimeWindow())
+            return repo.step_metrics(JOURNEY, TimeWindow(days_back=30))
 
         with ThreadPoolExecutor(max_workers=8) as pool:
             results = list(pool.map(read, range(240)))

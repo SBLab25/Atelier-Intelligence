@@ -379,7 +379,7 @@ def load_settings(
     env = r.choice("CJI_ENV", ENVIRONMENTS, "production")
     app = AppSettings(
         env=env,  # type: ignore[arg-type]
-        mode=r.choice("CJI_MODE", MODES, "demo"),  # type: ignore[arg-type]
+        mode=r.choice("CJI_MODE", MODES, "realtime"),  # type: ignore[arg-type]
         journey_name=r.text("JOURNEY_NAME", "user_onboarding"),
     )
     storage = StorageSettings(
@@ -527,11 +527,7 @@ def load_settings(
         pg_bin=r.text("CJI_PG_BIN", "") or None,
     )
 
-    if env == "production" and (values.get("CJI_ENV") or "").strip() and not (r.raw("CJI_MODE") or "").strip():
-        # Spec 15 (OD-172, F-95): no silent demo data on a host that declares CJI_ENV=production. (A host that
-        # leaves CJI_ENV unset also runs as production, fail-closed, and keeps the demo default for local use.)
-        r.problems.append("CJI_MODE is not set. In production set it explicitly: realtime, or demo to serve the "
-                          "bundled demo data (it no longer defaults to demo there).")
+
     for key in sorted(k for k in values if k.startswith("CJI_") and k not in KNOWN_KEYS):
         match = difflib.get_close_matches(key, KNOWN_KEYS, n=1)
         message = f"{key} is not a known setting." + (f" Did you mean {match[0]}?" if match else "")

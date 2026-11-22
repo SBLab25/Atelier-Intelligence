@@ -11,7 +11,7 @@ export interface LiveTelemetryPayload {
   windowMinutes: number;
   windowLabel?: string;
   totalEventsInWindow?: number;
-  mode: "realtime" | "demo";
+  mode: "realtime";
   isLiveSupabase: boolean;
   status: "connected" | "fallback" | "error";
   statusMessage: string;

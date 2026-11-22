@@ -1,17 +1,17 @@
 /**
  * API fixtures typed against the generated OpenAPI schema (Spec 13, OD-138): a change in the contract that the
- * frontend depends on fails the type check here. Values follow the demo data shape.
+ * frontend depends on fails the type check here. Values follow the OpenAPI schema shape.
  */
 import type { components } from "../../src/lib/api/schema";
 
 type S = components["schemas"];
 
-export const health: S["Health"] = { status: "ok", version: "1.0.0", mode: "demo" };
+export const health: S["Health"] = { status: "ok", version: "1.0.0", mode: "realtime" };
 
 export const healthDetails: S["HealthDetails"] = {
   status: "degraded",
   version: "1.0.0",
-  mode: "demo",
+  mode: "realtime",
   components: [
     { name: "repository", status: "ok", code: null },
     { name: "checkpoints", status: "ok", code: null },
@@ -25,7 +25,7 @@ export const me: S["Me"] = { token_id: "tok_0123456789ab", label: "analyst", rol
 export const journey: S["Journey"] = {
   journey_id: "user_onboarding",
   steps: ["landing_page", "signup_form", "email_verify", "profile_setup", "payment_info"],
-  mode: "demo",
+  mode: "realtime",
 };
 
 export const journeys: S["Page_Journey_"] = { data: [journey], page: { limit: 200, next_cursor: null } };
@@ -92,7 +92,7 @@ export const runs: S["Page_RunSummary_"] = {
     {
       run_id: RUN_ID,
       journey_id: "user_onboarding",
-      mode: "demo",
+      mode: "realtime",
       status: "completed",
       created_at: "2026-10-28T21:50:00+00:00",
       updated_at: "2026-10-28T21:52:30+00:00",
@@ -101,7 +101,7 @@ export const runs: S["Page_RunSummary_"] = {
     {
       run_id: "60a7b337-1da6-4071-9410-cd57fcec01f2",
       journey_id: "user_onboarding",
-      mode: "demo",
+      mode: "realtime",
       status: "awaiting_approval",
       created_at: "2026-10-28T21:55:00+00:00",
       updated_at: "2026-10-28T21:55:20+00:00",
@@ -114,7 +114,7 @@ export const runs: S["Page_RunSummary_"] = {
 export const run: S["Run"] = {
   run_id: RUN_ID,
   journey_id: "user_onboarding",
-  mode: "demo",
+  mode: "realtime",
   status: "completed",
   created_at: "2026-10-28T21:50:00+00:00",
   updated_at: "2026-10-28T21:52:30+00:00",

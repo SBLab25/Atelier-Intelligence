@@ -103,8 +103,8 @@ def production_problems(settings: Settings) -> list[str]:
     problems: list[str] = []
     if settings.app.env != "production":
         problems.append(f"CJI_ENV must be production on a release host (it is {settings.app.env!r}).")
-    if settings.app.mode == "realtime" and not settings.database.configured:
-        problems.append(database_missing("CJI_MODE=realtime (production)"))
+    if not settings.database.configured:
+        problems.append(database_missing("production"))
     if settings.observability.log_format != "json":
         problems.append("CJI_LOG_FORMAT must be json in production (log shippers parse one JSON object per line).")
     if settings.storage.audit_dir is None:
@@ -164,9 +164,6 @@ def require(settings: Settings, role: str) -> Settings:
     elif role == "launcher":
         pass  # no launcher-specific requirements beyond the checks above
     elif role == "production":
-        problems += collector_problems(
-            settings.app.env, secret_value(settings.auth.admin_key), settings.cors.origins
-        ) if settings.app.mode == "realtime" else []
         problems += api_problems(settings)
         problems += production_problems(settings)
     elif role.startswith("mcp:"):

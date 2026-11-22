@@ -193,58 +193,79 @@ def test_r01_low_confidence_is_flagged_not_looped(monkeypatch, tmp_path):
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# R-02 — demo health check never touches PostgreSQL
+# R-02 — system info readiness check
 # ═════════════════════════════════════════════════════════════════════════════
 
-def _no_postgres(*args, **kwargs):
-    raise AssertionError("PostgreSQL engine requested in demo mode")
-
-
-def test_r02_demo_system_info_is_ok_without_postgres(monkeypatch):
-    import sqlalchemy
-
+def test_r02_system_info_is_ok(monkeypatch):
     from cji.mcp_servers import journey_data_server as j
-    from cji.repositories import event_repository, use_repository
-    from cji.settings import get_settings
+    from cji.repositories import EventRepository, use_repository
 
-    monkeypatch.setattr(sqlalchemy, "create_engine", _no_postgres)
-    with use_repository(event_repository(get_settings())):        # demo, chosen from settings
+    class HealthyRepo(EventRepository):
+        mode = "realtime"
+        data_source = "postgres"
+
+        def health(self):
+            return None
+
+    with use_repository(HealthyRepo()):
         res = run(j.get_system_info())
     assert res["status"] == "ok", res
-    assert res["data_source"] == "parquet"
+    assert res["mode"] == "realtime"
+    assert res["data_source"] == "postgres"
 
 
-def test_r02_demo_system_info_reports_missing_parquet(monkeypatch, tmp_path):
-    import sqlalchemy
-
+def test_r02_system_info_reports_error(monkeypatch):
     from cji.mcp_servers import journey_data_server as j
-    from cji.repositories import DuckDbParquetRepository, use_repository
+    from cji.repositories import EventRepository, RepositoryError, use_repository
 
-    monkeypatch.setattr(sqlalchemy, "create_engine", _no_postgres)
-    with use_repository(DuckDbParquetRepository(tmp_path / "missing.parquet")):
+    class FailingRepo(EventRepository):
+        mode = "realtime"
+        data_source = "postgres"
+
+        def health(self):
+            raise RepositoryError("health", "database unreachable")
+
+    with use_repository(FailingRepo()):
         res = run(j.get_system_info())
     assert res["status"] == "error"
-    assert "events.parquet not found" in res["error"]
+    assert "database unreachable" in res["error"]
 
 
 # ═════════════════════════════════════════════════════════════════════════════
 # R-04 — SQL values are bound, never interpolated
 # ═════════════════════════════════════════════════════════════════════════════
 
-def test_r04_demo_step_filter_is_not_injectable():
+def test_r04_step_filter_is_not_injectable(monkeypatch):
     from cji.mcp_servers import journey_data_server as j
+    from cji.repositories import PostgresEventRepository, use_repository
+    from cji.repositories import postgres as pg_module
 
-    res = run(j.query_events(limit=100, step_id="x' OR '1'='1"))
+    captured = []
+
+    def fake_read_sql(sql, con, params=None, **kw):
+        captured.append((str(sql), dict(params or {})))
+        return pd.DataFrame()
+
+    realtime = PostgresEventRepository("postgresql://u@127.0.0.1:1/x", engine_factory=lambda *a, **k: FakeEngine())
+    monkeypatch.setattr(pg_module.pd, "read_sql", fake_read_sql)
+    with use_repository(realtime):
+        res = run(j.query_events(limit=100, step_id="x' OR '1'='1"))
     assert "error" not in res, res
     assert res["count"] == 0
+    assert captured and "x' OR '1'='1" not in captured[0][0]
 
 
-def test_r04_demo_quotes_in_config_values_do_not_break_sql(monkeypatch):
+def test_r04_quotes_in_config_values_do_not_break_sql(monkeypatch):
     from cji.mcp_servers import journey_data_server as j
+    from cji.repositories import PostgresEventRepository, use_repository
+    from cji.repositories import postgres as pg_module
 
+    monkeypatch.setattr(pg_module.pd, "read_sql", lambda sql, con, params=None, **kw: pd.DataFrame())
+    realtime = PostgresEventRepository("postgresql://u@127.0.0.1:1/x", engine_factory=lambda *a, **k: FakeEngine())
     monkeypatch.setattr(j, "JOURNEY_CONFIG", {"name": "o'brien", "steps": ["a'b", "c"]})
-    for res in (run(j.get_step_metrics()), run(j.get_funnel_dropoff()), run(j.query_events(limit=5))):
-        assert "error" not in res, res
+    with use_repository(realtime):
+        for res in (run(j.get_step_metrics()), run(j.get_funnel_dropoff()), run(j.query_events(limit=5))):
+            assert "error" not in res, res
 
 
 def test_r04_realtime_values_are_bound_parameters(monkeypatch):
@@ -407,7 +428,7 @@ def _report(monkeypatch, tmp_path, **overrides):
         "insights": [{"priority": 1, "step_id": XSS, "title": ATTR,
                       "root_cause": XSS, "suggested_fix": 'back\\slash "quote" \u00fc\u2028'}],
         "funnel_data": [{"step_id": BREAKOUT, "users": 3}],
-        "mode": "demo",
+        "mode": "realtime",
     }
     args.update(overrides)
     res = rs.export_report(**args)

@@ -33,7 +33,7 @@ async def _down() -> None:
 
 
 @pytest.fixture
-def papi(tmp_path, monkeypatch):
+def papi(tmp_path, monkeypatch, api_db_url):
     """The Spec 12 harness with a passing MCP preflight and a sqlite engine for ingestion writes."""
     from sqlalchemy import create_engine
 
@@ -42,7 +42,7 @@ def papi(tmp_path, monkeypatch):
 
     stubs.FAULTS.clear()
     stubs.WARNINGS.clear()
-    env = ApiEnv(tmp_path, monkeypatch)
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url)
     engine = create_engine(f"sqlite:///{tmp_path / 'events.db'}")
     with override_settings(env.settings), env:
         env.ctx = env.app.state.ctx
@@ -75,7 +75,7 @@ def test_start_run_creates_a_run_that_pauses_for_approval(papi):
     r = start(papi, papi.operator)
     assert r.status_code == 202, r.text
     run = r.json()
-    assert run["journey_id"] == JOURNEY and run["mode"] == "demo" and run["human_approved"] is False
+    assert run["journey_id"] == JOURNEY and run["mode"] == "realtime" and run["human_approved"] is False
     paused = wait_status(papi, run["run_id"], "awaiting_approval", papi.viewer)
     assert paused["steps"]["insight_worker"]["status"] == "succeeded"
     listed = papi.client.get(f"{API}/runs?journey_id={JOURNEY}", headers=bearer(papi.viewer)).json()["data"]
@@ -190,7 +190,7 @@ def test_results_map_recorded_provenance_ingestion_and_errors():
     from cji.api.routes.runs import _results
     from cji.workflow.index import IndexedRun
 
-    row = IndexedRun(run_id="r1", journey_id=JOURNEY, mode="demo", status="completed",
+    row = IndexedRun(run_id="r1", journey_id=JOURNEY, mode="realtime", status="completed",
                      created_at="2026-01-01T00:00:00Z", updated_at="2026-01-01T00:00:01Z", report_file=None)
     values = {
         "run": {"status": "completed"}, "narrative": "Summary",
@@ -295,10 +295,10 @@ def test_upload_limit_is_separate_from_the_json_body_limit(papi):
     problem(r, 413, "request_too_large")
 
 
-def test_upload_limit_setting(tmp_path, monkeypatch):
+def test_upload_limit_setting(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
 
-    env = ApiEnv(tmp_path, monkeypatch, CJI_API_MAX_UPLOAD_BYTES="2048")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_API_MAX_UPLOAD_BYTES="2048")
     with override_settings(env.settings), env:
         big = [dict(GOOD_ROWS[0], user_id=f"u{i}") for i in range(40)]
         problem(validate(env, env.operator, rows=big), 413, "request_too_large")
@@ -340,10 +340,10 @@ def test_report_download_disposition(papi):
             422, "validation_failed")
 
 
-def test_write_operations_can_be_switched_off(tmp_path, monkeypatch):
+def test_write_operations_can_be_switched_off(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
 
-    env = ApiEnv(tmp_path, monkeypatch, CJI_API_WRITE_OPERATIONS="false")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_API_WRITE_OPERATIONS="false")
     with override_settings(env.settings), env:
         problem(start(env, env.operator), 405, "method_not_allowed")          # GET /runs still exists
         problem(validate(env, env.operator), 404, "not_found")

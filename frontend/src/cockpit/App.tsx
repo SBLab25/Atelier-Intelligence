@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { NavigationTab, Task, TaskStatus, TaskCategory, TaskPriority, UserProfile, TeamMember, TimeLog } from './types';
-import { currentUser as defaultUser, teamMembers, initialTasks, weeklyWorkloadData, scheduleEvents, initialTimeLogs } from './data/mockData';
+import { currentUser as defaultUser, weeklyWorkloadData, scheduleEvents } from './data/mockData';
 import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/screens/LandingPage';
 import { OverviewScreen } from './components/screens/OverviewScreen';
@@ -39,59 +39,49 @@ export function CockpitApp({ initialViewMode = 'app', initialTab = 'dashboard', 
     ? `_${session.label.toLowerCase().replace(/\s+/g, '_')}`
     : '';
 
-  const isDemoAccount =
-    !session?.label ||
-    ['system administrator', 'admin', 'elena vance', 'marcus kane', 'priya patel'].includes(
-      session.label.toLowerCase().trim()
-    );
-
-  const initialUserTasks: Task[] = isDemoAccount
-    ? initialTasks
-    : [
-        {
-          id: 'task-onboard-1',
-          title: 'Copy client tracking snippet in Connections & install on your website',
-          category: 'core',
-          priority: 'high',
-          status: 'todo',
-          completed: false,
-          estimatedMinutes: 15,
-          spentMinutes: 0,
-          assignee: { name: session?.label || 'Account Lead', avatar: '' },
-          dueDate: 'Today',
-        },
-        {
-          id: 'task-onboard-2',
-          title: 'Verify first live customer telemetry event in Analytics',
-          category: 'analytics',
-          priority: 'medium',
-          status: 'todo',
-          completed: false,
-          estimatedMinutes: 30,
-          spentMinutes: 0,
-          assignee: { name: session?.label || 'Account Lead', avatar: '' },
-          dueDate: 'Sprint 1',
-        },
-      ];
+  const initialUserTasks: Task[] = [
+    {
+      id: 'task-onboard-1',
+      title: 'Copy client tracking snippet in Connections & install on your website',
+      category: 'core',
+      priority: 'high',
+      status: 'todo',
+      completed: false,
+      estimatedMinutes: 15,
+      spentMinutes: 0,
+      assignee: { name: session?.label || 'Account Lead', avatar: '' },
+      dueDate: 'Today',
+    },
+    {
+      id: 'task-onboard-2',
+      title: 'Verify first live customer telemetry event in Analytics',
+      category: 'analytics',
+      priority: 'medium',
+      status: 'todo',
+      completed: false,
+      estimatedMinutes: 30,
+      spentMinutes: 0,
+      assignee: { name: session?.label || 'Account Lead', avatar: '' },
+      dueDate: 'Sprint 1',
+    },
+  ];
 
   const [tasks, setTasks] = useState<Task[]>(initialUserTasks);
   const [activeTaskId, setActiveTaskId] = useState<string>(() => tasks[0]?.id || 't-1');
-  const [timeLogs, setTimeLogs] = useState<TimeLog[]>(isDemoAccount ? initialTimeLogs : []);
+  const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
 
-  const initialUserMembers: TeamMember[] = isDemoAccount
-    ? teamMembers
-    : [
-        {
-          id: 'm-owner',
-          name: session?.label || 'Account Owner',
-          role: session?.role === 'operator' ? 'Senior Operations Engineer' : 'Journey Intelligence Lead',
-          avatar: '',
-          status: 'Available',
-          hoursLogged: 0,
-          capacityHours: 40,
-          activeProject: 'Client Ingestion Setup',
-        },
-      ];
+  const initialUserMembers: TeamMember[] = [
+    {
+      id: 'm-owner',
+      name: session?.label || 'Account Owner',
+      role: session?.role === 'operator' ? 'Senior Operations Engineer' : 'Journey Intelligence Lead',
+      avatar: '',
+      status: 'Available',
+      hoursLogged: 0,
+      capacityHours: 40,
+      activeProject: 'Client Ingestion Setup',
+    },
+  ];
 
   const [members, setMembers] = useState<TeamMember[]>(initialUserMembers);
 
@@ -394,9 +384,8 @@ export function CockpitApp({ initialViewMode = 'app', initialTab = 'dashboard', 
             {viewMode === 'login' && (
               <LoginScreen
                 onLogin={handleLogin}
-                onExploreDemo={() => {
-                  setViewMode('app');
-                  setActiveTab('analytics');
+                onExploreCockpit={() => {
+                  setViewMode('landing');
                 }}
               />
             )}

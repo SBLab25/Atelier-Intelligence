@@ -74,7 +74,7 @@ def test_round_trip_restores_equal_counts_checksums_and_files(source, fresh_db_u
     tools = backup.PgTools.find(pg_bin)
     made = backup.create(tmp_path / "backups", url=url, layout=layout, tools=tools)
     manifest = made.manifest
-    assert manifest["tables"]["tracking_events"]["rows"] == 40 and manifest["schema_version"] == 2
+    assert manifest["tables"]["tracking_events"]["rows"] == 40 and manifest["schema_version"] == 4
     assert backup.verify(made.path, tools=tools) == []
 
     target_url = fresh_db_url()
@@ -89,7 +89,7 @@ def test_round_trip_restores_equal_counts_checksums_and_files(source, fresh_db_u
     assert conn.execute("SELECT run_id FROM run_index").fetchall() == [("r1",)]
     conn.close()
     restored = runner.engine_for(target_url)
-    assert runner.current_version(restored) == 2  # the schema table came back with the data
+    assert runner.current_version(restored) == 4  # the schema table came back with the data
 
 
 def test_manifest_and_messages_hold_no_password(source, tmp_path, pg_bin):

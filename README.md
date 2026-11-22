@@ -244,23 +244,20 @@ flowchart TB
 
 ---
 
-## Demo Mode Walkthrough
+## Realtime Mode Walkthrough
 
 ```bash
-# 1. Regenerate demo parquet dataset (2,000 sessions, seed 42)
-cji --mode demo --generate-data --sessions 2000 --seed 42
+# 1. Start MCP microservices in realtime mode
+cji-servers --mode realtime
 
-# 2. Start MCP microservices in demo mode
-cji-servers --mode demo
+# 2. Execute analysis run with auto-approval
+cji --mode realtime --run --auto-approve
 
-# 3. Execute analysis run with auto-approval
-cji --mode demo --run --auto-approve
-
-# 4. Optional: Run with human-in-the-loop checkpoint approval
-cji --mode demo --run
+# 3. Optional: Run with human-in-the-loop checkpoint approval
+cji --mode realtime --run
 cji --approve --thread-id <thread-id>
 
-# 5. Inspect status or resume interrupted run
+# 4. Inspect status or resume interrupted run
 cji --status --thread-id <thread-id>
 cji --resume --thread-id <thread-id>
 ```
@@ -365,17 +362,17 @@ npm run build && npm start
 | Variable | Default | Purpose |
 |---|---|---|
 | `CJI_ENV` | `production` | Environment mode (`development`, `test`, `production`). |
-| `CJI_MODE` | `demo` | Data source mode (`demo` for DuckDB/Parquet, `realtime` for PostgreSQL). |
+| `CJI_MODE` | `realtime` | Data source mode (`realtime` for PostgreSQL). |
 | `JOURNEY_NAME` | `user_onboarding` | Active customer journey under evaluation. |
 | `CJI_HOME` | Current directory | Working directory for checkpoints, reports, and data. |
 | `DATABASE_URL` | none | PostgreSQL connection string for realtime mode. |
 | `SUPABASE_DATABASE_URL` | none | Fallback PostgreSQL connection string. |
+| `CJI_ADMIN_KEY` | none | Shared secret for collector and administrative endpoints. |
 | `CJI_LLM_PROVIDER` | `groq` | Active LLM provider (`groq`, `anthropic`, or `none` for deterministic fallback). |
 | `LLM_MODEL` | provider default | Active LLM model (e.g. `openai/gpt-oss-120b` or `claude-sonnet-4-6`). |
 | `GROQ_API_KEY` | none | API key for Groq LLM inference. |
 | `ANTHROPIC_API_KEY` | none | API key for Anthropic Claude inference. |
 | `CJI_API_PORT` | `8006` | Port for the FastAPI backend REST API. |
-| `CJI_SESSION_SECRET` | none | 32+ character random secret for Next.js cookie encryption. |
 | `LANGCHAIN_TRACING_V2` | `false` | Enable LangSmith observability tracing. |
 | `LANGCHAIN_PROJECT` | `atelier-intelligence`| Project identifier in LangSmith. |
 

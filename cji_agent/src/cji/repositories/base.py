@@ -18,11 +18,11 @@ import pandas as pd  # type: ignore[import-untyped]
 from cji.domain.events import EventRecord
 from cji.domain.metrics import FunnelStep, StepMetrics
 
-Mode = Literal["demo", "realtime"]
+Mode = Literal["realtime"]
 
 EVENT_COLUMNS: tuple[str, ...] = (
     "event_id", "user_id", "session_id", "journey_id", "step_id",
-    "event_type", "timestamp", "duration_ms", "url", "metadata",
+    "event_type", "timestamp", "duration_ms", "url", "metadata", "account_id",
 )
 MISSING_PARQUET_MESSAGE = "events.parquet not found — run --generate-data"
 DEMO_LIVE_SNAPSHOT_MESSAGE = "get_live_snapshot is only available in realtime mode"

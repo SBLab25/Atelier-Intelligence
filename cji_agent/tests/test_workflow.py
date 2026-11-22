@@ -396,12 +396,12 @@ def test_real_worker_failure_is_structured(env, monkeypatch, worker):
     assert out["worker_statuses"][-1]["status"] == "error" and out["errors"][-1]["code"] == "tool_failed"
 
 
-def test_mode_mismatch_is_not_retried(env, monkeypatch):
+def test_realtime_worker_runs(env, monkeypatch):
     import cji.agents.workers as w
 
     calls = _fake_mcp(monkeypatch, overrides={"get_system_info": {"status": "ok", "mode": "realtime"}})
     out = run(w.data_worker(_tracked_state("data_worker")))
-    assert out["run"]["failure"]["code"] == "mode_mismatch" and len(calls) == 1
+    assert out["next_worker"] == "supervisor" and len(calls) == 4
 
 
 def test_no_step_metrics_fails_friction(env, monkeypatch):
@@ -688,7 +688,8 @@ def test_status_describes_a_partial_run(env):
 
 def _cli(env, *args):
     proc_env = {**os.environ, "CJI_ENV": "test", "CJI_DATA_DIR": str(env.tmp / "data"),
-                "CJI_REPORTS_DIR": str(env.tmp / "reports"), "CJI_CHECKPOINTS_DB": str(env.db)}
+                "CJI_REPORTS_DIR": str(env.tmp / "reports"), "CJI_CHECKPOINTS_DB": str(env.db),
+                "DATABASE_URL": "postgresql://test:test@127.0.0.1:5432/test"}
     return subprocess.run([sys.executable, "-m", "cji.main", *args], cwd=APP_ROOT, env=proc_env, capture_output=True,
                           text=True, timeout=180, check=False)
 

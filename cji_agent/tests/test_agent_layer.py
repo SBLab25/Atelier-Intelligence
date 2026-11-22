@@ -11,7 +11,7 @@ from pathlib import Path
 CJI_ROOT = Path(__file__).parent.parent.resolve()   # cji_agent/ (the package is installed: Spec 11)
 
 # Set CJI_MODE before importing config
-os.environ["CJI_MODE"] = "demo"
+os.environ["CJI_MODE"] = "realtime"
 
 
 # ── Supervisor routing tests ─────────────────────────────────────────────────
@@ -22,7 +22,7 @@ class TestRoute:
     def _make_state(self, **overrides):
         """Build a minimal CJIState-like dict with defaults."""
         base = {
-            "mode":                 "demo",
+            "mode":                 "realtime",
             "journey_name":         "onboarding",
             "journey_steps":        ["step1", "step2"],
             "analysis_window_days": 30,

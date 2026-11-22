@@ -178,7 +178,7 @@ def maintenance(dry_run: bool, live_retention_days: int = 30) -> dict[str, Any]:
             db_engine = create_engine(s.database.url_value(), pool_pre_ping=True)
             report["live_events_purged"] = prune_live_events(db_engine, live_retention_days, dry_run=dry_run)
             db_engine.dispose()
-        except Exception:
+        except Exception:  # broad-except: database purge failures must not crash maintenance
             report["live_events_purged"] = 0
 
     return report

@@ -1,8 +1,12 @@
 """Journey definitions (Spec 12, OD-111): today the configured journey; a list so more can be added."""
 from __future__ import annotations
 
+import logging
+
 from cji.domain.journeys import JourneyDefinition, journey_from_config
 from cji.settings import Settings
+
+logger = logging.getLogger("cji.journeys")
 
 
 def configured_steps() -> list[str]:
@@ -37,8 +41,8 @@ def list_journeys(settings: Settings) -> list[JourneyDefinition]:
                             if clean and clean != "*" and clean not in names:
                                 names.append(clean)
             eng.dispose()
-        except Exception:
-            pass
+        except Exception:  # broad-except: dynamic journey discovery fallback
+            logger.debug("Failed to list dynamic journeys")
 
     return [journey_from_config({"name": n, "steps": configured_steps()}) for n in sorted(set(names))]
 

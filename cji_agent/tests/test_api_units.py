@@ -20,16 +20,14 @@ JOURNEY = "user_onboarding"
 
 # ── friction and funnel modules (OD-112) ─────────────────────────────────────────────────────────────
 
-def test_friction_module_matches_the_mcp_tool_on_the_demo_data(tmp_path):
+def test_friction_module_matches_the_mcp_tool():
     from cji.analytics import friction
     from cji.mcp_servers import friction_engine_server as server
-    from cji.repositories import DuckDbParquetRepository, TimeWindow
 
-    repo = DuckDbParquetRepository(copy_demo_data(tmp_path))
-    try:
-        metrics = repo.step_metrics(JOURNEY, TimeWindow())
-    finally:
-        repo.close()
+    metrics = [
+        {"step_id": "landing_page", "unique_users": 100, "drop_off_pct": 20.0, "p95_duration_ms": 1200, "error_pct": 1.0},
+        {"step_id": "payment_info", "unique_users": 80, "drop_off_pct": 50.0, "p95_duration_ms": 5000, "error_pct": 10.0},
+    ]
     tool = getattr(server.score_all_steps, "fn", server.score_all_steps)
     assert friction.score_steps(metrics, threshold=60) == tool(metrics)
     assert server.WEIGHTS is friction.WEIGHTS and server.BASELINES is friction.BASELINES
@@ -56,38 +54,47 @@ def test_overall_completion_is_shared_with_the_journey_data_server():
 
 # ── keyset paging (OD-119) ───────────────────────────────────────────────────────────────────────────
 
-def test_events_page_walks_every_matching_event_once(tmp_path):
-    from cji.repositories import DuckDbParquetRepository
+def test_events_page_walks_every_matching_event_once(pg_url, monkeypatch):
+    from sqlalchemy import create_engine
+    from cji.repositories import PostgresEventRepository
+    from tests.test_repositories import fixture_frame, load_postgres
 
-    repo = DuckDbParquetRepository(copy_demo_data(tmp_path))
+    engine = create_engine(pg_url)
     try:
-        seen, after = [], None
-        while True:
-            rows = repo.events_page(JOURNEY, limit=500, after=after, step_id="onboarding_done", event_type=None)
-            seen += [(r["timestamp"], r["event_id"]) for r in rows]
-            if len(rows) < 500:
-                break
-            after = (rows[-1]["timestamp"], rows[-1]["event_id"])
-        total = repo._query("count", "SELECT COUNT(*) AS n FROM events WHERE journey_id = $j AND step_id = $s",
-                            {"j": JOURNEY, "s": "onboarding_done"})["n"].iloc[0]
+        load_postgres(engine, monkeypatch, fixture_frame(minutes_ago=5))
+        repo = PostgresEventRepository(pg_url)
+        try:
+            seen, after = [], None
+            while True:
+                rows = repo.events_page(JOURNEY, limit=2, after=after, step_id="landing_page", event_type=None)
+                seen += [(r["timestamp"], r["event_id"]) for r in rows]
+                if len(rows) < 2:
+                    break
+                after = (rows[-1]["timestamp"], rows[-1]["event_id"])
+            from sqlalchemy import text
+
+            with engine.connect() as conn:
+                total = conn.execute(text("SELECT COUNT(*) FROM tracking_events WHERE journey_id = :j AND step_id = :s"),
+                                     {"j": JOURNEY, "s": "landing_page"}).scalar()
+        finally:
+            repo.close()
     finally:
-        repo.close()
-    assert len(seen) == len(set(seen)) == int(total) > 500
+        engine.dispose()
+    assert len(seen) == len(set(seen)) == int(total) >= 2
 
 
 def test_events_page_sql_binds_every_value():
     from cji.repositories.queries import (
-        DUCKDB,
         POSTGRES,
         events_page_sql,
         realtime_page_source,
     )
 
-    for sql in (events_page_sql(DUCKDB, "events"), events_page_sql(POSTGRES, realtime_page_source(JOURNEY))):
-        assert "ORDER BY timestamp DESC, event_id DESC" in sql
-        for name in ("journey_id", "step_id", "event_type", "after_ts", "after_id", "limit"):
-            assert name in sql
-        assert JOURNEY not in sql
+    sql = events_page_sql(POSTGRES, realtime_page_source(JOURNEY))
+    assert "ORDER BY timestamp DESC, event_id DESC" in sql
+    for name in ("journey_id", "step_id", "event_type", "after_ts", "after_id", "limit"):
+        assert name in sql
+    assert JOURNEY not in sql
 
 
 # ── run index and approval split (OD-115, OD-116) ────────────────────────────────────────────────────
@@ -110,7 +117,7 @@ def wf(tmp_path, monkeypatch):
 def _state(auto):
     from cji.workflow.runtime import initial_state
 
-    return initial_state(mode="demo", journey_name=JOURNEY, journey_steps=["s1", "s2"], auto_approve=auto)
+    return initial_state(mode="realtime", journey_name=JOURNEY, journey_steps=["s1", "s2"], auto_approve=auto)
 
 
 def test_the_workflow_keeps_the_run_index_current(wf, tmp_path):
@@ -122,7 +129,7 @@ def test_the_workflow_keeps_the_run_index_current(wf, tmp_path):
     rows = {r.run_id: r for r in index.page(journeys=None, journey_id=None, status=None, limit=10, after=None)}
     assert rows[done].status == "completed" and rows[done].report_file == f"cji_report_j_{done}.html"
     assert rows[paused].status == "awaiting_approval" and rows[paused].journey_id == JOURNEY
-    assert rows[done].mode == "demo" and rows[done].created_at <= rows[done].updated_at
+    assert rows[done].mode == "realtime" and rows[done].created_at <= rows[done].updated_at
 
 
 def test_mark_approved_changes_state_only(wf, tmp_path):
@@ -280,8 +287,8 @@ def test_api_settings_and_registry(tmp_path):
 def test_api_role_fails_closed_in_production(tmp_path):
     from cji.settings import ConfigError, load_settings, require
 
-    base = {"CJI_ENV": "production", "CJI_MODE": "demo", "CJI_DATA_DIR": str(tmp_path / "d"),
-            "CJI_REPORTS_DIR": str(tmp_path / "r")}
+    base = {"CJI_ENV": "production", "CJI_MODE": "realtime", "DATABASE_URL": "postgresql://u:p@localhost/db",
+            "CJI_DATA_DIR": str(tmp_path / "d"), "CJI_REPORTS_DIR": str(tmp_path / "r")}
     with pytest.raises(ConfigError) as exc:
         require(load_settings({**base, "CJI_API_CORS_ORIGINS": "http://app.example.com"}, dotenv_path=None), "api")
     text = str(exc.value)

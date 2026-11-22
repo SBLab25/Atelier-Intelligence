@@ -38,7 +38,7 @@ export type Provenance = Schemas["Provenance"];
 
 export const RUN_STATUSES: readonly RunStatus[] = ["running", "awaiting_approval", "approved", "completed", "failed"];
 
-/** The analysis window of a journey page: days (demo data) or minutes (realtime data). */
+/** The analysis window of a journey page: days or minutes (realtime data). */
 export interface AnalysisWindow {
   readonly days?: number | undefined;
   readonly minutes?: number | undefined;

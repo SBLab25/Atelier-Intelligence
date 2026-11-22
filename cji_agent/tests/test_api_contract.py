@@ -30,10 +30,9 @@ class ApiEnv:
         from cji.settings import make_test_settings
 
         self.tmp = tmp_path
-        copy_demo_data(tmp_path / "data")
         self.tokens_file = tmp_path / "data" / "api_tokens.json"
         self.db = tmp_path / "checkpoints.db"
-        values = {"CJI_MODE": "demo", "CJI_CHECKPOINTS_DB": str(self.db), "CJI_API_TOKENS_FILE": str(self.tokens_file),
+        values = {"CJI_MODE": "realtime", "CJI_CHECKPOINTS_DB": str(self.db), "CJI_API_TOKENS_FILE": str(self.tokens_file),
                   "CJI_API_RATE_PER_TOKEN": "1000", "CJI_API_RATE_PER_IP": "1000",
                   "CJI_API_CURSOR_SECRET": "c" * 40, "CJI_WORKFLOW_RETRY_BACKOFF_S": "0", **env}
         self.settings = make_test_settings(tmp_path, **values)
@@ -56,7 +55,7 @@ class ApiEnv:
     def start_run(self, *, auto_approve=False):
         from cji.workflow.runtime import initial_state
 
-        state = initial_state(mode="demo", journey_name=JOURNEY, journey_steps=["s1", "s2"], auto_approve=auto_approve)
+        state = initial_state(mode="realtime", journey_name=JOURNEY, journey_steps=["s1", "s2"], auto_approve=auto_approve)
         outcome = asyncio.run(self.workflow(owner="test-start").start(state))
         return outcome.run_id
 
@@ -76,13 +75,13 @@ class ApiEnv:
 
 
 @pytest.fixture
-def api(tmp_path, monkeypatch):
+def api(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
     from tests import _workflow_stubs as stubs
 
     stubs.FAULTS.clear()
     stubs.WARNINGS.clear()
-    env = ApiEnv(tmp_path, monkeypatch)
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url)
     with override_settings(env.settings), env:
         yield env
     stubs.FAULTS.clear()
@@ -124,7 +123,7 @@ def approve(api, run_id, token, key="approve-key-0001", body=None):
 
 def test_health_is_public_and_minimal(api):
     r = api.client.get(f"{API}/health")
-    assert r.status_code == 200 and r.json() == {"status": "ok", "version": "1.0.0", "mode": "demo"}
+    assert r.status_code == 200 and r.json() == {"status": "ok", "version": "1.0.0", "mode": "realtime"}
     assert r.headers["x-request-id"]
     assert r.headers["cache-control"] == "no-store" and r.headers["x-content-type-options"] == "nosniff"
 
@@ -156,7 +155,7 @@ def test_journeys_are_filtered_by_the_token(api):
 
 def test_journey_detail(api):
     r = api.client.get(f"{API}/journeys/{JOURNEY}", headers=bearer(api.viewer))
-    assert r.status_code == 200 and r.json()["journey_id"] == JOURNEY and r.json()["mode"] == "demo"
+    assert r.status_code == 200 and r.json()["journey_id"] == JOURNEY and r.json()["mode"] == "realtime"
 
 
 def test_metrics_match_the_repository(api):
@@ -172,7 +171,7 @@ def test_metrics_match_the_repository(api):
         assert body["funnel"] == repo.funnel(JOURNEY, JOURNEY_CONFIG["steps"], TimeWindow(days_back=30))
     finally:
         repo.close()
-    assert body["window"] == {"days": 30, "minutes": None}
+    assert body["window"] == {"days": None, "minutes": 43200}
     assert 0 <= body["overall_completion_pct"] <= 100
 
 
@@ -305,7 +304,7 @@ def test_list_parameters_are_validated(api, query):
         assert body["errors"] and {"location", "field", "reason"} <= set(body["errors"][0])
 
 
-@pytest.mark.parametrize("query", ["days=0", "days=366", "minutes=0", "minutes=43201"])
+@pytest.mark.parametrize("query", ["days=0", "days=3651", "minutes=0", "minutes=5256001"])
 def test_window_parameters_are_validated(api, query):
     problem(api.client.get(f"{API}/journeys/{JOURNEY}/metrics?{query}", headers=bearer(api.viewer)), 422,
             "validation_failed")
@@ -494,10 +493,10 @@ def test_a_key_still_in_progress_is_a_conflict(api):
 # rate limit
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
-def test_tokens_are_rate_limited(tmp_path, monkeypatch):
+def test_tokens_are_rate_limited(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
 
-    env = ApiEnv(tmp_path, monkeypatch, CJI_API_RATE_PER_TOKEN="3")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_API_RATE_PER_TOKEN="3")
     with override_settings(env.settings), env:
         for _ in range(3):
             assert env.client.get(f"{API}/me", headers=bearer(env.viewer)).status_code == 200
@@ -507,10 +506,10 @@ def test_tokens_are_rate_limited(tmp_path, monkeypatch):
         assert env.client.get(f"{API}/me", headers=bearer(env.operator)).status_code == 200   # own bucket
 
 
-def test_bad_tokens_are_rate_limited_per_address(tmp_path, monkeypatch):
+def test_bad_tokens_are_rate_limited_per_address(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
 
-    env = ApiEnv(tmp_path, monkeypatch, CJI_API_RATE_PER_IP="2")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_API_RATE_PER_IP="2")
     with override_settings(env.settings), env:
         bad = {"Authorization": "Bearer cji_api_guess-000000000000000000000000000000000"}
         for _ in range(2):
@@ -523,8 +522,8 @@ def test_bad_tokens_are_rate_limited_per_address(tmp_path, monkeypatch):
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════
 
 class BrokenRepository:
-    mode = "demo"
-    data_source = "parquet"
+    mode = "realtime"
+    data_source = "postgres"
 
     def __getattr__(self, name):
         def fail(*args, **kwargs):
@@ -605,10 +604,10 @@ def test_request_ids_are_echoed_or_generated(api):
         assert response.status_code == status and response.json()["request_id"] == response.headers["x-request-id"]
 
 
-def test_cors_allows_only_the_configured_origin(tmp_path, monkeypatch):
+def test_cors_allows_only_the_configured_origin(tmp_path, monkeypatch, api_db_url):
     from cji.settings import override_settings
 
-    env = ApiEnv(tmp_path, monkeypatch, CJI_API_CORS_ORIGINS="http://localhost:3000")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_API_CORS_ORIGINS="http://localhost:3000")
     with override_settings(env.settings), env:
         pre = {"Origin": "http://localhost:3000", "Access-Control-Request-Method": "GET",
                "Access-Control-Request-Headers": "authorization"}

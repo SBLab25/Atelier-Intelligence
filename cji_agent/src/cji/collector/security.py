@@ -47,6 +47,13 @@ class KeyGrant:
         return allows_journey(self.journey, journey_id)
 
 
+# Permanently revoked tracker keys (historical git leak and documentation sample key)
+REVOKED_KEY_FINGERPRINTS: frozenset[str] = frozenset({
+    "8aa90e8de3b9c744",  # Leaked historical tracker key (my_vercel_site)
+    "54d5b3115cb8abb1",  # Documentation sample key (docs/6-API-Contracts.md)
+})
+
+
 def key_fingerprint(key: str) -> str:
     """First 8 hex characters of sha256(key): enough to tell keys apart in logs, not to recover them."""
     return hashlib.sha256(key.encode("utf-8")).hexdigest()[:8]
@@ -54,9 +61,12 @@ def key_fingerprint(key: str) -> str:
 
 def authenticate(api_key: str, conn: Any) -> KeyGrant | None:
     """Return the grant for an active key, or None for an unknown or inactive key."""
+    fp = key_fingerprint(api_key)
+    if fp in REVOKED_KEY_FINGERPRINTS:
+        return None
     try:
         row = conn.execute(_KEY_LOOKUP, {"api_key": api_key}).fetchone()
-    except Exception:
+    except Exception:  # broad-except: fallback if account_id column is missing in legacy schemas
         fallback_lookup = text("SELECT journey_name, is_active FROM api_keys WHERE api_key = :api_key")
         row = conn.execute(fallback_lookup, {"api_key": api_key}).fetchone()
         if row is None or not row[1]:

@@ -70,7 +70,7 @@ describe("loaders", () => {
 
   it("call the public health endpoint without a token", async () => {
     const { getHealth } = await loaders();
-    const fetchMock = stubFetch(200, { status: "ok", version: "1.0.0", mode: "demo" });
+    const fetchMock = stubFetch(200, { status: "ok", version: "1.0.0", mode: "realtime" });
     await getHealth();
     expect(requireSession).not.toHaveBeenCalled();
     expect((fetchMock.mock.calls[0]?.[0] as Request).headers.has("authorization")).toBe(false);

@@ -9,21 +9,15 @@ import { axeViolations } from "../support/axe";
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }) }));
 
 describe("LoginScreen (Atelier Dual-Bento)", () => {
-  it("renders labelled user ID and password fields, demo personas, and passes accessibility", async () => {
+  it("renders labelled user ID and password fields and passes accessibility", async () => {
     const { container } = render(<LoginScreen next="/dashboard" />);
     const idField = screen.getByLabelText("User ID or Work Email");
     const pwField = screen.getByLabelText("Password / Passkey");
 
     expect(idField).toBeInTheDocument();
     expect(pwField).toHaveAttribute("type", "password");
-    expect(idField).toHaveValue("admin");
-    expect(pwField).toHaveValue("admin123");
-
-    // Demo personas are rendered
-    expect(screen.getByText("System Administrator")).toBeInTheDocument();
-    expect(screen.getByText("Elena Vance")).toBeInTheDocument();
-    expect(screen.getByText("Marcus Kane")).toBeInTheDocument();
-    expect(screen.getByText("Priya Patel")).toBeInTheDocument();
+    expect(idField).toHaveValue("");
+    expect(pwField).toHaveValue("");
 
     // SSO buttons
     expect(screen.getByText("Google Workspace")).toBeInTheDocument();
@@ -65,6 +59,11 @@ describe("LoginScreen (Atelier Dual-Bento)", () => {
     });
 
     render(<LoginScreen onLogin={onLogin} next="/dashboard" />);
+    const idField = screen.getByLabelText("User ID or Work Email");
+    const pwField = screen.getByLabelText("Password / Passkey");
+
+    await userEvent.type(idField, "admin");
+    await userEvent.type(pwField, "admin123");
     await userEvent.click(screen.getByRole("button", { name: "Enter Atelier Workspace" }));
 
     expect(global.fetch).toHaveBeenCalledWith(

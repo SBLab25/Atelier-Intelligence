@@ -61,7 +61,10 @@ def test_parse_file_root_key_and_map(tmp_path):
 
 def test_ingest_file_writes_what_parse_file_accepts(tmp_path, monkeypatch):
     import cji.tools.ingest_json as ij
+    from cji.settings import reset_settings
 
+    monkeypatch.setenv("DATABASE_URL", "postgresql://test:test@localhost:5432/test")
+    reset_settings()
     engine = create_engine(f"sqlite:///{tmp_path / 'events.db'}")
     monkeypatch.setattr(ij, "create_engine", lambda url: engine)
     path = tmp_path / "e.json"

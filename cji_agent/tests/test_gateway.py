@@ -69,8 +69,6 @@ def run(value):
 
 def load(env=None):
     env = {"CJI_ENV": "test", **(env or {})}
-    if env["CJI_ENV"] == "production":
-        env.setdefault("CJI_MODE", "demo")          # Spec 15: a declared production host names its mode
     return load_settings(env, dotenv_path=None)
 
 

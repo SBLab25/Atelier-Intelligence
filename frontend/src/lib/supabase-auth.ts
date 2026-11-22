@@ -73,14 +73,8 @@ export async function authenticateWithSupabase(
       );
 
       const isMatched = Boolean(matchRes.rows[0]?.matched);
-      const isDefaultAdmin =
-        (trimmedId === "admin" || trimmedId === "admin@cji.io") &&
-        (password === "admin" || password === "admin123");
-      const isDefaultOperator =
-        (trimmedId === "operator" || trimmedId === "operator@cji.io") &&
-        (password === "operator" || password === "operator123");
 
-      if (isMatched || isDefaultAdmin || isDefaultOperator) {
+      if (isMatched) {
         const role = (row.role === "admin" || row.role === "viewer" ? row.role : "operator") as
           | "viewer"
           | "operator"
@@ -128,63 +122,9 @@ export async function authenticateWithSupabase(
       }
     }
 
-    // 3. Fallback for demo personas in local / staging environments
-    const demoAccounts: Record<string, SupabaseUser> = {
-      admin: {
-        id: "usr-admin-default",
-        username: "admin",
-        email: "admin@cji.io",
-        fullName: "System Administrator",
-        role: "admin",
-        journeys: ["*"],
-      },
-      elena: {
-        id: "usr-elena-default",
-        username: "elena",
-        email: "elena.vance@atelier.intelligence",
-        fullName: "Elena Vance",
-        role: "operator",
-        journeys: ["*"],
-      },
-      marcus: {
-        id: "usr-marcus-default",
-        username: "marcus",
-        email: "marcus.kane@atelier.intelligence",
-        fullName: "Marcus Kane",
-        role: "operator",
-        journeys: ["*"],
-      },
-      priya: {
-        id: "usr-priya-default",
-        username: "priya",
-        email: "priya.patel@atelier.intelligence",
-        fullName: "Priya Patel",
-        role: "operator",
-        journeys: ["*"],
-      },
-    };
-
-    const foundDemo =
-      demoAccounts[trimmedId] || Object.values(demoAccounts).find((d) => d.email.toLowerCase() === trimmedId);
-    if (foundDemo && (password === "admin123" || password === "admin" || password === "password123")) {
-      return foundDemo;
-    }
-
     return null;
   } catch (err) {
     log("error", "Error authenticating with Supabase", { error: String(err) });
-    // Offline / sandbox fallback for demo personas
-    const demoAccounts: Record<string, SupabaseUser> = {
-      admin: { id: "usr-admin-default", username: "admin", email: "admin@cji.io", fullName: "System Administrator", role: "admin", journeys: ["*"] },
-      elena: { id: "usr-elena-default", username: "elena", email: "elena.vance@atelier.intelligence", fullName: "Elena Vance", role: "operator", journeys: ["*"] },
-      marcus: { id: "usr-marcus-default", username: "marcus", email: "marcus.kane@atelier.intelligence", fullName: "Marcus Kane", role: "operator", journeys: ["*"] },
-      priya: { id: "usr-priya-default", username: "priya", email: "priya.patel@atelier.intelligence", fullName: "Priya Patel", role: "operator", journeys: ["*"] },
-    };
-    const foundDemo =
-      demoAccounts[trimmedId] || Object.values(demoAccounts).find((d) => d.email.toLowerCase() === trimmedId);
-    if (foundDemo && (password === "admin123" || password === "admin" || password === "password123")) {
-      return foundDemo;
-    }
     throw err;
   }
 }
@@ -273,14 +213,6 @@ export async function registerWithSupabase(params: SignUpParams): Promise<Supaba
       throw err;
     }
     log("error", "Database error registering with Supabase", { error: String(err) });
-    // In local / sandbox environments without live database connection:
-    return {
-      id: `usr-${Date.now()}`,
-      username,
-      email,
-      fullName,
-      role: "operator",
-      journeys: ["*"],
-    };
+    throw new Error("Database error registering user account. Please try again later.");
   }
 }

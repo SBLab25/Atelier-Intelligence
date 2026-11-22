@@ -104,7 +104,7 @@ async def ingestion_worker(state: CJIState) -> dict:
                 ingest_result = await call_tool(session, "ingest_to_store", {
                     "file_path":      file_path,
                     "mapping_config": mapping_config,
-                    "mode":           state.get("mode", "demo"),
+                    "mode":           state.get("mode", "realtime"),
                 })
 
             # Step 4 — Record result

@@ -26,7 +26,7 @@ export const SignedOutScreen: React.FC<SignedOutScreenProps> = ({
     if (onExploreCockpit) {
       onExploreCockpit();
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     }
   };
 
@@ -135,7 +135,7 @@ export const SignedOutScreen: React.FC<SignedOutScreenProps> = ({
             onClick={handleExplore}
             className="w-full sm:w-auto bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-title-md text-title-md px-6 py-3 rounded-full font-semibold transition-colors cursor-pointer"
           >
-            Explore Public Demo
+            Explore Platform Overview
           </button>
         </div>
 

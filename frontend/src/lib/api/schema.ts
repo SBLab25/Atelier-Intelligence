@@ -537,9 +537,9 @@ export interface components {
             version: string;
             /**
              * Mode
-             * @enum {string}
+             * @constant
              */
-            mode: "demo" | "realtime";
+            mode: "realtime";
         };
         /** HealthDetails */
         HealthDetails: {
@@ -552,9 +552,9 @@ export interface components {
             version: string;
             /**
              * Mode
-             * @enum {string}
+             * @constant
              */
-            mode: "demo" | "realtime";
+            mode: "realtime";
             /** Components */
             components: components["schemas"]["Component"][];
             /**
@@ -689,9 +689,9 @@ export interface components {
             steps: string[];
             /**
              * Mode
-             * @enum {string}
+             * @constant
              */
-            mode: "demo" | "realtime";
+            mode: "realtime";
         };
         /** LlmUsage */
         LlmUsage: {
@@ -1538,7 +1538,7 @@ export interface operations {
                 days?: number;
                 /** @description Window in minutes (realtime data) */
                 minutes?: number | null;
-                /** @description Source table: live_events, tracking_events, or all */
+                /** @description Source table: veriscape_trial_events, live_events, tracking_events, or all */
                 table?: string | null;
             };
             header?: never;
@@ -1631,7 +1631,7 @@ export interface operations {
                 days?: number;
                 /** @description Window in minutes (realtime data) */
                 minutes?: number | null;
-                /** @description Source table: live_events, tracking_events, or all */
+                /** @description Source table: veriscape_trial_events, live_events, tracking_events, or all */
                 table?: string | null;
             };
             header?: never;
@@ -1728,7 +1728,7 @@ export interface operations {
                 step_id?: string | null;
                 /** @description Only events of this type */
                 event_type?: string | null;
-                /** @description Source table: live_events, tracking_events, or all */
+                /** @description Source table: veriscape_trial_events, live_events, tracking_events, or all */
                 table?: string | null;
             };
             header?: never;

@@ -40,14 +40,14 @@ describe("journey analytics", () => {
     await expectAccessible(container);
   });
 
-  it("offers days for demo data and minutes for realtime data", () => {
-    const { unmount } = render(<WindowSelector journey={fx.journey} window={{ days: 7 }} />);
-    expect(screen.getByLabelText("Analysis window")).toHaveAttribute("name", "days");
-    expect(screen.getByLabelText("Analysis window")).toHaveValue("7");
-    unmount();
-    render(<WindowSelector journey={{ ...fx.journey, mode: "realtime" }} window={{}} />);
+  it("offers minutes for realtime data", () => {
+    const { unmount } = render(<WindowSelector journey={fx.journey} window={{ minutes: 60 }} />);
     expect(screen.getByLabelText("Analysis window")).toHaveAttribute("name", "minutes");
     expect(screen.getByLabelText("Analysis window")).toHaveValue("60");
+    unmount();
+    render(<WindowSelector journey={{ ...fx.journey, mode: "realtime" }} window={{ minutes: 240 }} />);
+    expect(screen.getByLabelText("Analysis window")).toHaveAttribute("name", "minutes");
+    expect(screen.getByLabelText("Analysis window")).toHaveValue("240");
   });
 });
 

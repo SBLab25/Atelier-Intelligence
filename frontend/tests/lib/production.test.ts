@@ -112,7 +112,7 @@ describe("API client headers", () => {
     const seen: Headers[] = [];
     const fetchSpy = vi.fn(async (input: RequestInfo | URL) => {
       seen.push((input as Request).headers);
-      return new Response(JSON.stringify({ status: "ok", version: "1", mode: "demo" }), {
+      return new Response(JSON.stringify({ status: "ok", version: "1", mode: "realtime" }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });

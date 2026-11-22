@@ -28,7 +28,7 @@ class Page(_Out, Generic[T]):  # noqa: UP046 - pydantic generic model
 class Health(_Out):
     status: Literal["ok"]
     version: str
-    mode: Literal["demo", "realtime"]
+    mode: Literal["realtime"]
 
 
 class Readiness(_Out):
@@ -46,7 +46,7 @@ class Component(_Out):
 class HealthDetails(_Out):
     status: Literal["ok", "degraded"]
     version: str
-    mode: Literal["demo", "realtime"]
+    mode: Literal["realtime"]
     components: list[Component]
     active_runs: int = Field(ge=0, description="Runs this API process is driving now (Spec 14)")
 
@@ -61,7 +61,7 @@ class Me(_Out):
 class Journey(_Out):
     journey_id: str
     steps: list[str] = Field(max_length=64)
-    mode: Literal["demo", "realtime"]
+    mode: Literal["realtime"]
 
 
 class Event(_Out):

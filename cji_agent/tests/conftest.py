@@ -5,6 +5,7 @@ import os
 
 # Spec 04: tests run in the test environment (no .env, no PostgreSQL uploads).
 os.environ.setdefault("CJI_ENV", "test")
+os.environ.setdefault("CJI_MODE", "realtime")
 # Spec 09: workflow step retries do not wait in tests (the attempt count is unchanged).
 os.environ.setdefault("CJI_WORKFLOW_RETRY_BACKOFF_S", "0")
 # Spec 11: the runtime home (data/, reports/) is cji_agent/, wherever pytest is started from.
@@ -188,6 +189,48 @@ def fresh_db_url(pg_url):
     with admin.connect() as conn:
         for name in made:
             conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+    admin.dispose()
+
+
+@pytest.fixture(scope="session")
+def api_db_url(pg_url):
+    """Session-scoped PostgreSQL database with migrations applied and events loaded for API contract tests."""
+    import uuid
+    from urllib.parse import urlsplit, urlunsplit
+    from sqlalchemy import create_engine, text
+    import pandas as pd
+    from cji.migrations import runner
+
+    name = "t_api_" + uuid.uuid4().hex[:8]
+    admin = create_engine(pg_url, isolation_level="AUTOCOMMIT")
+    with admin.connect() as conn:
+        conn.execute(text(f'CREATE DATABASE "{name}"'))
+    admin.dispose()
+
+    parts = urlsplit(pg_url)
+    db_url = urlunsplit((parts.scheme, parts.netloc, "/" + name, parts.query, parts.fragment))
+
+    engine = runner.engine_for(db_url)
+    runner.up(engine)
+
+    parquet_path = Path(__file__).resolve().parent.parent / "data" / "events.parquet"
+    if parquet_path.exists():
+        from datetime import UTC, datetime
+        df = pd.read_parquet(parquet_path)
+        if "account_id" not in df.columns:
+            df["account_id"] = None
+        # Shift timestamps so the most recent event is right now
+        delta = datetime.now(UTC) - pd.to_datetime(df["timestamp"].max(), utc=True)
+        df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True) + delta
+        df.to_sql("tracking_events", engine, if_exists="append", index=False)
+
+    yield db_url
+
+    engine.dispose()
+    runner._engines.pop(db_url, None)
+    admin = create_engine(pg_url, isolation_level="AUTOCOMMIT")
+    with admin.connect() as conn:
+        conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
     admin.dispose()
 
 

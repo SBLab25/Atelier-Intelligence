@@ -302,7 +302,7 @@ def test_cursor_rotation_invalidates_open_cursors(tmp_path):
     from cji.settings import make_test_settings
 
     def codec(secret):
-        settings = make_test_settings(tmp_path, CJI_MODE="demo", CJI_API_CURSOR_SECRET=secret)
+        settings = make_test_settings(tmp_path, CJI_MODE="realtime", CJI_API_CURSOR_SECRET=secret)
         return build_context(settings, repository=object()).cursors
 
     filters = {"resource": "runs"}
@@ -324,7 +324,8 @@ def _production_env(tmp_path, **extra):
         create_token(tokens, label="ops", role="admin", journeys=["*"])
     env = {
         "CJI_ENV": "production",
-        "CJI_MODE": "demo",
+        "CJI_MODE": "realtime",
+        "DATABASE_URL": "postgresql://u:p@localhost:5432/db",
         "CJI_HOME": str(tmp_path),
         "CJI_LOG_FORMAT": "json",
         "CJI_API_CURSOR_SECRET": "k" * 40,
@@ -360,7 +361,7 @@ def test_a_complete_production_configuration_passes(tmp_path):
         ({"CJI_API_TRUSTED_PROXY_HOPS": "1", "CJI_SERVICE_HOST": "0.0.0.0"}, "could forge X-Forwarded-For"),
         ({"CJI_API_CURSOR_SECRET": "short"}, "CJI_API_CURSOR_SECRET must be"),
         ({"CJI_API_CORS_ORIGINS": "http://app.example.com"}, "must use https"),
-        ({"CJI_MODE": "realtime"}, "DATABASE_URL is not set"),
+        ({"DATABASE_URL": ""}, "DATABASE_URL is not set"),
     ],
 )
 def test_each_production_rule_reports_its_violation(tmp_path, extra, expected):
@@ -373,9 +374,8 @@ def test_production_needs_an_admin_token_and_an_explicit_mode(tmp_path):
 
     (tmp_path / "tokens.json").write_text('{"tokens": []}', encoding="utf-8")
     assert "no active admin token" in _problems(tmp_path)
-    env = _production_env(tmp_path)
-    env.pop("CJI_MODE")
-    with pytest.raises(ConfigError, match="CJI_MODE is not set"):
+    env = _production_env(tmp_path, CJI_MODE="demo")
+    with pytest.raises(ConfigError, match="CJI_MODE='demo' is not valid"):
         load_settings(env, None)
 
 
@@ -498,13 +498,13 @@ def test_status_reports_every_service_down_when_nothing_runs(monkeypatch, capsys
 
 
 @pytest.fixture
-def api_env(tmp_path, monkeypatch):
+def api_env(tmp_path, monkeypatch, api_db_url):
     from cji.integrations.audit import reset_security_sink
     from cji.settings import override_settings
 
     audit_dir = tmp_path / "audit"
     reset_security_sink()
-    env = ApiEnv(tmp_path, monkeypatch, CJI_AUDIT_DIR=str(audit_dir), CJI_API_AUTH_FAILURES_PER_MIN="3")
+    env = ApiEnv(tmp_path, monkeypatch, DATABASE_URL=api_db_url, CJI_AUDIT_DIR=str(audit_dir), CJI_API_AUTH_FAILURES_PER_MIN="3")
     env.audit_dir = audit_dir
     with override_settings(env.settings), env:
         yield env

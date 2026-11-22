@@ -7,6 +7,7 @@ are placed into the SQL text; every value is a named bound parameter.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -42,31 +43,44 @@ POSTGRES = Dialect(
 # ── Realtime sources (fixed strings; chosen by journey label, never formatted from input) ──
 _TRACKING = (
     "SELECT user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, "
-    "metadata::text AS metadata, account_id FROM tracking_events"
+    "metadata::text AS metadata, account_id::text AS account_id FROM tracking_events"
 )
 _LIVE = (
     "SELECT user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
-    "0 AS duration_ms, metadata::text AS metadata, account_id FROM live_events"
+    "0 AS duration_ms, metadata::text AS metadata, account_id::text AS account_id FROM live_events"
 )
 _VERISCAPE_TRIAL = (
     "SELECT user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
-    "COALESCE(duration_ms, 0) AS duration_ms, metadata::text AS metadata, account_id FROM veriscape_trial_events"
+    "COALESCE(duration_ms, 0) AS duration_ms, metadata::text AS metadata, account_id::text AS account_id FROM veriscape_trial_events"
 )
 # Event pages for the API (Spec 12) also need the event id and URL; the sources above stay unchanged.
 _TRACKING_PAGE = (
-    "SELECT event_id, user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, url, account_id "
+    "SELECT event_id, user_id, session_id, journey_id, step_id, event_type, timestamp, duration_ms, url, account_id::text AS account_id "
     "FROM tracking_events"
 )
 _LIVE_PAGE = (
     "SELECT event_id, user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
-    "0 AS duration_ms, url, account_id FROM live_events"
+    "0 AS duration_ms, url, account_id::text AS account_id FROM live_events"
 )
 _VERISCAPE_TRIAL_PAGE = (
     "SELECT event_id, user_id, session_id, journey_name AS journey_id, step_id, event_type, timestamp, "
-    "COALESCE(duration_ms, 0) AS duration_ms, url, account_id FROM veriscape_trial_events"
+    "COALESCE(duration_ms, 0) AS duration_ms, url, account_id::text AS account_id FROM veriscape_trial_events"
 )
 LIVE_ONLY_LABEL = "Live_event track"         # dashboard selections (unchanged behaviour)
 TRACKING_ONLY_LABEL = "tracking_event track"
+
+
+_ACCOUNT_ID_RE = re.compile(r"^[A-Za-z0-9_\-\.]{1,64}$")
+
+
+def _safe_tenant_clause(base: str, account_id: str | None) -> str:
+    """Enforce strict tenant isolation: only events matching account_id or shared events are returned."""
+    if not account_id or account_id in ("*", "all"):
+        return base
+    if not _ACCOUNT_ID_RE.match(account_id):
+        raise ValueError(f"Invalid account_id: {account_id!r}")
+    safe_acc = account_id.replace("'", "''")
+    return f"(SELECT * FROM {base} WHERE (account_id = '{safe_acc}' OR account_id IS NULL)) AS tenant_events"
 
 
 def realtime_source(journey_id: str, table: str | None = None, account_id: str | None = None) -> str:
@@ -80,12 +94,11 @@ def realtime_source(journey_id: str, table: str | None = None, account_id: str |
         base = f"({_LIVE}) AS unified_events"
     elif journey_id == TRACKING_ONLY_LABEL:
         base = f"({_TRACKING}) AS unified_events"
-    else:
+    elif table == "all":
         base = f"(SELECT * FROM ({_TRACKING}) UNION ALL SELECT * FROM ({_LIVE}) UNION ALL SELECT * FROM ({_VERISCAPE_TRIAL})) AS unified_events"  # nosec B608
-    if account_id and account_id not in ("*", "all"):
-        safe_acc = account_id.replace("'", "''")
-        return f"(SELECT * FROM {base} WHERE (account_id = '{safe_acc}' OR account_id IS NULL)) AS tenant_events"
-    return base
+    else:
+        base = f"(SELECT * FROM ({_TRACKING}) UNION ALL SELECT * FROM ({_LIVE})) AS unified_events"  # nosec B608
+    return _safe_tenant_clause(base, account_id)
 
 
 def realtime_page_source(journey_id: str, table: str | None = None, account_id: str | None = None) -> str:
@@ -100,15 +113,11 @@ def realtime_page_source(journey_id: str, table: str | None = None, account_id: 
         base = f"({_LIVE_PAGE}) AS unified_events"
     elif journey_id == TRACKING_ONLY_LABEL:
         base = f"({_TRACKING_PAGE}) AS unified_events"
-    else:
+    elif table == "all":
         base = f"(SELECT * FROM ({_TRACKING_PAGE}) UNION ALL SELECT * FROM ({_LIVE_PAGE}) UNION ALL SELECT * FROM ({_VERISCAPE_TRIAL_PAGE})) AS unified_events"  # nosec B608
-    if account_id and account_id not in ("*", "all"):
-        safe_acc = account_id.replace("'", "''")
-        return f"(SELECT * FROM {base} WHERE (account_id = '{safe_acc}' OR account_id IS NULL)) AS tenant_events"
-    return base
-
-
-DEMO_SOURCE = "events"
+    else:
+        base = f"(SELECT * FROM ({_TRACKING_PAGE}) UNION ALL SELECT * FROM ({_LIVE_PAGE})) AS unified_events"  # nosec B608
+    return _safe_tenant_clause(base, account_id)
 
 _STEP_METRICS = """
 SELECT

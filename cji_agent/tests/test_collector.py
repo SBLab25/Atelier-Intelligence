@@ -218,6 +218,13 @@ def test_revoked_tracker_key_is_refused(collector, monkeypatch):
     assert collector.client.post("/admin/api-keys/revoke", json={"api_key": key}).status_code == 403
 
 
+def test_permanently_revoked_historical_key_is_refused(collector):
+    from cji.collector.security import REVOKED_KEY_FINGERPRINTS
+    for leaked_fp in REVOKED_KEY_FINGERPRINTS:
+        res = collector.post(batch(wire(ids("leak", 1)[0]), key=f"leaked_{leaked_fp}"))
+        assert res.status_code == 401
+
+
 def test_collector_metrics_need_the_admin_key(collector, monkeypatch):
     monkeypatch.setattr(collector.api, "CJI_ADMIN_KEY", GOOD_ADMIN)
     collector.post(batch(*[wire(i) for i in ids("met", 2)]))

@@ -181,27 +181,77 @@ def test_apply_mapping_sanitises_urls(sample_ga4_df, sample_mapping_config, tmp_
         assert "?" not in rec.get("url", "")
 
 
-# ── Integration Tests (require API key) ───────────────────────────────────────
+# ── Integration Tests ─────────────────────────────────────────────────────────
 
 @pytest.mark.integration
-def test_detect_schema_calls_llm_for_unknown_source(sample_ga4_df, tmp_path):
-    from cji.mcp_servers.ingestion_intelligence_server import detect_schema
+def test_detect_schema_calls_llm_for_unknown_source(sample_ga4_df, tmp_path, monkeypatch):
+    import json
+    from cji.integrations import LLMGateway
+    from cji.integrations.testing import ScriptedTransport, groq_response
+    import cji.mcp_servers.ingestion_intelligence_server as server
+
+    mock_resp = {
+        "detected_source": "GA4 export",
+        "confidence": 0.95,
+        "field_mapping": {
+            "event_name": "event_type",
+            "page_location": "url",
+            "ga_session_id": "session_id",
+            "user_pseudo_id": "user_id",
+        },
+        "derived_fields": {},
+        "missing_fields": [],
+        "transformation_notes": [],
+        "warnings": [],
+    }
+    gw = LLMGateway(
+        provider="groq", model="openai/gpt-oss-120b", api_key="sk-test",
+        service="cji-ingestion-intelligence",
+        transport=ScriptedTransport(groq_response(json.dumps(mock_resp))),
+    )
+    monkeypatch.setattr(server, "_llm", gw)
+    monkeypatch.setattr(server, "INGESTION_MAPPING_REGISTRY", tmp_path / "mapping_registry.json")
+
     csv_path = str(tmp_path / "ga4_unknown.csv")
     sample_ga4_df.to_csv(csv_path, index=False)
 
-    result = asyncio.run(detect_schema(csv_path, source_hint="GA4 export"))
+    result = asyncio.run(server.detect_schema(csv_path, source_hint="GA4 export"))
     assert result["confidence"] > 0.5
     assert "field_mapping" in result
     assert result["cached"] is False
 
 
 @pytest.mark.integration
-def test_detect_schema_uses_cache_on_second_call(sample_ga4_df, tmp_path):
-    from cji.mcp_servers.ingestion_intelligence_server import detect_schema
+def test_detect_schema_uses_cache_on_second_call(sample_ga4_df, tmp_path, monkeypatch):
+    import json
+    from cji.integrations import LLMGateway
+    from cji.integrations.testing import ScriptedTransport, groq_response
+    import cji.mcp_servers.ingestion_intelligence_server as server
+
+    mock_resp = {
+        "detected_source": "GA4 export",
+        "confidence": 0.95,
+        "field_mapping": {
+            "event_name": "event_type",
+            "page_location": "url",
+        },
+        "derived_fields": {},
+        "missing_fields": [],
+        "transformation_notes": [],
+        "warnings": [],
+    }
+    gw = LLMGateway(
+        provider="groq", model="openai/gpt-oss-120b", api_key="sk-test",
+        service="cji-ingestion-intelligence",
+        transport=ScriptedTransport(groq_response(json.dumps(mock_resp))),
+    )
+    monkeypatch.setattr(server, "_llm", gw)
+    monkeypatch.setattr(server, "INGESTION_MAPPING_REGISTRY", tmp_path / "mapping_registry.json")
+
     csv_path = str(tmp_path / "ga4_cache.csv")
     sample_ga4_df.to_csv(csv_path, index=False)
 
-    asyncio.run(detect_schema(csv_path))          # first call fills the mapping cache
-    second = asyncio.run(detect_schema(csv_path))
+    asyncio.run(server.detect_schema(csv_path))          # first call fills the mapping cache
+    second = asyncio.run(server.detect_schema(csv_path))
 
     assert second["cached"] is True

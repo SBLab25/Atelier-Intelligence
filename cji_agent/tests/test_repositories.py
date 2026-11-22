@@ -19,7 +19,6 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 
 from cji.repositories import (
-    DuckDbParquetRepository,
     NotSupported,
     PostgresEventRepository,
     RepositoryError,
@@ -27,7 +26,6 @@ from cji.repositories import (
     event_repository,
 )
 from cji.repositories import base as repo_base
-from cji.repositories import duckdb_parquet as duck_module
 from cji.settings import make_test_settings
 
 APP_ROOT = Path(__file__).resolve().parent.parent
@@ -117,6 +115,8 @@ def create_live_tables(engine, monkeypatch):
 def load_postgres(engine, monkeypatch, df):
     create_live_tables(engine, monkeypatch)
     df.to_sql("tracking_events", engine, if_exists="replace", index=False)   # ingest_json layout
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE tracking_events ADD COLUMN IF NOT EXISTS account_id VARCHAR(64)"))
 
 
 def load_parquet(path, df):
@@ -131,23 +131,16 @@ def shared_frame():
 
 
 @pytest.fixture
-def demo_repo(tmp_path, shared_frame):
-    repo = DuckDbParquetRepository(load_parquet(tmp_path / "events.parquet", shared_frame))
-    yield repo
-    repo.close()
+def repo(pg_engine, pg_url, monkeypatch, shared_frame):
+    load_postgres(pg_engine, monkeypatch, shared_frame)
+    r = PostgresEventRepository(pg_url)
+    yield r
+    r.close()
 
 
 @pytest.fixture
-def pg_repo(pg_engine, pg_url, monkeypatch, shared_frame):
-    load_postgres(pg_engine, monkeypatch, shared_frame)
-    repo = PostgresEventRepository(pg_url)
-    yield repo
-    repo.close()
-
-
-@pytest.fixture(params=["demo", "realtime"])
-def repo(request):
-    return request.getfixturevalue("demo_repo" if request.param == "demo" else "pg_repo")
+def pg_repo(repo):
+    return repo
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -225,108 +218,18 @@ def test_contract_empty_batch(repo):
     assert (result.written, result.duplicates) == (0, 0)
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# Parity — the same fixture through both implementations
-# ═════════════════════════════════════════════════════════════════════════════
-
-COMMON_EVENT_KEYS = ("user_id", "session_id", "journey_id", "step_id", "event_type", "duration_ms", "metadata")
-
-
-def test_parity_between_demo_and_realtime(demo_repo, pg_repo):
-    assert demo_repo.step_metrics(JOURNEY, WINDOW) == pg_repo.step_metrics(JOURNEY, WINDOW)
-    assert demo_repo.funnel(JOURNEY, STEPS, WINDOW) == pg_repo.funnel(JOURNEY, STEPS, WINDOW)
-    for step_id, event_type in [(None, None), ("landing_page", None), (None, "error")]:
-        demo = demo_repo.events(JOURNEY, limit=100, step_id=step_id, event_type=event_type)
-        live = pg_repo.events(JOURNEY, limit=100, step_id=step_id, event_type=event_type)
-        assert [{k: e[k] for k in COMMON_EVENT_KEYS} for e in demo] == \
-               [{k: e[k] for k in COMMON_EVENT_KEYS} for e in live]
-        assert [pd.Timestamp(e["timestamp"]) for e in demo] == [pd.Timestamp(e["timestamp"]) for e in live]
-
-
-def test_parity_on_an_empty_store(tmp_path, pg_engine, pg_url, monkeypatch):
-    empty = fixture_frame([])
-    demo = DuckDbParquetRepository(load_parquet(tmp_path / "events.parquet", empty))
+def test_postgres_on_an_empty_store(pg_engine, pg_url, monkeypatch):
     load_postgres(pg_engine, monkeypatch, fixture_frame(FIXTURE[:1]))
     with pg_engine.begin() as conn:
         conn.execute(text("DELETE FROM tracking_events"))
     live = PostgresEventRepository(pg_url)
     try:
-        for r in (demo, live):
-            r.health()
-            assert r.step_metrics(JOURNEY, WINDOW) == []
-            assert r.funnel(JOURNEY, STEPS, WINDOW) == []
-            assert r.events(JOURNEY, limit=10, step_id=None, event_type=None) == []
+        live.health()
+        assert live.step_metrics(JOURNEY, WINDOW) == []
+        assert live.funnel(JOURNEY, STEPS, WINDOW) == []
+        assert live.events(JOURNEY, limit=10, step_id=None, event_type=None) == []
     finally:
-        demo.close()
         live.close()
-
-
-# ═════════════════════════════════════════════════════════════════════════════
-# DuckDB / Parquet (demo)
-# ═════════════════════════════════════════════════════════════════════════════
-
-def test_demo_missing_parquet(tmp_path):
-    repo = DuckDbParquetRepository(tmp_path / "missing.parquet")
-    with pytest.raises(RepositoryError, match="events.parquet not found"):
-        repo.health()
-    with pytest.raises(RepositoryError, match="events.parquet not found"):
-        repo.step_metrics(JOURNEY, WINDOW)
-
-
-def test_demo_corrupt_parquet(tmp_path):
-    path = tmp_path / "events.parquet"
-    path.write_bytes(b"this is not parquet")
-    with pytest.raises(RepositoryError):
-        DuckDbParquetRepository(path).health()
-
-
-def test_demo_live_snapshot_is_not_supported(demo_repo):
-    with pytest.raises(NotSupported, match="only available in realtime mode"):
-        demo_repo.live_snapshot(15)
-
-
-def test_demo_window_is_reported_but_not_applied(tmp_path):
-    old = DuckDbParquetRepository(load_parquet(tmp_path / "events.parquet", fixture_frame(minutes_ago=60 * 24 * 90)))
-    assert old.step_metrics(JOURNEY, TimeWindow(days_back=1)) == EXPECTED_METRICS     # F-10: kept as-is
-    assert old.window_fields(TimeWindow(days_back=7, minutes_back=5)) == (7, None)
-    old.close()
-
-
-def test_demo_write_is_atomic(tmp_path, monkeypatch):
-    path = load_parquet(tmp_path / "events.parquet", fixture_frame())
-    before = path.read_bytes()
-
-    def broken_replace(src, dst):
-        raise OSError("disk full")
-
-    monkeypatch.setattr(duck_module.os, "replace", broken_replace)
-    with pytest.raises(RepositoryError, match="disk full"):
-        DuckDbParquetRepository(path).append_events(records_of(fixture_frame(FIXTURE[:2])))
-    assert path.read_bytes() == before
-    assert sorted(p.name for p in tmp_path.iterdir()) == ["events.parquet"]
-
-
-def test_demo_write_creates_the_file_and_keeps_types(tmp_path):
-    path = tmp_path / "new" / "events.parquet"
-    repo = DuckDbParquetRepository(path)
-    assert repo.append_events(records_of(fixture_frame())).written == len(FIXTURE)
-    stored = pd.read_parquet(path)
-    assert str(stored["timestamp"].dtype).startswith("datetime64") and stored["duration_ms"].dtype == "int64"
-    assert repo.step_metrics(JOURNEY, WINDOW) == EXPECTED_METRICS
-
-
-def test_demo_never_builds_a_database_engine(demo_repo, monkeypatch):
-    import sqlalchemy
-
-    def no_engine(*args, **kwargs):
-        raise AssertionError("demo repository asked for a database engine")
-
-    monkeypatch.setattr(sqlalchemy, "create_engine", no_engine)
-    demo_repo.health()
-    demo_repo.step_metrics(JOURNEY, WINDOW)
-    demo_repo.funnel(JOURNEY, STEPS, WINDOW)
-    demo_repo.events(JOURNEY, limit=5, step_id=None, event_type=None)
-    demo_repo.append_events(records_of(fixture_frame(FIXTURE[:1])))
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -358,7 +261,7 @@ def test_realtime_window_excludes_old_events(pg_engine, pg_url, monkeypatch):
     load_postgres(pg_engine, monkeypatch, frame)
     repo = PostgresEventRepository(pg_url)
     assert repo.step_metrics(JOURNEY, TimeWindow(minutes_back=60)) == EXPECTED_METRICS
-    assert repo.window_fields(TimeWindow(days_back=30, minutes_back=0)) == (None, 60)
+    assert repo.window_fields(TimeWindow(minutes_back=60)) == (None, 60)
     repo.close()
 
 
@@ -415,10 +318,7 @@ def test_realtime_never_touches_demo_storage(tmp_path, pg_repo):
 # Selection and isolation
 # ═════════════════════════════════════════════════════════════════════════════
 
-def test_factory_selects_once_from_the_configured_mode(tmp_path):
-    demo = event_repository(make_test_settings(tmp_path))
-    assert isinstance(demo, DuckDbParquetRepository)
-    assert demo.parquet_path == tmp_path / "data" / "events.parquet"
+def test_factory_creates_realtime_repository(tmp_path):
     realtime = event_repository(make_test_settings(tmp_path, CJI_MODE="realtime", DATABASE_URL="postgresql://u@127.0.0.1:1/x"))
     assert isinstance(realtime, PostgresEventRepository)
 
@@ -448,7 +348,6 @@ def _imports(path):
 
 def test_implementations_cannot_reach_the_other_store():
     pkg = SRC / "repositories"
-    assert "sqlalchemy" not in _imports(pkg / "duckdb_parquet.py")
     assert "duckdb" not in _imports(pkg / "postgres.py")
     assert "parquet" not in (pkg / "postgres.py").read_text(encoding="utf-8").lower()
 
@@ -463,7 +362,24 @@ def test_rendered_sql_contains_no_values():
     from cji.repositories import queries as q
 
     for sql in (q.step_metrics_sql(q.POSTGRES, q.realtime_source(INJECTION)),
-                q.funnel_sql(q.DUCKDB, q.DEMO_SOURCE), q.events_sql(q.POSTGRES, q.realtime_source(JOURNEY))):
+                q.funnel_sql(q.POSTGRES, q.realtime_source(JOURNEY)), q.events_sql(q.POSTGRES, q.realtime_source(JOURNEY))):
         assert INJECTION not in sql and JOURNEY not in sql
     assert q.realtime_source(q.LIVE_ONLY_LABEL).count("FROM live_events") == 1
+
+
+def test_tenant_isolation_and_parameterization():
+    from cji.repositories import queries as q
+
+    # Valid account id filters for the tenant while allowing shared baseline events
+    src = q.realtime_source(JOURNEY, account_id="acct_123")
+    assert "account_id = 'acct_123'" in src
+    assert "account_id IS NULL" in src
+
+    # Wildcards return base source
+    assert q.realtime_source(JOURNEY, account_id="*") == q.realtime_source(JOURNEY)
+    assert q.realtime_source(JOURNEY, account_id="all") == q.realtime_source(JOURNEY)
+
+    # Invalid account_id formats fail closed with ValueError
+    with pytest.raises(ValueError, match="Invalid account_id"):
+        q.realtime_source(JOURNEY, account_id="acct'; DROP TABLE live_events; --")
 

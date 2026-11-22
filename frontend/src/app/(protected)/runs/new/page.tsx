@@ -52,7 +52,7 @@ export default async function NewRunPage() {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="window_days">Window in days (demo data, optional, default 30)</label>
+            <label htmlFor="window_days">Window in days (optional, default 30)</label>
             <input id="window_days" name="window_days" type="number" min={1} max={365} inputMode="numeric" />
           </div>
           <div className="field">

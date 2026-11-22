@@ -16,7 +16,7 @@ import requests
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
@@ -103,10 +103,10 @@ class EventBroadcaster:
                     try:
                         q.get_nowait()
                         q.put_nowait(ev)
-                    except Exception:
-                        pass
-                except Exception:
-                    pass
+                    except Exception:  # broad-except: best-effort queue eviction
+                        logger.debug("broadcaster queue drop failed")
+                except Exception:  # broad-except: best-effort queue dispatch
+                    logger.debug("broadcaster queue dispatch failed")
 
 
 BROADCASTER = EventBroadcaster()
@@ -249,6 +249,14 @@ class AdminKeyCreate(BaseModel):
     journey_name: str = Field(..., min_length=1, max_length=256, description="Journey identifier, list, or '*'")
     description: str = Field(..., max_length=256)
     account_id: str | None = Field(default=None, max_length=64)
+
+    @field_validator("journey_name")
+    @classmethod
+    def validate_journey(cls, v: str) -> str:
+        s = v.strip()
+        if not s:
+            raise ValueError("journey_name must not be empty or whitespace only")
+        return s
 
 
 # ─── HELPERS ───────────────────────────────────────────────────────────────

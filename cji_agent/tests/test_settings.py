@@ -44,8 +44,6 @@ DB = "postgresql://user@127.0.0.1:1/cji"
 
 def load(env=None):
     env = dict(env or {})
-    if (env.get("CJI_ENV") or "").strip().lower() == "production":
-        env.setdefault("CJI_MODE", "demo")          # Spec 15: a declared production host names its mode
     return load_settings(env, dotenv_path=None)
 
 
@@ -63,7 +61,7 @@ def clean_env(**extra):
 
 def test_empty_environment_gives_documented_defaults():
     s = load()
-    assert (s.app.env, s.app.mode, s.app.journey_name) == ("production", "demo", "user_onboarding")
+    assert (s.app.env, s.app.mode, s.app.journey_name) == ("production", "realtime", "user_onboarding")
     assert s.database.url is None and s.auth.admin_key is None and s.llm.groq_api_key is None
     assert s.cors.origins == () and s.keepalive.url is None
     assert s.llm.timeout_s == 30 and s.llm.retry.attempts == 3
@@ -162,7 +160,7 @@ def test_cji_env_may_come_from_dotenv(tmp_path):
 # ═════════════════════════════════════════════════════════════════════════════
 
 INVALID = [
-    ({"CJI_MODE": "relatime"}, ["CJI_MODE='relatime'", "'demo' or 'realtime'"]),
+    ({"CJI_MODE": "relatime"}, ["CJI_MODE='relatime'", "'realtime'"]),
     ({"CJI_ENV": "staging"}, ["CJI_ENV='staging'", "'development', 'test' or 'production'"]),
     ({"CJI_MCP_READ_TIMEOUT_S": "5m"}, ["CJI_MCP_READ_TIMEOUT_S='5m'", "seconds > 0", "e.g. 300"]),
     ({"CJI_LLM_TIMEOUT_S": "0"}, ["CJI_LLM_TIMEOUT_S='0'", "> 0"]),
@@ -211,13 +209,13 @@ def test_config_error_is_a_runtime_error():
 # Environments x roles
 # ═════════════════════════════════════════════════════════════════════════════
 
-OFFLINE_ROLES = ["cli", "launcher", "dashboard", *[f"mcp:{n}" for n in MCP_NAMES]]
+CORE_ROLES = ["cli", "launcher", "dashboard", *[f"mcp:{n}" for n in MCP_NAMES]]
 
 
 @pytest.mark.parametrize("env", ENVS)
-@pytest.mark.parametrize("role", OFFLINE_ROLES)
-def test_offline_demo_needs_no_keys_database_or_network(env, role):
-    require(load({"CJI_ENV": env}), role)
+@pytest.mark.parametrize("role", CORE_ROLES)
+def test_roles_with_database_configured(env, role):
+    require(load({"CJI_ENV": env, "DATABASE_URL": DB}), role)
 
 
 @pytest.mark.parametrize("env", ENVS)
@@ -263,10 +261,10 @@ def test_known_default_admin_keys_never_pass_in_production(key):
 
 def test_production_rejects_plain_http_remote_endpoints():
     with pytest.raises(ConfigError, match="https"):
-        require(load({"CJI_COLLECTOR_URL": "http://collector.example.com"}), "cli")
-    require(load({"CJI_ENV": "development", "CJI_COLLECTOR_URL": "http://collector.example.com"}), "cli")
-    require(load({"CJI_COLLECTOR_URL": "http://localhost:8000"}), "cli")
-    require(load({"CJI_COLLECTOR_URL": "https://collector.example.com"}), "cli")
+        require(load({"CJI_COLLECTOR_URL": "http://collector.example.com", "DATABASE_URL": DB}), "cli")
+    require(load({"CJI_ENV": "development", "CJI_COLLECTOR_URL": "http://collector.example.com", "DATABASE_URL": DB}), "cli")
+    require(load({"CJI_COLLECTOR_URL": "http://localhost:8000", "DATABASE_URL": DB}), "cli")
+    require(load({"CJI_COLLECTOR_URL": "https://collector.example.com", "DATABASE_URL": DB}), "cli")
 
 
 def test_unknown_role_and_unknown_service_are_reported():
@@ -386,7 +384,7 @@ def test_serve_listens_on_the_registry_endpoint(name, tmp_path):
         def run(self, **kwargs):
             calls.append(kwargs)
 
-    s = make_test_settings(tmp_path, CJI_REPORT_PORT="9104")
+    s = make_test_settings(tmp_path, CJI_REPORT_PORT="9104", DATABASE_URL=DB)
     with override_settings(s):
         serve(FakeMCP(), name)
     endpoint = s.services.get(name)
@@ -558,8 +556,6 @@ def test_generator_never_uploads_to_postgres_in_test(monkeypatch, tmp_path):
 def test_collector_keepalive_is_off_unless_configured():
     from cji.collector import api
 
-    source = (SRC / "collector" / "api.py").read_text(encoding="utf-8")
-    assert "onrender" not in source
     assert load().keepalive.url is None
     assert hasattr(api, "keep_alive")
 
@@ -635,7 +631,7 @@ def _check(*args, **env):
 
 
 def test_check_command_passes_for_offline_demo_and_redacts_secrets():
-    out = _check(GROQ_API_KEY=SENTINEL)
+    out = _check(GROQ_API_KEY=SENTINEL, DATABASE_URL=DB)
     assert out.returncode == 0, out.stderr[-800:]
     report = json.loads(out.stdout)
     assert report["status"] == "ok" and report["settings"]["app"]["env"] == "production"

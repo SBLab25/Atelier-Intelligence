@@ -24,7 +24,7 @@ def current_document() -> dict[str, Any]:
     from .app import create_app
 
     with tempfile.TemporaryDirectory() as tmp:
-        return create_app(make_test_settings(Path(tmp), CJI_MODE="demo")).openapi()
+        return create_app(make_test_settings(Path(tmp), CJI_MODE="realtime", DATABASE_URL="postgresql://test:test@127.0.0.1:5432/test")).openapi()
 
 
 def render(doc: dict[str, Any]) -> str:

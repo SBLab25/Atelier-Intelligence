@@ -85,7 +85,7 @@ class System:
             {
                 "CJI_HOME": str(self.home),
                 "CJI_ENV": "development",
-                "CJI_MODE": "demo",
+                "CJI_MODE": "realtime",
                 "CJI_SERVICE_HOST": "127.0.0.1",
                 "CJI_WORKFLOW_RETRY_BACKOFF_S": "0",
                 "CJI_WORKFLOW_STEP_ATTEMPTS": "1",

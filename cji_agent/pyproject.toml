@@ -27,7 +27,6 @@ dependencies = [
     "mcp>=2.3,<3",
     "fastmcp>=4.1.4,<5",
     # storage
-    "duckdb>=1.5,<2",
     "SQLAlchemy>=2.0.55,<2.1",          # 2.1 changes the postgresql:// default driver to psycopg 3
     "psycopg2-binary>=2.9.13,<3",       # SQLAlchemy's postgresql:// driver (not imported directly)
     "chromadb>=1.5.9,<2",
@@ -65,7 +64,6 @@ cji-api = "cji.api.serve:main"
 cji-api-token = "cji.api.tokens_cli:main"
 cji-ingest-json = "cji.tools.ingest_json:main"
 cji-snippet = "cji.tracker.snippet_generator:main"
-cji-generate-diverse = "cji.tools.generate_diverse:main"
 # Spec 15: operations commands
 cji-db = "cji.ops.db_cli:main"
 cji-backup = "cji.ops.backup:main"

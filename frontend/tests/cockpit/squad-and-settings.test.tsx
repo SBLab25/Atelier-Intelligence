@@ -150,7 +150,7 @@ describe("SettingsScreen (Profile Pictures & Custom LLM Keys)", () => {
     expect(saved.apiKey).toBe("sk-ant-api03-my-custom-key");
   });
 
-  it("allows switching workspace database isolation mode", () => {
+  it("displays production realtime workspace database isolation", () => {
     render(
       <SettingsScreen
         user={currentUser}
@@ -163,14 +163,8 @@ describe("SettingsScreen (Profile Pictures & Custom LLM Keys)", () => {
     );
 
     expect(screen.getByText("Workspace Database & Multi-Tenant Isolation")).toBeInTheDocument();
-
-    const sandboxBtn = screen.getByText("Demo Sandbox");
-    fireEvent.click(sandboxBtn);
-    expect(localStorage.getItem("cji_workspace_data_mode")).toBe("demo");
-
-    const cleanBtn = screen.getByText("Clean Live Workspace");
-    fireEvent.click(cleanBtn);
-    expect(localStorage.getItem("cji_workspace_data_mode")).toBe("clean");
+    expect(screen.getByText("Production Realtime")).toBeInTheDocument();
+    expect(screen.getByText(/Dedicated production ingestion/)).toBeInTheDocument();
   });
 });
 

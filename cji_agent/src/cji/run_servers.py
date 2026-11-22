@@ -23,8 +23,8 @@ def launch_plan() -> list[tuple[str, str]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="cji-servers", description="CJI MCP Server Launcher")
     parser.add_argument(
-        "--mode", choices=["demo", "realtime"], default=None,
-        help="Override CJI_MODE for all servers (demo or realtime)."
+        "--mode", choices=["realtime"], default="realtime",
+        help="CJI operational mode (realtime)."
     )
     parser.add_argument(
         "--threaded", action="store_true",
@@ -34,12 +34,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     configure_logging(fmt="%(asctime)s [%(levelname)s] %(message)s")
 
-    # Inject mode override if supplied (before settings are first loaded)
-    if args.mode:
-        os.environ["CJI_MODE"] = args.mode
-        logger.info(f"CJI_MODE overridden to: {args.mode}")
-    else:
-        logger.info(f"CJI_MODE from env: {os.environ.get('CJI_MODE', 'demo (default)')}")
+    os.environ["CJI_MODE"] = args.mode or "realtime"
+    logger.info(f"CJI_MODE: {os.environ['CJI_MODE']}")
 
     try:
         settings = require(get_settings(), "launcher")

@@ -31,7 +31,7 @@ describe("typed client", () => {
   });
 
   it("sends no Authorization header without a token", async () => {
-    const fetchMock = respond(200, { status: "ok", version: "1.0.0", mode: "demo" });
+    const fetchMock = respond(200, { status: "ok", version: "1.0.0", mode: "realtime" });
     await call("req-1", () => client(fetchMock, "").GET("/api/v1/health"));
     expect((fetchMock.mock.calls[0]?.[0] as Request).headers.has("authorization")).toBe(false);
   });

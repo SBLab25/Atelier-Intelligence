@@ -52,16 +52,16 @@ def _old_style_tables(engine, df):
 
 def test_files_are_complete_and_numbered():
     migrations = runner.discover()
-    assert [m.version for m in migrations] == [1, 2, 3]
+    assert [m.version for m in migrations] == [1, 2, 3, 4]
     assert runner.REQUIRED_SCHEMA_VERSION == migrations[-1].version
-    assert not migrations[0].reversible and migrations[1].reversible and migrations[2].reversible
+    assert not migrations[0].reversible and migrations[1].reversible and migrations[2].reversible and migrations[3].reversible
 
 
 def test_fresh_database_goes_to_the_required_version(db_url):
     engine = runner.engine_for(db_url)
-    assert runner.up(engine) == ["0001_baseline", "0002_indexes", "0003_multi_journey_and_partitions"]
+    assert runner.up(engine) == ["0001_baseline", "0002_indexes", "0003_multi_journey_and_partitions", "0004_tenant_isolation"]
     report = runner.status(engine)
-    assert report["current"] == 3 and report["pending"] == [] and report["problems"] == []
+    assert report["current"] == 4 and report["pending"] == [] and report["problems"] == []
     assert report["column_differences"] == []
     assert {"tracking_events_event_id_key", "tracking_events_journey_time"} <= _indexes(engine, "tracking_events")
     assert runner.up(engine) == []  # idempotent
@@ -73,7 +73,7 @@ def test_existing_database_is_adopted_without_data_changes(db_url):
     runner.up(engine)
     with engine.connect() as conn:
         assert conn.execute(text("SELECT count(*) FROM tracking_events")).scalar() == 30
-    assert runner.current_version(engine) == 2
+    assert runner.current_version(engine) == 4
 
 
 def test_duplicate_event_ids_stop_0002_with_a_count(db_url):
@@ -90,9 +90,9 @@ def test_up_down_up_keeps_the_data(db_url):
     engine = runner.engine_for(db_url)
     runner.up(engine)
     _events(12).to_sql("tracking_events", engine, if_exists="append", index=False)
-    assert runner.down(engine, 1) == ["0002_indexes"]
+    assert runner.down(engine, 1) == ["0004_tenant_isolation", "0003_multi_journey_and_partitions", "0002_indexes"]
     assert "tracking_events_event_id_key" not in _indexes(engine, "tracking_events")
-    assert runner.up(engine) == ["0002_indexes"]
+    assert runner.up(engine) == ["0002_indexes", "0003_multi_journey_and_partitions", "0004_tenant_isolation"]
     with engine.connect() as conn:
         assert conn.execute(text("SELECT count(*) FROM tracking_events")).scalar() == 12
 
@@ -102,7 +102,7 @@ def test_down_never_reverts_the_baseline(db_url):
     runner.up(engine)
     with pytest.raises(runner.MigrationError, match="baseline is not reversible"):
         runner.down(engine, 0)
-    assert runner.current_version(engine) == 2
+    assert runner.current_version(engine) == 4
 
 
 def test_a_changed_migration_file_is_refused(db_url, monkeypatch):
@@ -144,7 +144,7 @@ def test_readiness_check_reports_a_schema_behind(db_url):
         runner.check_schema(S())
     assert info.value.code == "schema_behind"
     runner.up(engine)
-    assert runner.check_schema(S()) == 2
+    assert runner.check_schema(S()) == 4
 
 
 def test_cli_status_and_up_read_the_url_from_a_named_variable(db_url, monkeypatch, capsys):
@@ -154,7 +154,7 @@ def test_cli_status_and_up_read_the_url_from_a_named_variable(db_url, monkeypatc
     assert db_cli.main(["--database-url-env", "CJI_MIGRATE_TEST_URL", "migrate", "up"]) == 0
     assert db_cli.main(["--database-url-env", "CJI_MIGRATE_TEST_URL", "migrate", "status"]) == 0
     out = capsys.readouterr().out
-    assert "schema version 2" in out
+    assert "schema version 4" in out
     password = urlsplit(db_url).password
     assert not password or password not in out
     assert db_cli.main(["--database-url-env", "CJI_UNSET_VARIABLE", "migrate", "status"]) == 2

@@ -165,11 +165,11 @@ class RunOutcome:
 
 def initial_state(
     *,
-    mode: str,
+    mode: str = "realtime",
     journey_name: str,
     journey_steps: list[str],
     auto_approve: bool,
-    window_days: int = 30,
+    window_days: int = 0,
     window_mins: int = 60,
     collector_url: str = "",
     pending_files: list[dict[str, Any]] | None = None,

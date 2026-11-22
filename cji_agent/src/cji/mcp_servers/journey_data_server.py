@@ -11,10 +11,9 @@ from typing import Any
 from fastmcp import FastMCP
 
 from cji.analytics.funnel import overall_completion_pct
-from cji.config import DUCKDB_PATH, JOURNEY_CONFIG
+from cji.config import JOURNEY_CONFIG
 from cji.repositories import (
     EventRepository,
-    NotSupported,
     RepositoryError,
     TimeWindow,
     get_repository,
@@ -27,11 +26,6 @@ MAX_LIMIT = 1000
 MAX_MINUTES = 43200          # 30 days, as the collector's /live/stats
 MAX_DAYS = 3650
 MAX_FILTER_LENGTH = 128
-DEMO_SNAPSHOT_REPLY = {
-    "error": "get_live_snapshot is only available in realtime mode",
-    "mode": "demo",
-    "message": "Switch to CJI_MODE=realtime to use this tool",
-}
 
 
 class InvalidArgument(ValueError):
@@ -84,7 +78,6 @@ async def get_system_info() -> dict:
     return {
         "mode": repo.mode,
         "data_source": repo.data_source,
-        "duckdb_path": str(DUCKDB_PATH),
         "journey_id": JOURNEY_CONFIG["name"],
         "journey_steps": JOURNEY_CONFIG["steps"],
         "status": "ok"
@@ -149,12 +142,10 @@ async def query_events(limit: int = 100, step_id: str | None = None, event_type:
 
 @mcp.tool()
 async def get_live_snapshot(minutes: int = 15) -> dict:
-    """Realtime mode only. Returns rolling event counts for the last N minutes."""
+    """Realtime mode. Returns rolling event counts for the last N minutes."""
     try:
         minutes = _whole_number("minutes", minutes, 1, MAX_MINUTES)
         snapshot = _repository().live_snapshot(minutes)
-    except NotSupported:
-        return dict(DEMO_SNAPSHOT_REPLY)
     except (InvalidArgument, RepositoryError) as e:
         return {"error": str(e)}
     return {

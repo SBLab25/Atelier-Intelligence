@@ -21,7 +21,7 @@ from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
 
-REQUIRED_SCHEMA_VERSION = 3
+REQUIRED_SCHEMA_VERSION = 4
 LOCK_KEY = 7_215_015  # pg_advisory_xact_lock key shared by every cji-db process
 TABLE = "cji_schema_migrations"
 _FILE = re.compile(r"(\d{4})_([a-z0-9_]+)\.(up|down)\.sql")
@@ -38,6 +38,7 @@ BASELINE_COLUMNS: dict[str, dict[str, str]] = {
         "duration_ms": "bigint",
         "url": "text",
         "metadata": "text",
+        "account_id": "character varying",
     },
     "live_events": {
         "timestamp": "timestamp without time zone",
@@ -50,6 +51,7 @@ BASELINE_COLUMNS: dict[str, dict[str, str]] = {
         "url": "character varying",
         "element_selectors": "character varying",
         "metadata": "jsonb",
+        "account_id": "character varying",
     },
     "api_keys": {
         "api_key": "character varying",
@@ -57,6 +59,7 @@ BASELINE_COLUMNS: dict[str, dict[str, str]] = {
         "description": "character varying",
         "created_at": "timestamp without time zone",
         "is_active": "boolean",
+        "account_id": "character varying",
     },
 }
 

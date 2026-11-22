@@ -24,7 +24,7 @@ DEAD_DATABASE = "postgresql://cji:cji@127.0.0.1:1/cji"
 
 
 def _run_dashboard(tmp_path, **env):
-    settings = make_test_settings(tmp_path, CJI_MODE="demo", **env)
+    settings = make_test_settings(tmp_path, CJI_MODE="realtime", **env)
     with override_settings(settings):
         app = AppTest.from_file(str(dashboard_path()), default_timeout=120)    # the installed cji/dashboard.py
         app.run()

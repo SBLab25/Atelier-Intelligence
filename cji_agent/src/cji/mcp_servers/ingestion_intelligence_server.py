@@ -284,6 +284,10 @@ async def detect_schema(file_path: str, source_hint: str = "", run_context: dict
     mapping["last_used"]           = mapping["created_at"]
     mapping["use_count"]           = 1
 
+    if mapping.get("confidence", 0.0) > 0.0:
+        registry[fp] = mapping
+        _save_registry(registry)
+
     log.info(f"Schema detected: {mapping.get('detected_source')} | confidence: {mapping.get('confidence')}")
     return mapping
 
@@ -491,35 +495,24 @@ async def validate_transformed_data(records_sample: list) -> dict:
 
 
 @mcp.tool()
-def ingest_to_store(file_path: str, mapping_config: dict, mode: str = "") -> dict:
+def ingest_to_store(file_path: str, mapping_config: dict, mode: str = "realtime") -> dict:
     """
-    Full pipeline: detect → apply → validate → write to DuckDB or Supabase.
+    Full pipeline: detect → apply → validate → write to Supabase/PostgreSQL.
     Auto-saves the mapping to registry if confidence >= INGESTION_CONFIDENCE_THRESHOLD.
 
     Args:
         file_path:      Absolute path to raw data file.
         mapping_config: Output from detect_schema().
-        mode:           'demo' or 'realtime'. Defaults to CJI_MODE from config.
+        mode:           'realtime'. Defaults to CJI_MODE from config.
 
     Returns:
         Dict with status, records_written, records_skipped, destination, duration_ms.
     """
     start_ms = datetime.now().timestamp() * 1000
-    # The store is chosen once from the server's settings (Spec 05); a request for the
-    # other mode is refused instead of writing to the wrong store (OD-33).
     try:
         repo = get_repository()
     except ConfigError as exc:
         return {"status": "error", "error": "; ".join(exc.problems), "records_written": 0, "records_skipped": 0}
-    if mode in ("demo", "realtime") and mode != repo.mode:
-        return {
-            "status":          "error",
-            "error":           (f"this server is configured for {repo.mode} mode but the request asked for "
-                                f"{mode}. Start the MCP servers with --mode {mode}, or run the analysis in "
-                                f"{repo.mode} mode."),
-            "records_written": 0,
-            "records_skipped": 0,
-        }
     log.info(f"ingest_to_store: mode={repo.mode}, file={file_path}")
 
     # Apply mapping

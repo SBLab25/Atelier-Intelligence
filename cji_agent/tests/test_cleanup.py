@@ -73,6 +73,7 @@ REMOVED_REFERENCES = [
 GREP_EXCLUDES = [
     ":!.kiro", ":!graphify-out", ":!refactoring.md", ":!kiro_upgrade_guide.md",
     ":!kiro_upgrade_prompts.md", ":!antigravity_upgrade_prompts.md", ":!.gitignore",
+    ":!upgrade.md",
     ":!cji_agent/tests/test_cleanup.py",
 ]
 

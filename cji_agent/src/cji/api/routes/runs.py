@@ -372,10 +372,11 @@ async def start_run(request: Request, ctx: Ctx, caller: Caller, idempotency_key:
         from cji.workflow.runtime import initial_state
 
         settings = ctx.settings
+        mins = body.window_minutes or (body.window_days * 1440 if body.window_days else settings.budgets.realtime_window_minutes)
         state = initial_state(
             mode=settings.app.mode, journey_name=journey.name, journey_steps=list(journey.steps),
-            auto_approve=body.auto_approve, window_days=body.window_days or 30,
-            window_mins=body.window_minutes or settings.budgets.realtime_window_minutes,
+            auto_approve=body.auto_approve, window_days=0,
+            window_mins=mins,
             collector_url=settings.services.get("collector").url,
         )
         run_id = str(uuid.uuid4())

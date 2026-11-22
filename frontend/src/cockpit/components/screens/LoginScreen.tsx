@@ -5,6 +5,7 @@ import { UserProfile } from '../../types';
 
 export interface LoginScreenProps {
   onLogin?: (user: UserProfile) => void;
+  onExploreCockpit?: () => void;
   onExploreDemo?: () => void;
   next?: string;
   initialMode?: 'signin' | 'signup';
@@ -12,6 +13,7 @@ export interface LoginScreenProps {
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLogin,
+  onExploreCockpit,
   onExploreDemo,
   next = '/dashboard',
   initialMode = 'signin',
@@ -19,8 +21,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
 
   // Sign In state
-  const [email, setEmail] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -42,87 +44,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotStatus, setForgotStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
-
-  const demoAccounts = [
-    {
-      name: 'System Administrator',
-      role: 'Administrator · Supabase Auth',
-      email: 'admin@cji.io',
-      username: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80',
-      status: 'In Focus' as const,
-    },
-    {
-      name: 'Elena Vance',
-      role: 'Principal Quantitative Strategist',
-      email: 'elena.vance@atelier.intelligence',
-      username: 'elena',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80',
-      status: 'In Focus' as const,
-    },
-    {
-      name: 'Marcus Kane',
-      role: 'Lead Systems Architect',
-      email: 'marcus.kane@atelier.intelligence',
-      username: 'marcus',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&h=256&q=80',
-      status: 'Available' as const,
-    },
-    {
-      name: 'Priya Patel',
-      role: 'Staff Product Researcher',
-      email: 'priya.patel@atelier.intelligence',
-      username: 'priya',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&h=256&q=80',
-      status: 'In Meeting' as const,
-    },
-  ];
-
-  const handleSelectDemo = async (account: (typeof demoAccounts)[0]) => {
-    setMode('signin');
-    setEmail(account.username || account.email);
-    setPassword('admin123');
-    setError(null);
-    setSuccessMessage(null);
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          identifier: account.username || account.email,
-          password: 'admin123',
-          next,
-        }),
-      });
-      const data = await res.json().catch(() => null);
-
-      if (res.ok && data?.ok) {
-        if (onLogin) {
-          onLogin({
-            name: account.name,
-            role: account.role,
-            avatar: account.avatar,
-            status: account.status,
-            weeklyVelocity: 94,
-            sprintTarget: 100,
-          });
-        }
-        window.location.replace(data.redirect || next || '/dashboard');
-        return;
-      }
-
-      if (data?.fieldError) {
-        setError(data.fieldError);
-        return;
-      }
-      setError('Invalid demo credentials. Please retry.');
-    } catch {
-      setError('Unable to connect to authentication server. Please verify network status.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSsoClick = async (provider: string) => {
     setError(null);
@@ -309,10 +230,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   };
 
   const handleExplore = () => {
-    if (onExploreDemo) {
+    if (onExploreCockpit) {
+      onExploreCockpit();
+    } else if (onExploreDemo) {
       onExploreDemo();
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     }
   };
 
@@ -376,49 +299,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   </span>
                   <span className="text-[10px] text-on-primary-container">PostgreSQL</span>
                 </div>
-              </div>
-            </div>
-
-            {/* One-Click Quick Demo Personas */}
-            <div className="mt-6">
-              <span className="text-[11px] font-stat uppercase tracking-wider text-on-primary-container block mb-2.5 font-semibold">
-                Quick Demo Switcher (1-Click Sign In)
-              </span>
-              <div className="space-y-2">
-                {demoAccounts.map((account) => (
-                  <button
-                    key={account.email}
-                    type="button"
-                    onClick={() => handleSelectDemo(account)}
-                    disabled={isLoading}
-                    className="w-full flex items-center justify-between p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/[0.05] transition-all text-left group cursor-pointer disabled:opacity-50"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {account.avatar ? (
-                        <img
-                          src={account.avatar}
-                          alt={account.name}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-white/20 shrink-0"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container ring-1 ring-white/20 shrink-0 flex items-center justify-center text-xs font-bold">
-                          {account.name.charAt(0) || 'D'}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <span className="text-xs font-semibold text-white block leading-tight truncate group-hover:text-secondary-container transition-colors">
-                          {account.name}
-                        </span>
-                        <span className="text-[10px] text-on-primary-container truncate block">
-                          {account.role}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="material-symbols-outlined text-[16px] text-on-primary-container group-hover:text-white transition-transform group-hover:translate-x-0.5">
-                      arrow_forward
-                    </span>
-                  </button>
-                ))}
               </div>
             </div>
           </div>
@@ -880,7 +760,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               onClick={handleExplore}
               className="text-secondary font-semibold hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>Explore Public Preview Demo</span>
+              <span>Explore Platform Overview</span>
               <span className="material-symbols-outlined text-[14px]">north_east</span>
             </button>
           </div>

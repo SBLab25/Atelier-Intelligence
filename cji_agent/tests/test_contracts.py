@@ -208,14 +208,36 @@ def test_journey_data_and_friction_outputs_match_contracts(monkeypatch):
     from cji.domain.metrics import FRICTION_SCORES, FUNNEL_RESULT, STEP_METRICS_LIST
     from cji.mcp_servers import journey_data_server as j
     from cji.mcp_servers.friction_engine_server import score_all_steps
+    from cji.repositories import use_repository
 
-    # Demo is the configured mode in tests; the repository is chosen from settings (Spec 05).
+    sample_metrics = [
+        {"step_id": step, "unique_users": 100, "completion_rate_pct": 80.0, "abandon_rate_pct": 10.0,
+         "error_rate_pct": 5.0, "avg_dwell_ms": 15000.0, "avg_rage_clicks": 0.05, "avg_retries": 0.1}
+        for step in JOURNEY_CONFIG["steps"]
+    ]
+    sample_funnel = [
+        {"step_id": step, "users": 100 - i * 10, "drop_off_pct": 10.0}
+        for i, step in enumerate(JOURNEY_CONFIG["steps"])
+    ]
+
+    class ContractRepo:
+        mode = "realtime"
+        data_source = "live_events"
+        def health(self): pass
+        def window_fields(self, window): return None, 60
+        def step_metrics(self, j_id, window, **kw): return sample_metrics
+        def funnel(self, j_id, steps, window, **kw): return sample_funnel
+        def events(self, j_id, limit, step_id, event_type, **kw): return []
+        def live_snapshot(self, minutes): pass
+        def close(self): pass
+
     monkeypatch.setattr(j, "JOURNEY_CONFIG", {"name": "user_onboarding", "steps": JOURNEY_CONFIG["steps"]})
-    metrics = run(j.get_step_metrics())["step_metrics"]
-    assert len(metrics) == 8
-    STEP_METRICS_LIST.validate_python(metrics)
-    FUNNEL_RESULT.validate_python(run(j.get_funnel_dropoff()))
-    FRICTION_SCORES.validate_python(score_all_steps(metrics)["scores"])
+    with use_repository(ContractRepo()):
+        metrics = run(j.get_step_metrics())["step_metrics"]
+        assert len(metrics) == 8
+        STEP_METRICS_LIST.validate_python(metrics)
+        FUNNEL_RESULT.validate_python(run(j.get_funnel_dropoff()))
+        FRICTION_SCORES.validate_python(score_all_steps(metrics)["scores"])
 
 
 def test_validator_and_fallback_outputs_are_insight_drafts():

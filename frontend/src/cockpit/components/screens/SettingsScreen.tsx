@@ -79,7 +79,7 @@ export const LLM_PROVIDERS: {
     icon: 'bolt',
     placeholderKey: 'gsk_...',
     defaultBaseUrl: 'https://api.groq.com/openai/v1',
-    popularModels: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b', 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+    popularModels: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b', 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'deepseek-r1-distill-llama-70b'],
   },
   {
     id: 'gemini',
@@ -141,7 +141,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const [llmBaseUrl, setLlmBaseUrl] = useState<string>('https://api.anthropic.com/v1');
   const [isKeyVisible, setIsKeyVisible] = useState<boolean>(false);
   const [llmStatus, setLlmStatus] = useState<'idle' | 'saved' | 'cleared'>('idle');
-  const [workspaceDataMode, setWorkspaceDataMode] = useState<'clean' | 'demo'>('clean');
 
   // Load existing LLM configuration from localStorage
   useEffect(() => {
@@ -155,10 +154,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           if (parsed.model) setLlmModel(parsed.model);
           if (parsed.baseUrl) setLlmBaseUrl(parsed.baseUrl);
           setLlmStatus('saved');
-        }
-        const savedMode = localStorage.getItem('cji_workspace_data_mode');
-        if (savedMode === 'demo' || savedMode === 'clean') {
-          setWorkspaceDataMode(savedMode);
         }
       } catch {
         // ignore
@@ -262,21 +257,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     }
     setLlmStatus('cleared');
     setFeedback('Custom LLM configuration cleared. System will use default analysis agent.');
-    setTimeout(() => setFeedback(null), 3500);
-  };
-
-  const handleToggleWorkspaceMode = (mode: 'clean' | 'demo') => {
-    setWorkspaceDataMode(mode);
-    try {
-      localStorage.setItem('cji_workspace_data_mode', mode);
-    } catch {
-      // ignore
-    }
-    setFeedback(
-      mode === 'clean'
-        ? 'Workspace set to Clean Production Ingestion (isolated from demo data).'
-        : 'Workspace set to Demo Sandbox Mode (pre-loaded with sample events).'
-    );
     setTimeout(() => setFeedback(null), 3500);
   };
 
@@ -689,49 +669,17 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             </div>
 
             <div className="space-y-3">
-              {/* Isolation Mode Toggle */}
+              {/* Isolation Mode Card */}
               <div className="p-3.5 bg-surface-container-low rounded-2xl border border-surface-container-high space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-primary">Workspace Ingestion Scope</span>
-                  <span
-                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                      workspaceDataMode === 'clean'
-                        ? 'bg-emerald-500/15 text-emerald-800'
-                        : 'bg-secondary-container text-on-secondary-fixed'
-                    }`}
-                  >
-                    {workspaceDataMode === 'clean' ? 'Clean Live Workspace' : 'Demo Sandbox'}
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800">
+                    Production Realtime
                   </span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant leading-relaxed">
-                  {workspaceDataMode === 'clean'
-                    ? 'Isolated live ingestion: queries only show telemetry received with your account API key. No demo data is mixed in.'
-                    : 'Sandbox mode: pre-populates sample events and reports for testing and evaluation.'}
+                  Dedicated production ingestion: queries and insights strictly process live telemetry received with your account API key in real-time. Demo mode has been removed.
                 </p>
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => handleToggleWorkspaceMode('clean')}
-                    className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      workspaceDataMode === 'clean'
-                        ? 'bg-primary text-on-primary shadow-xs'
-                        : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
-                    }`}
-                  >
-                    Clean Live Workspace
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleToggleWorkspaceMode('demo')}
-                    className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      workspaceDataMode === 'demo'
-                        ? 'bg-primary text-on-primary shadow-xs'
-                        : 'bg-surface-container-high text-on-surface-variant hover:text-primary'
-                    }`}
-                  >
-                    Demo Sandbox
-                  </button>
-                </div>
               </div>
 
               {/* Active Token Details */}

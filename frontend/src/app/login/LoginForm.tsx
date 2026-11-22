@@ -17,17 +17,6 @@ export function LoginForm({ next }: { readonly next: string }) {
 
   const errorId = "auth-error";
 
-  function handleQuickFill(user: "admin" | "operator") {
-    if (user === "admin") {
-      setIdentifier("admin");
-      setPassword("admin123");
-    } else {
-      setIdentifier("operator");
-      setPassword("operator123");
-    }
-    setState(INITIAL);
-  }
-
   async function handleFormAction(formData: FormData) {
     setState(INITIAL);
     const result = await signIn(INITIAL, formData);
@@ -191,7 +180,7 @@ export function LoginForm({ next }: { readonly next: string }) {
               onChange={(e) => setIdentifier(e.target.value)}
               aria-invalid={Boolean(state.fieldError)}
               aria-describedby={state.fieldError ? errorId : undefined}
-              placeholder={isSignUp ? "e.g. elena or elena@cji.io" : "admin or admin@cji.io"}
+              placeholder={isSignUp ? "e.g. alex@example.com" : "username or email"}
               className="w-full bg-surface-container-lowest border border-surface-container-high focus:border-primary focus:ring-1 focus:ring-primary rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-outline/60 outline-none transition-all font-mono"
               required
             />
@@ -260,34 +249,6 @@ export function LoginForm({ next }: { readonly next: string }) {
             <span>{isSignUp ? "Create Supabase Account" : "Sign in with Supabase"}</span>
           </button>
         </form>
-
-        {/* Quick Fill Demo Badges */}
-        {!isSignUp && (
-          <div className="bg-surface-container-low border border-surface-container-high rounded-2xl p-3.5 space-y-2">
-            <div className="flex items-center justify-between text-xs text-on-surface-variant font-medium">
-              <span>Quick Fill Credentials:</span>
-              <span className="text-[10px] text-primary/80 font-mono">Supabase Auth</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickFill("admin")}
-                className="px-2.5 py-1.5 rounded-lg bg-surface-container-highest hover:bg-surface-container-high text-xs font-medium text-on-surface text-left transition-colors flex flex-col cursor-pointer border border-surface-container-high"
-              >
-                <span className="font-semibold text-primary">Admin</span>
-                <span className="text-[10px] text-on-surface-variant font-mono">admin / admin123</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("operator")}
-                className="px-2.5 py-1.5 rounded-lg bg-surface-container-highest hover:bg-surface-container-high text-xs font-medium text-on-surface text-left transition-colors flex flex-col cursor-pointer border border-surface-container-high"
-              >
-                <span className="font-semibold text-primary">Operator</span>
-                <span className="text-[10px] text-on-surface-variant font-mono">operator / operator123</span>
-              </button>
-            </div>
-          </div>
-        )}
     </div>
   );
 }

@@ -7,10 +7,9 @@ CRITICAL RULE: CJI_MODE must be set in os.environ BEFORE importing graph or
 config, because config.py reads CJI_MODE at import time.
 
 Usage:
-  cji --mode demo --generate-data
-  cji --mode demo --run
+  cji --mode realtime --run
   cji --approve --thread-id {UUID}
-  cji --mode demo --run --auto-approve
+  cji --mode realtime --run --auto-approve
   cji --resume --thread-id {UUID}
   cji --status --thread-id {UUID}
 """
@@ -35,9 +34,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  cji --mode demo --generate-data
-  cji --mode demo --run
-  cji --mode demo --run --auto-approve
+  cji --mode realtime --run
+  cji --mode realtime --run --auto-approve
   cji --approve --thread-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   cji --resume --thread-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   cji --status --thread-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -46,26 +44,9 @@ Examples:
     )
     parser.add_argument(
         "--mode",
-        choices=["demo", "realtime"],
-        default=None,
-        help="Override CJI_MODE env var. Must be set before --run.",
-    )
-    parser.add_argument(
-        "--generate-data",
-        action="store_true",
-        help="Generate synthetic demo data to data/events.parquet (demo mode only).",
-    )
-    parser.add_argument(
-        "--sessions",
-        type=int,
-        default=2000,
-        help="Number of user sessions for --generate-data (default: 2000).",
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="Random seed for --generate-data (default: 42).",
+        choices=["realtime"],
+        default="realtime",
+        help="CJI operational mode (realtime).",
     )
     parser.add_argument(
         "--ingest",
@@ -120,12 +101,6 @@ Examples:
         type=int,
         default=60,
         help="Realtime analysis window in minutes (default: 60).",
-    )
-    parser.add_argument(
-        "--window-days",
-        type=int,
-        default=30,
-        help="Demo analysis window in days (default: 30).",
     )
     return parser.parse_args(argv)
 
@@ -217,7 +192,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         from cji.config import (
             CJI_MODE,
-            EVENTS_PARQUET,
             JOURNEY_CONFIG,
         )
         from cji.settings import get_settings, require
@@ -226,22 +200,6 @@ def main(argv: list[str] | None = None) -> int:
     except ConfigError as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
-
-    # ── --generate-data ───────────────────────────────────────────────────────
-    if args.generate_data:
-        if CJI_MODE != "demo":
-            print("[ERROR] --generate-data is only available in demo mode. Set CJI_MODE=demo.")
-            return 1
-        print(f"[INFO] Generating synthetic demo data ({args.sessions} sessions, seed={args.seed})...")
-        from cji.tools.synthetic_data import generate_demo_data
-        out = generate_demo_data(
-            n_sessions=args.sessions,
-            seed=args.seed,
-            output_path=EVENTS_PARQUET,
-        )
-        print(f"[OK] Data generated -> {out}")
-        if not args.run:
-            return 0
 
     # ── --run / --approve / --resume / --status (Spec 09: workflow.runtime) ────────────
     if args.run or args.approve or args.resume or args.status:
@@ -276,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
                 return await workflow.resume(args.thread_id)
             state = initial_state(
                 mode=CJI_MODE, journey_name=JOURNEY_CONFIG["name"], journey_steps=JOURNEY_CONFIG["steps"],
-                auto_approve=args.auto_approve, window_days=args.window_days, window_mins=args.window_mins,
+                auto_approve=args.auto_approve, window_mins=args.window_mins,
                 collector_url=settings.services.get("collector").url,
                 pending_files=[{"file_path": f, "source_hint": args.source_hint} for f in args.file]
                 if args.ingest else [],

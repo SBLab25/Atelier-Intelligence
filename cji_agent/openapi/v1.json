@@ -558,7 +558,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 365,
+              "maximum": 3650,
               "minimum": 1,
               "description": "Window in days (demo data)",
               "default": 30,
@@ -574,7 +574,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "maximum": 43200,
+                  "maximum": 5256000,
                   "minimum": 1
                 },
                 {
@@ -599,10 +599,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Source table: live_events, tracking_events, or all",
+              "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all",
               "title": "Table"
             },
-            "description": "Source table: live_events, tracking_events, or all"
+            "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all"
           }
         ],
         "responses": {
@@ -722,7 +722,7 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 365,
+              "maximum": 3650,
               "minimum": 1,
               "description": "Window in days (demo data)",
               "default": 30,
@@ -738,7 +738,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "maximum": 43200,
+                  "maximum": 5256000,
                   "minimum": 1
                 },
                 {
@@ -763,10 +763,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Source table: live_events, tracking_events, or all",
+              "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all",
               "title": "Table"
             },
-            "description": "Source table: live_events, tracking_events, or all"
+            "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all"
           }
         ],
         "responses": {
@@ -966,10 +966,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Source table: live_events, tracking_events, or all",
+              "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all",
               "title": "Table"
             },
-            "description": "Source table: live_events, tracking_events, or all"
+            "description": "Source table: veriscape_trial_events, live_events, tracking_events, or all"
           }
         ],
         "responses": {
@@ -3274,10 +3274,7 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "demo",
-              "realtime"
-            ],
+            "const": "realtime",
             "title": "Mode"
           }
         },
@@ -3306,10 +3303,7 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "demo",
-              "realtime"
-            ],
+            "const": "realtime",
             "title": "Mode"
           },
           "components": {
@@ -3664,10 +3658,7 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "demo",
-              "realtime"
-            ],
+            "const": "realtime",
             "title": "Mode"
           }
         },

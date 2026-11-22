@@ -74,11 +74,12 @@ def _resume(system: System, token: str, run_id: str) -> int:
 
 
 @pytest.fixture
-def system(tmp_path):
+def system(tmp_path, api_db_url):
     made: list[System] = []
 
     def make(**env: str) -> System:
-        s = System(tmp_path / f"s{len(made)}", extra_env=env)
+        merged = {"CJI_MODE": "realtime", "DATABASE_URL": api_db_url, **env}
+        s = System(tmp_path / f"s{len(made)}", extra_env=merged)
         made.append(s)
         return s
 
@@ -209,6 +210,7 @@ def test_api_death_during_a_run_is_resumable_after_restart(system):
             GROQ_API_KEY="recovery-dummy-key-0000",
             HTTPS_PROXY=proxy,
             HTTP_PROXY=proxy,
+            NO_PROXY="localhost,127.0.0.1",
             CJI_LLM_TIMEOUT_S="3",
             CJI_LLM_DEADLINE_S="5",
             CJI_LLM_RETRY_ATTEMPTS="1",

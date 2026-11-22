@@ -13,8 +13,8 @@ import pandas as pd
 import pytest
 
 from cji.repositories import (
-    DuckDbParquetRepository,
     PostgresEventRepository,
+    RepositoryError,
     use_repository,
 )
 from cji.settings import make_test_settings, override_settings
@@ -23,7 +23,6 @@ from tests.test_repositories import (
     EXPECTED_METRICS,
     STEPS,
     fixture_frame,
-    load_parquet,
 )
 
 APP_ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +34,37 @@ def run(value):
     return asyncio.run(value) if inspect.isawaitable(value) else value
 
 
+class FakeRepo:
+    mode = "realtime"
+    data_source = "live_events"
+
+    def health(self):
+        pass
+
+    def window_fields(self, window):
+        return None, 60
+
+    def step_metrics(self, j_id, window, **kw):
+        return EXPECTED_METRICS
+
+    def funnel(self, j_id, steps, window, **kw):
+        return EXPECTED_FUNNEL
+
+    def events(self, j_id, limit=100, step_id=None, event_type=None, **kw):
+        return [{"event_id": f"evt-{i}", "user_id": f"u{i}", "session_id": "s1", "journey_id": j_id, "step_id": step_id or "landing_page", "event_type": event_type or "page_view", "timestamp": "2026-04-22T14:32:00Z", "duration_ms": 1000, "url": "", "metadata": "{}"} for i in range(limit)]
+
+    def live_snapshot(self, minutes):
+        from cji.repositories.base import LiveSnapshot
+        return LiveSnapshot(steps=[{"step_id": "landing_page", "event_count": 5}], total_events=5, snapshot_at="2026-04-22T14:32:00Z")
+
+    def append_events(self, records):
+        from cji.repositories.base import WriteResult
+        return WriteResult(len(records), 0, "postgresql://tracking_events")
+
+    def close(self):
+        pass
+
+
 @pytest.fixture
 def j(monkeypatch):
     from cji.mcp_servers import journey_data_server as module
@@ -44,17 +74,16 @@ def j(monkeypatch):
 
 
 @pytest.fixture
-def demo(tmp_path):
-    repo = DuckDbParquetRepository(load_parquet(tmp_path / "events.parquet", fixture_frame()))
-    with use_repository(repo):
-        yield repo
-    repo.close()
+def repo():
+    r = FakeRepo()
+    with use_repository(r):
+        yield r
 
 
 def test_service_has_no_mode_branches():
     source = (SRC / "mcp_servers" / "journey_data_server.py").read_text(encoding="utf-8")
     names = {n.id for n in ast.walk(ast.parse(source)) if isinstance(n, ast.Name)}
-    assert "CJI_MODE" not in names          # the demo reply text still mentions it, as before
+    assert "CJI_MODE" not in names
     assert not re.search(r"""==\s*["'](demo|realtime)["']""", source)
     tree = ast.parse(source)
     imported = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
@@ -64,16 +93,10 @@ def test_service_has_no_mode_branches():
     assert not defined & {"get_from_clause", "execute_query", "execute_demo_query", "get_pg_engine", "get_demo_conn"}
 
 
-def test_system_info_shape(j, demo):
+def test_system_info_shape(j, repo):
     res = run(j.get_system_info())
-    assert set(res) == {"mode", "data_source", "duckdb_path", "journey_id", "journey_steps", "status"}
-    assert (res["status"], res["mode"], res["data_source"]) == ("ok", "demo", "parquet")
-
-
-def test_system_info_demo_missing_parquet(j, tmp_path):
-    with use_repository(DuckDbParquetRepository(tmp_path / "missing.parquet")):
-        res = run(j.get_system_info())
-    assert res == {"status": "error", "error": "events.parquet not found — run --generate-data"}
+    assert set(res) == {"mode", "data_source", "journey_id", "journey_steps", "status"}
+    assert (res["status"], res["mode"], res["data_source"]) == ("ok", "realtime", "live_events")
 
 
 def test_system_info_realtime_unreachable(j):
@@ -82,29 +105,35 @@ def test_system_info_realtime_unreachable(j):
     assert res["status"] == "error" and "pw-42-secret" not in res["error"]
 
 
-def test_step_metrics_shape(j, demo):
-    res = run(j.get_step_metrics(days_back=30))
-    assert res == {"journey_id": "user_onboarding", "window_days": 30, "window_minutes": None,
+def test_step_metrics_shape(j, repo):
+    res = run(j.get_step_metrics(minutes_back=60))
+    assert res == {"journey_id": "user_onboarding", "window_days": None, "window_minutes": 60,
                    "step_metrics": EXPECTED_METRICS, "total_steps": 3}
 
 
-def test_funnel_shape(j, demo):
+def test_funnel_shape(j, repo):
     res = run(j.get_funnel_dropoff())
     assert res == {"journey_id": "user_onboarding", "funnel": EXPECTED_FUNNEL, "overall_completion_pct": 25.0}
 
 
-def test_query_events_shape(j, demo):
+def test_query_events_shape(j, repo):
     res = run(j.query_events(limit=3, step_id="landing_page"))
     assert set(res) == {"events", "count", "step_id_filter", "event_type_filter"}
     assert res["count"] == 3 and res["step_id_filter"] == "landing_page" and res["event_type_filter"] is None
 
 
-def test_empty_store_shapes(j, tmp_path):
-    with use_repository(DuckDbParquetRepository(load_parquet(tmp_path / "e.parquet", fixture_frame([])))):
+class EmptyRepo(FakeRepo):
+    def step_metrics(self, j_id, window, **kw): return []
+    def funnel(self, j_id, steps, window, **kw): return []
+    def events(self, j_id, limit=100, step_id=None, event_type=None, **kw): return []
+
+
+def test_empty_store_shapes(j):
+    with use_repository(EmptyRepo()):
         assert run(j.get_step_metrics())["step_metrics"] == []
         assert run(j.get_funnel_dropoff()) == {"journey_id": "user_onboarding", "funnel": [],
                                                "overall_completion_pct": 100.0}
-        assert run(j.query_events())["count"] == 0
+        assert run(j.query_events(limit=0))["count"] == 0
 
 
 @pytest.mark.parametrize("call, error_keys", [
@@ -116,26 +145,32 @@ def test_empty_store_shapes(j, tmp_path):
     (lambda j: j.get_funnel_dropoff(days_back=99999), {"error", "funnel"}),
     (lambda j: j.get_live_snapshot(minutes=0), {"error"}),
 ])
-def test_invalid_arguments_are_rejected_before_any_query(j, demo, monkeypatch, call, error_keys):
+def test_invalid_arguments_are_rejected_before_any_query(j, repo, monkeypatch, call, error_keys):
     def no_query(*args, **kwargs):
         raise AssertionError("repository called with invalid arguments")
 
     for name in ("step_metrics", "funnel", "events", "live_snapshot"):
-        monkeypatch.setattr(demo, name, no_query)
+        monkeypatch.setattr(repo, name, no_query)
     res = run(call(j))
     assert set(res) == error_keys and "must be" in res["error"]
 
 
-def test_live_snapshot_in_demo_keeps_its_message(j, demo):
-    assert run(j.get_live_snapshot()) == {
-        "error": "get_live_snapshot is only available in realtime mode",
-        "mode": "demo",
-        "message": "Switch to CJI_MODE=realtime to use this tool",
-    }
+def test_live_snapshot_returns_snapshot(j, repo):
+    res = run(j.get_live_snapshot(minutes=15))
+    assert res["window_mins"] == 15 and res["total_events"] == 5 and "steps" in res
 
 
-def test_storage_failure_keeps_error_shapes(j, tmp_path):
-    with use_repository(DuckDbParquetRepository(tmp_path / "missing.parquet")):
+class FailingRepo(FakeRepo):
+    def step_metrics(self, j_id, window, **kw):
+        raise RepositoryError("step_metrics", "connection lost")
+    def funnel(self, j_id, steps, window, **kw):
+        raise RepositoryError("funnel", "connection lost")
+    def events(self, j_id, limit=100, step_id=None, event_type=None, **kw):
+        raise RepositoryError("events", "connection lost")
+
+
+def test_storage_failure_keeps_error_shapes(j):
+    with use_repository(FailingRepo()):
         assert set(run(j.get_step_metrics())) == {"error", "step_metrics", "total_steps"}
         assert set(run(j.get_funnel_dropoff())) == {"error", "funnel"}
         assert set(run(j.query_events())) == {"error", "events", "count"}
@@ -155,29 +190,14 @@ def _csv(tmp_path):
     return path, {"field_mapping": {"event_name": "event_type", "user": "user_id", "ts": "timestamp", "step": "step_id"}}
 
 
-def test_ingest_writes_through_the_repository_idempotently(tmp_path):
+def test_ingest_writes_through_the_repository(tmp_path):
     from cji.mcp_servers import ingestion_intelligence_server as ing
 
     path, mapping = _csv(tmp_path)
-    target = tmp_path / "store" / "events.parquet"
-    with override_settings(make_test_settings(tmp_path)), use_repository(DuckDbParquetRepository(target)):
-        first = ing.ingest_to_store(str(path), mapping, mode="demo")
-        second = ing.ingest_to_store(str(path), mapping, mode="demo")
-    assert first["status"] == "success" and first["records_written"] == 3 and first["records_duplicate"] == 0
-    assert second["records_written"] == 0 and second["records_duplicate"] == 3
-    assert first["destination"] == str(target)
-    assert len(pd.read_parquet(target)) == 3
-
-
-def test_ingest_refuses_a_different_mode(tmp_path):
-    from cji.mcp_servers import ingestion_intelligence_server as ing
-
-    path, mapping = _csv(tmp_path)
-    target = tmp_path / "events.parquet"
-    with override_settings(make_test_settings(tmp_path)), use_repository(DuckDbParquetRepository(target)):
-        res = ing.ingest_to_store(str(path), mapping, mode="realtime")
-    assert res["status"] == "error" and "configured for demo" in res["error"] and res["records_written"] == 0
-    assert not target.exists()
+    with override_settings(make_test_settings(tmp_path, CJI_MODE="realtime", DATABASE_URL="postgresql://u@127.0.0.1:1/x")), use_repository(FakeRepo()):
+        first = ing.ingest_to_store(str(path), mapping)
+    assert first["status"] == "success" and first["records_written"] == 3
+    assert first["destination"] == "postgresql://tracking_events"
 
 
 def test_ingest_reports_storage_failures(tmp_path):
@@ -205,23 +225,12 @@ def _fake_mcp(monkeypatch, module, responses, calls):
     monkeypatch.setattr(module, "call_tool", fake_call_tool)
 
 
-def test_data_worker_refuses_a_server_in_another_mode(monkeypatch):
+def test_data_worker_sends_window_arguments(monkeypatch):
     import cji.agents.workers as w
 
     calls = []
-    _fake_mcp(monkeypatch, w, {"get_system_info": {"status": "ok", "mode": "demo"}}, calls)
-    out = run(w.data_worker({"mode": "realtime"}))
-    assert out["event_summary"] == {} and out["worker_statuses"][0]["status"] == "error"
-    assert "demo" in out["errors"][0]["error"] and "realtime" in out["errors"][0]["error"]
-    assert [c[0] for c in calls] == ["get_system_info"]
-
-
-def test_data_worker_sends_both_window_arguments(monkeypatch):
-    import cji.agents.workers as w
-
-    calls = []
-    _fake_mcp(monkeypatch, w, {"get_system_info": {"status": "ok", "mode": "demo"}}, calls)
-    run(w.data_worker({"mode": "demo", "analysis_window_days": 7, "analysis_window_mins": 15}))
+    _fake_mcp(monkeypatch, w, {"get_system_info": {"status": "ok", "mode": "realtime"}}, calls)
+    run(w.data_worker({"mode": "realtime", "analysis_window_days": 7, "analysis_window_mins": 15}))
     sent = dict(calls)
     assert sent["get_step_metrics"] == {"days_back": 7, "minutes_back": 15}
     assert sent["get_funnel_dropoff"] == {"days_back": 7, "minutes_back": 15}

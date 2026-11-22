@@ -73,7 +73,7 @@ class PostgresEventRepository:
         try:
             with self._get_engine(operation).begin() as conn:
                 return pd.read_sql(text(sql), conn, params=params)
-        except (SQLAlchemyError, PandasDatabaseError) as exc:
+        except Exception as exc:  # broad-except: database driver or connection failure
             raise RepositoryError(operation, describe_failure(exc)) from exc
 
     def close(self) -> None:

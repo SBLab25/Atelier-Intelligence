@@ -37,16 +37,15 @@ SCRIPTS = {
     "cji-api-token": "cji.api.tokens_cli:main",
     "cji-ingest-json": "cji.tools.ingest_json:main",
     "cji-snippet": "cji.tracker.snippet_generator:main",
-    "cji-generate-diverse": "cji.tools.generate_diverse:main",
     "cji-db": "cji.ops.db_cli:main",              # Spec 15
     "cji-backup": "cji.ops.backup:main",
     "cji-ops": "cji.ops.cli:main",
     "cji-trace": "cji.ops.trace_cli:main",
 }
-LAUNCHERS = ["_cji_launcher.py", "main.py", "run_servers.py", "dashboard.py", "generate_diverse.py",
+LAUNCHERS = ["_cji_launcher.py", "main.py", "run_servers.py", "dashboard.py",
              "tools/ingest_json.py", "tracker/snippet_generator.py", "settings/__init__.py", "settings/__main__.py",
              "collector/__init__.py", "collector/api.py"]
-OLD_NAMES = {"config", "graph", "main", "state", "dashboard", "run_servers", "generate_diverse", "agents",
+OLD_NAMES = {"config", "graph", "main", "state", "dashboard", "run_servers", "agents",
              "collector", "domain", "guardrails", "integrations", "mcp_servers", "reporting", "repositories",
              "settings", "tools", "workflow", "tracker"}
 REMOVED = {"litellm", "anthropic", "langchain-community", "sentence-transformers", "torch", "transformers",
@@ -86,7 +85,13 @@ def imports(path):
 
 def child_env(tmp_path, **extra):
     env = {k: v for k, v in os.environ.items() if not k.startswith("CJI_") and k != "PYTHONPATH"}
-    env.update({"CJI_ENV": "test", "CJI_HOME": str(tmp_path), "PYTHONIOENCODING": "utf-8", **extra})
+    env.update({
+        "CJI_ENV": "test",
+        "CJI_HOME": str(tmp_path),
+        "PYTHONIOENCODING": "utf-8",
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/test_packaging",
+        **extra,
+    })
     return env
 
 
@@ -345,7 +350,7 @@ def test_console_scripts_work_outside_the_project(script, tmp_path):
     assert "usage" in out.stdout.lower()
 
 
-@pytest.mark.parametrize("command", [["main.py"], ["run_servers.py"], ["generate_diverse.py"],
+@pytest.mark.parametrize("command", [["main.py"], ["run_servers.py"],
                                      ["tools/ingest_json.py"], ["tracker/snippet_generator.py"], ["-m", "settings"]])
 def test_old_commands_still_work_from_the_project(command, tmp_path):
     out = subprocess.run([sys.executable, *command, "--help"], cwd=PROJECT, env=child_env(tmp_path),

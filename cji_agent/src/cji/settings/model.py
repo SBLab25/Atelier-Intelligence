@@ -14,9 +14,9 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 from .services import ServiceRegistry
 
 Environment = Literal["development", "test", "production"]
-Mode = Literal["demo", "realtime"]
+Mode = Literal["realtime"]
 ENVIRONMENTS: tuple[str, ...] = ("development", "test", "production")
-MODES: tuple[str, ...] = ("demo", "realtime")
+MODES: tuple[str, ...] = ("realtime",)
 
 MIN_ADMIN_KEY_LENGTH = 32
 # Admin key values that must never authenticate (shipped defaults).
@@ -40,7 +40,7 @@ class _Frozen(BaseModel):
 
 class AppSettings(_Frozen):
     env: Environment = "production"
-    mode: Mode = "demo"
+    mode: Mode = "realtime"
     journey_name: str = "user_onboarding"
 
 

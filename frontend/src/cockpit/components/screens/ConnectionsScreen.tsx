@@ -80,7 +80,7 @@ export const ConnectionsScreen: React.FC<ConnectionsScreenProps> = ({
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       return 'https://atelier-backend-jv2m.onrender.com';
     }
-    return process.env.NEXT_PUBLIC_COLLECTOR_URL || 'http://localhost:8000';
+    return 'http://localhost:8000';
   });
   const [apiKey, setApiKey] = useState<string>(
     session?.role ? `cji_live_${session.role}_key` : 'cji_live_2026_operator_key_default'

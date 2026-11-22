@@ -133,7 +133,7 @@ export function parseWindow(days: string | string[] | undefined, minutes: string
   return {};
 }
 
-/** Window choice as a plain GET form (works without JavaScript); demo data uses days, realtime data minutes. */
+/** Window choice as a plain GET form (works without JavaScript); realtime data uses minutes (or days). */
 export function WindowSelector({ journey, window }: { readonly journey: Journey; readonly window: AnalysisWindow }) {
   const realtime = journey.mode === "realtime";
   const name = realtime ? "minutes" : "days";
