@@ -61,7 +61,7 @@ const DEFAULT_SITES: ClientSite[] = [
   },
 ];
 
-type IntegrationFormat = 'html' | 'react' | 'nextjs' | 'curl';
+type IntegrationFormat = 'html' | 'react' | 'nextjs' | 'sdk' | 'curl';
 
 export interface ConnectionsScreenProps {
   user?: UserProfile | undefined;
@@ -311,6 +311,25 @@ export function CJITrackerScript() {
   );
 }`;
 
+  const npmSdkSnippet = `// 1. Install or copy the CJI Tracker module:
+// npm install @cji/tracker   (or import from '@/lib/tracker')
+
+import { initCJITracker, trackEvent, trackStep, identifyUser } from '@/lib/tracker';
+
+// 2. Initialize in your app root (e.g. App.tsx or layout.tsx):
+initCJITracker({
+  api_key: '${apiKey}',
+  journey_name: '${activeSite.journeyName}',
+  collector_url: '${collectorHost}/collect/batch',
+  auto_capture_rage_clicks: true,
+  auto_capture_errors: true,
+});
+
+// 3. Dispatch custom telemetry events anywhere in your UI:
+trackEvent('click', { button_name: 'checkout_cta' });
+trackStep('payment_selection');
+identifyUser('user-12345', { tier: 'enterprise' });`;
+
   const curlSnippet = `# Send a test batch directly to the CJI Collector API
 curl -X POST "${collectorHost}/collect/batch" \\
   -H "Content-Type: application/json" \\
@@ -340,6 +359,8 @@ curl -X POST "${collectorHost}/collect/batch" \\
       ? reactHookSnippet
       : format === 'nextjs'
       ? nextjsSnippet
+      : format === 'sdk'
+      ? npmSdkSnippet
       : curlSnippet;
 
   const handleCopy = () => {
@@ -882,11 +903,12 @@ curl -X POST "${collectorHost}/collect/batch" \\
             </div>
 
             {/* Framework Format Tabs */}
-            <div className="flex items-center gap-1 border-b border-surface-container-high pb-2">
+            <div className="flex items-center gap-1 border-b border-surface-container-high pb-2 overflow-x-auto">
               {[
                 { id: 'html' as IntegrationFormat, label: 'HTML Embed Snippet', icon: 'html' },
                 { id: 'react' as IntegrationFormat, label: 'React Hook', icon: 'code' },
                 { id: 'nextjs' as IntegrationFormat, label: 'Next.js App Script', icon: 'layers' },
+                { id: 'sdk' as IntegrationFormat, label: 'TypeScript / NPM SDK', icon: 'package_2' },
                 { id: 'curl' as IntegrationFormat, label: 'cURL / REST API', icon: 'terminal' },
               ].map((tab) => (
                 <button

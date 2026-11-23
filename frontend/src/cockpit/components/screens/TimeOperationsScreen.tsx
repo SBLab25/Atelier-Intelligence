@@ -1,273 +1,553 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Clock, DollarSign, Trash2, Plus } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Activity,
+  Radio,
+  Zap,
+  AlertCircle,
+  Clock,
+  Filter,
+  RefreshCw,
+  Play,
+  Pause,
+  Download,
+  Flame,
+  CheckCircle2,
+  Layers
+} from 'lucide-react';
 import { Task, TimeLog } from '../../types';
-import { formatDuration, formatHoursMinutes } from '../../utils/bentoMetrics';
-import { TimeTrackerDial } from '../bento/TimeTrackerDial';
 
-interface TimeOperationsScreenProps {
-  tasks: Task[];
-  activeTaskId: string;
-  onSelectTask: (taskId: string) => void;
-  timeLogs: TimeLog[];
-  onLogTime: (taskId: string, durationSeconds: number) => void;
-  onDeleteLog: (logId: string) => void;
+export interface TelemetryStreamEvent {
+  event_id: string;
+  timestamp: string;
+  journey_id?: string | null;
+  step_id?: string | null;
+  event_type: string | null;
+  user_id?: string | null;
+  session_id?: string | null;
+  duration_ms?: number | null;
+  url?: string | null;
 }
 
-export const TimeOperationsScreen: React.FC<TimeOperationsScreenProps> = ({
-  tasks,
-  activeTaskId,
-  onSelectTask,
-  timeLogs,
-  onLogTime,
-  onDeleteLog,
-}) => {
-  const [filterProject, setFilterProject] = useState<string>('all');
-  const [manualMinutes, setManualMinutes] = useState<string>('30');
-  const [manualNote, setManualNote] = useState<string>('');
+export interface StepDwellStat {
+  step_id: string;
+  avg_dwell_ms: number;
+  unique_users: number;
+  avg_rage_clicks: number;
+  error_rate_pct: number;
+  abandon_rate_pct: number;
+}
 
-  const fallbackTask: Task = {
-    id: 't-1',
-    title: 'Deliverable',
-    category: 'core',
-    priority: 'medium',
-    status: 'todo',
-    completed: false,
-    estimatedMinutes: 60,
-    spentMinutes: 0,
-    assignee: { name: 'Operator', avatar: '' },
-    dueDate: 'Next Sprint',
+export interface TimeOperationsScreenProps {
+  tasks?: Task[];
+  activeTaskId?: string;
+  onSelectTask?: (taskId: string) => void;
+  timeLogs?: TimeLog[];
+  onLogTime?: (taskId: string, durationSeconds: number) => void;
+  onDeleteLog?: (logId: string) => void;
+}
+
+export const TimeOperationsScreen: React.FC<TimeOperationsScreenProps> = () => {
+  const [isStreaming, setIsStreaming] = useState<boolean>(true);
+  const [streamStatus, setStreamStatus] = useState<'connected' | 'polling' | 'disconnected'>('connected');
+  const [selectedJourney, setSelectedJourney] = useState<string>('all');
+  const [selectedEventType, setSelectedEventType] = useState<string>('all');
+  const [events, setEvents] = useState<TelemetryStreamEvent[]>([]);
+  const [stepDwells, setStepDwells] = useState<StepDwellStat[]>([]);
+  const [totalWindowEvents, setTotalWindowEvents] = useState<number>(0);
+  const [availableJourneys, setAvailableJourneys] = useState<string[]>(['all']);
+  const [lastHeartbeat, setLastHeartbeat] = useState<string>('Just now');
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Initial load of telemetry & dwell metrics
+  const fetchSnapshot = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const journeyParam = selectedJourney !== 'all' ? `&journey_id=${encodeURIComponent(selectedJourney)}` : '';
+      const res = await fetch(`/api/analytics?minutes=60${journeyParam}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.events)) {
+          setEvents((prev) => {
+            const combined = [...data.events, ...prev];
+            const seen = new Set<string>();
+            return combined.filter((e) => {
+              if (seen.has(e.event_id)) return false;
+              seen.add(e.event_id);
+              return true;
+            }).slice(0, 100);
+          });
+        }
+        if (data.metrics?.steps && Array.isArray(data.metrics.steps)) {
+          setStepDwells(data.metrics.steps);
+        }
+        if (data.totalEventsInWindow !== undefined) {
+          setTotalWindowEvents(data.totalEventsInWindow);
+        }
+        if (Array.isArray(data.availableJourneys)) {
+          setAvailableJourneys(['all', ...data.availableJourneys.filter((j: string) => j !== 'all')]);
+        }
+        setLastHeartbeat(new Date().toLocaleTimeString());
+      }
+    } catch (err) {
+      console.warn('Analytics snapshot error:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [selectedJourney]);
+
+  // Connect SSE Stream
+  useEffect(() => {
+    fetchSnapshot();
+
+    if (!isStreaming) {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      setStreamStatus('disconnected');
+      return;
+    }
+
+    const sseUrl = new URL('/api/analytics/stream', window.location.origin);
+    if (selectedJourney && selectedJourney !== 'all') {
+      sseUrl.searchParams.set('journey_id', selectedJourney);
+    }
+    if (selectedEventType && selectedEventType !== 'all') {
+      sseUrl.searchParams.set('event_type', selectedEventType);
+    }
+
+    const es = new EventSource(sseUrl.toString());
+    eventSourceRef.current = es;
+
+    es.onopen = () => {
+      setStreamStatus('connected');
+    };
+
+    es.addEventListener('telemetry', (e: MessageEvent) => {
+      try {
+        const newEvent: TelemetryStreamEvent = JSON.parse(e.data);
+        setEvents((prev) => [newEvent, ...prev.slice(0, 99)]);
+        setTotalWindowEvents((count) => count + 1);
+        setLastHeartbeat(new Date().toLocaleTimeString());
+      } catch {
+        // ignore parse error
+      }
+    });
+
+    es.onerror = () => {
+      setStreamStatus('polling');
+      es.close();
+      eventSourceRef.current = null;
+    };
+
+    return () => {
+      es.close();
+      eventSourceRef.current = null;
+    };
+  }, [isStreaming, selectedJourney, selectedEventType, fetchSnapshot]);
+
+  // Fallback Polling when SSE is not actively streaming
+  useEffect(() => {
+    if (streamStatus !== 'polling' || !isStreaming) return;
+
+    const interval = setInterval(() => {
+      fetchSnapshot();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [streamStatus, isStreaming, fetchSnapshot]);
+
+  // Filtered view
+  const filteredEvents = events.filter((ev) => {
+    if (selectedJourney !== 'all' && ev.journey_id && ev.journey_id !== selectedJourney) {
+      return false;
+    }
+    if (selectedEventType !== 'all' && ev.event_type !== selectedEventType) {
+      return false;
+    }
+    return true;
+  });
+
+  // Calculate dwell summaries
+  const totalRageClicks = events.filter((e) => e.event_type === 'rage_click').length;
+  const totalErrors = events.filter((e) => e.event_type === 'error').length;
+  const avgDwellSeconds =
+    stepDwells.length > 0
+      ? (stepDwells.reduce((acc, s) => acc + (s.avg_dwell_ms || 0), 0) / stepDwells.length / 1000).toFixed(1)
+      : '0.0';
+
+  const handleExportEvents = () => {
+    const jsonStr = JSON.stringify(filteredEvents, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cji_telemetry_stream_${new Date().toISOString().slice(0, 19)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
-  const activeTask = tasks.find((t) => t.id === activeTaskId) ?? tasks[0] ?? fallbackTask;
 
-  const totalLoggedSeconds = timeLogs.reduce((acc, log) => acc + log.durationSeconds, 0);
-  const billableSeconds = timeLogs
-    .filter((l) => l.billable)
-    .reduce((acc, l) => acc + l.durationSeconds, 0);
-
-  const handleManualAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    const mins = parseInt(manualMinutes, 10);
-    if (!isNaN(mins) && mins > 0 && activeTask) {
-      onLogTime(activeTask.id, mins * 60);
-      setManualNote('');
+  const getBadgeStyle = (eventType: string | null) => {
+    switch (eventType) {
+      case 'rage_click':
+        return 'bg-red-500/15 text-red-700 border-red-500/30';
+      case 'error':
+        return 'bg-amber-500/15 text-amber-800 border-amber-500/30';
+      case 'abandon':
+        return 'bg-orange-500/15 text-orange-800 border-orange-500/30';
+      case 'step_complete':
+        return 'bg-emerald-500/15 text-emerald-800 border-emerald-500/30';
+      default:
+        return 'bg-blue-500/15 text-blue-800 border-blue-500/30';
     }
   };
-
-  const filteredLogs = filterProject === 'all'
-    ? timeLogs
-    : timeLogs.filter((l) => l.project.toLowerCase().includes(filterProject.toLowerCase()));
 
   return (
     <div className="space-y-6">
       {/* Screen Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-white rounded-[28px] border border-[#ECE7E1] shadow-[0_12px_28px_-8px_rgba(180,160,140,0.14)]">
         <div>
-          <span className="font-stat text-[11px] uppercase tracking-wider text-[#6E6B68] bg-[#F3EFEA] px-2.5 py-0.5 rounded-full">
-            Time & Operations Cockpit
-          </span>
-          <h2 className="text-2xl font-bold tracking-tight text-[#1E1E22] mt-1">
-            Precision Time Operations
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="font-stat text-[11px] uppercase tracking-wider text-[#6E6B68] bg-[#F3EFEA] px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <Radio className={`w-3 h-3 ${isStreaming ? 'text-emerald-600 animate-pulse' : 'text-slate-400'}`} />
+              Telemetry Operations
+            </span>
+            <span
+              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                streamStatus === 'connected'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : streamStatus === 'polling'
+                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                  : 'bg-slate-100 text-slate-600 border-slate-200'
+              }`}
+            >
+              {streamStatus === 'connected'
+                ? 'SSE Live Stream Connected'
+                : streamStatus === 'polling'
+                ? 'Polling Fallback (5s)'
+                : 'Stream Paused'}
+            </span>
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-[#1E1E22]">
+            Realtime Telemetry & Dwell Operations
           </h2>
-          <p className="text-xs text-[#6E6B68]">
-            High-cadence session tracker, billable allocation meters, and audit trails.
+          <p className="text-xs text-[#6E6B68] mt-0.5">
+            Live ingestion pulse, customer dwell latency distributions, and active friction event ledger.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="bg-[#FAF8F5] border border-[#E8E3DC] px-4 py-2 rounded-2xl text-right">
+        {/* Global Controls & Metric Pills */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="bg-[#FAF8F5] border border-[#E8E3DC] px-3.5 py-2 rounded-2xl text-right min-w-[100px]">
             <span className="text-[10px] font-stat uppercase text-[#6E6B68] block">
-              Total Recorded
+              Events In Window
             </span>
-            <span className="font-stat text-xl font-bold text-[#1E1E22] tabular-nums">
-              {formatHoursMinutes(Math.round(totalLoggedSeconds / 60))}
+            <span className="font-stat text-lg font-bold text-[#1E1E22] tabular-nums">
+              {totalWindowEvents.toLocaleString()}
             </span>
           </div>
 
-          <div className="bg-[#FAF8F5] border border-[#E8E3DC] px-4 py-2 rounded-2xl text-right">
+          <div className="bg-[#FAF8F5] border border-[#E8E3DC] px-3.5 py-2 rounded-2xl text-right min-w-[90px]">
             <span className="text-[10px] font-stat uppercase text-[#6E6B68] block">
-              Billable Ratio
+              Avg Dwell
             </span>
-            <span className="font-stat text-xl font-bold text-[#F4B33E] tabular-nums">
-              {totalLoggedSeconds > 0 ? Math.round((billableSeconds / totalLoggedSeconds) * 100) : 0}%
+            <span className="font-stat text-lg font-bold text-[#1E1E22] tabular-nums">
+              {avgDwellSeconds}s
             </span>
           </div>
-        </div>
-      </div>
 
-      {/* Main Grid: Interactive Dial & Quick Log Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Flagship Dial Module (6 cols) */}
-        <div className="lg:col-span-6 flex flex-col">
-          <TimeTrackerDial
-            tasks={tasks}
-            activeTaskId={activeTaskId}
-            onSelectTask={onSelectTask}
-            onLogTime={onLogTime}
-          />
-        </div>
-
-        {/* Manual Time Entry & Settings Card (6 cols) */}
-        <div className="lg:col-span-6 bento-card p-6 bg-white flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F4B33E]" />
-              <h3 className="text-base font-semibold text-[#1E1E22]">
-                Manual Time Adjustment & Session Metadata
-              </h3>
-            </div>
-            <p className="text-xs text-[#6E6B68]">
-              Log completed off-dial sessions or review meetings with client tags.
-            </p>
-
-            <form onSubmit={handleManualAdd} className="mt-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#1E1E22] mb-1">
-                  Target Sprint Deliverable
-                </label>
-                <div className="bg-[#F3EFEA] rounded-xl p-2.5 border border-[#E8E3DC]">
-                  <span className="text-xs font-medium text-[#1E1E22]">
-                    {activeTask.title}
-                  </span>
-                  <div className="flex items-center gap-2 mt-1 text-[10px] font-stat text-[#6E6B68]">
-                    <span>Category: {activeTask.category}</span>
-                    <span>•</span>
-                    <span>Spent: {activeTask.spentMinutes}m / {activeTask.estimatedMinutes}m</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-[#1E1E22] mb-1">
-                    Duration (Minutes)
-                  </label>
-                  <input
-                    type="number"
-                    min="5"
-                    max="600"
-                    step="5"
-                    value={manualMinutes}
-                    onChange={(e) => setManualMinutes(e.target.value)}
-                    className="w-full bg-[#F3EFEA] border border-[#E8E3DC] rounded-xl px-3 py-2 text-xs font-stat font-medium text-[#1E1E22] focus:outline-none focus:ring-2 focus:ring-[#F4B33E]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#1E1E22] mb-1">
-                    Billing Status
-                  </label>
-                  <div className="flex items-center gap-2 bg-[#F3EFEA] border border-[#E8E3DC] rounded-xl px-3 py-2 text-xs text-[#1E1E22]">
-                    <DollarSign className="w-4 h-4 text-[#449E74]" />
-                    <span className="font-medium">Client Billable</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#1E1E22] mb-1">
-                  Session Notes & Context
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Tactile ergonomics audit notes..."
-                  value={manualNote}
-                  onChange={(e) => setManualNote(e.target.value)}
-                  className="w-full bg-[#F3EFEA] border border-[#E8E3DC] rounded-xl px-3 py-2 text-xs text-[#1E1E22] placeholder:text-[#6E6B68] focus:outline-none focus:ring-2 focus:ring-[#F4B33E]"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-[#1E1E22] hover:bg-[#2E2E34] text-white py-2.5 px-4 rounded-full text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Log Session to Sprint</span>
-              </button>
-            </form>
+          <div className="bg-[#FAF8F5] border border-[#E8E3DC] px-3.5 py-2 rounded-2xl text-right min-w-[80px]">
+            <span className="text-[10px] font-stat uppercase text-[#6E6B68] block">
+              Rage Clicks
+            </span>
+            <span className="font-stat text-lg font-bold text-red-600 tabular-nums">
+              {totalRageClicks}
+            </span>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#E8E3DC] flex items-center justify-between text-xs text-[#6E6B68]">
-            <span>Active Sprint Target: 40h/week</span>
-            <span className="font-stat font-medium text-[#449E74]">On Track</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Session History Audit Ledger */}
-      <div className="bento-card p-6 bg-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div>
-            <h3 className="text-base font-semibold text-[#1E1E22]">
-              Recorded Sessions Ledger
-            </h3>
-            <p className="text-xs text-[#6E6B68]">
-              Verified time intervals logged into sprint telemetries
-            </p>
-          </div>
-
-          {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 bg-[#F3EFEA] p-1 rounded-full border border-[#E8E3DC]">
-            {['all', 'Aura', 'Warm Tactile', 'Typography'].map((proj) => (
-              <button
-                key={proj}
-                onClick={() => setFilterProject(proj)}
-                className={`px-3 py-1 rounded-full text-xs font-stat capitalize transition-all ${
-                  filterProject === proj
-                    ? 'bg-[#1E1E22] text-white shadow-xs'
-                    : 'text-[#6E6B68] hover:text-[#1E1E22]'
-                }`}
-              >
-                {proj}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2.5">
-          {filteredLogs.map((log) => (
-            <div
-              key={log.id}
-              className="flex items-center justify-between p-3 rounded-2xl bg-[#FAF8F5] border border-[#E8E3DC] hover:border-[#C8C5CB] transition-colors"
+          <div className="flex items-center gap-1.5 ml-1">
+            <button
+              onClick={() => setIsStreaming((prev) => !prev)}
+              className={`p-2.5 rounded-2xl border transition-all cursor-pointer ${
+                isStreaming
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+              }`}
+              title={isStreaming ? 'Pause Realtime Stream' : 'Resume Realtime Stream'}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#F3EFEA] flex items-center justify-center text-[#F4B33E]">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold text-[#1E1E22]">
-                    {log.taskTitle}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-[#6E6B68]">
-                    <span className="font-medium text-[#1E1E22] bg-[#F3EFEA] px-2 py-0.2 rounded-full text-[10px]">
-                      {log.project}
+              {isStreaming ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </button>
+
+            <button
+              onClick={fetchSnapshot}
+              disabled={isRefreshing}
+              className="p-2.5 rounded-2xl border border-[#E8E3DC] bg-white hover:bg-[#FAF8F5] text-slate-700 transition-all cursor-pointer disabled:opacity-50"
+              title="Manual Refresh"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Grid: Live Ingestion Stream (8 cols) & Step Dwell Diagnostics (4 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Live Event Stream Terminal (8 cols) */}
+        <div className="lg:col-span-8 bg-white rounded-[28px] border border-[#ECE7E1] p-6 shadow-[0_12px_28px_-8px_rgba(180,160,140,0.14)] space-y-4">
+          {/* Stream Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#ECE7E1]">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-bold text-[#1E1E22]">Live Event Stream</h3>
+              <span className="text-[11px] font-mono text-[#6E6B68]">
+                ({filteredEvents.length} buffer)
+              </span>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Journey filter */}
+              <div className="flex items-center gap-1 bg-[#FAF8F5] border border-[#E8E3DC] rounded-xl px-2 py-1 text-xs">
+                <Layers className="w-3.5 h-3.5 text-[#6E6B68]" />
+                <select
+                  value={selectedJourney}
+                  onChange={(e) => setSelectedJourney(e.target.value)}
+                  className="bg-transparent text-xs text-[#1E1E22] font-semibold focus:outline-none cursor-pointer"
+                >
+                  {availableJourneys.map((j) => (
+                    <option key={j} value={j}>
+                      {j === 'all' ? 'All Journeys' : j}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Event Type filter */}
+              <div className="flex items-center gap-1 bg-[#FAF8F5] border border-[#E8E3DC] rounded-xl px-2 py-1 text-xs">
+                <Filter className="w-3.5 h-3.5 text-[#6E6B68]" />
+                <select
+                  value={selectedEventType}
+                  onChange={(e) => setSelectedEventType(e.target.value)}
+                  className="bg-transparent text-xs text-[#1E1E22] font-semibold focus:outline-none cursor-pointer"
+                >
+                  <option value="all">All Event Types</option>
+                  <option value="page_view">page_view</option>
+                  <option value="click">click</option>
+                  <option value="rage_click">rage_click</option>
+                  <option value="error">error</option>
+                  <option value="abandon">abandon</option>
+                  <option value="step_complete">step_complete</option>
+                </select>
+              </div>
+
+              {/* Export JSON */}
+              <button
+                onClick={handleExportEvents}
+                className="flex items-center gap-1 bg-[#FAF8F5] hover:bg-[#F3EFEA] border border-[#E8E3DC] rounded-xl px-2.5 py-1 text-xs font-semibold text-[#1E1E22] transition-colors cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-[#6E6B68]" />
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Event Stream List */}
+          <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+            {filteredEvents.length === 0 ? (
+              <div className="text-center py-16 bg-[#FAF8F5] rounded-2xl border border-dashed border-[#E8E3DC]">
+                <Activity className="w-8 h-8 text-[#A8A49E] mx-auto mb-2 animate-pulse" />
+                <p className="text-xs font-semibold text-[#1E1E22]">Awaiting incoming telemetry events...</p>
+                <p className="text-[11px] text-[#6E6B68] mt-1">
+                  Events sent to the collector will stream here live via SSE.
+                </p>
+              </div>
+            ) : (
+              filteredEvents.map((ev, idx) => (
+                <div
+                  key={`${ev.event_id}-${idx}`}
+                  className="p-3 bg-[#FAF8F5] hover:bg-white rounded-2xl border border-[#ECE7E1] hover:border-[#D5D0C9] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                >
+                  <div className="flex items-start sm:items-center gap-3 min-w-0">
+                    <span
+                      className={`text-[10px] font-bold uppercase font-mono px-2 py-0.5 rounded-lg border whitespace-nowrap ${getBadgeStyle(
+                        ev.event_type
+                      )}`}
+                    >
+                      {ev.event_type || 'event'}
                     </span>
-                    <span>•</span>
-                    <span className="font-stat">{log.timestamp}</span>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-bold text-[#1E1E22]">
+                          {ev.step_id || 'unassigned_step'}
+                        </span>
+                        {ev.journey_id && (
+                          <span className="text-[10px] font-medium text-[#6E6B68] bg-[#F3EFEA] px-1.5 py-0.2 rounded-md">
+                            {ev.journey_id}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-0.5 text-[11px] font-mono text-[#6E6B68] truncate">
+                        <span>User: {ev.user_id ? String(ev.user_id).slice(0, 12) : 'anon'}</span>
+                        <span>•</span>
+                        <span>Session: {ev.session_id ? String(ev.session_id).slice(0, 10) : 'n/a'}</span>
+                        {ev.url && (
+                          <>
+                            <span>•</span>
+                            <span className="truncate max-w-[180px]">{ev.url}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 sm:text-right shrink-0">
+                    {ev.duration_ms !== null && ev.duration_ms !== undefined && ev.duration_ms > 0 && (
+                      <div className="text-right">
+                        <span className="text-[10px] font-mono text-[#6E6B68] block">Dwell</span>
+                        <span className="text-xs font-bold font-mono text-[#1E1E22]">
+                          {(ev.duration_ms / 1000).toFixed(1)}s
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-[10px] font-mono text-[#A8A49E]">
+                      {ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : 'now'}
+                    </span>
                   </div>
                 </div>
+              ))
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-[#ECE7E1] flex items-center justify-between text-[11px] text-[#6E6B68]">
+            <span>Collector SSE Protocol (Keepalive: 15s)</span>
+            <span className="font-mono text-[10px]">Heartbeat: {lastHeartbeat}</span>
+          </div>
+        </div>
+
+        {/* Right Column: Step Dwell & Latency Breakdown (4 cols) */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Step Dwell Times Card */}
+          <div className="bg-white rounded-[28px] border border-[#ECE7E1] p-6 shadow-[0_12px_28px_-8px_rgba(180,160,140,0.14)] space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-bold text-[#1E1E22]">Step Dwell Latency</h3>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Live Stats
+              </span>
+            </div>
+
+            <p className="text-xs text-[#6E6B68]">
+              Average time spent by visitors on each funnel stage before progressing or abandoning.
+            </p>
+
+            <div className="space-y-3 pt-1">
+              {stepDwells.length === 0 ? (
+                <div className="text-center py-8 text-xs text-[#6E6B68]">
+                  No step dwell metrics available for the current window.
+                </div>
+              ) : (
+                stepDwells.map((s) => {
+                  const dwellSec = (s.avg_dwell_ms / 1000).toFixed(1);
+                  const isHighDwell = s.avg_dwell_ms > 45000;
+                  return (
+                    <div
+                      key={s.step_id}
+                      className="p-3 bg-[#FAF8F5] rounded-2xl border border-[#ECE7E1] space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-[#1E1E22] truncate max-w-[180px]">
+                          {s.step_id}
+                        </span>
+                        <span
+                          className={`font-mono font-bold text-xs ${
+                            isHighDwell ? 'text-amber-700' : 'text-[#1E1E22]'
+                          }`}
+                        >
+                          {dwellSec}s avg
+                        </span>
+                      </div>
+
+                      {/* Mini bar indicator */}
+                      <div className="w-full bg-[#E8E3DC] h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isHighDwell ? 'bg-amber-500' : 'bg-primary'
+                          }`}
+                          style={{
+                            width: `${Math.min(100, Math.max(8, (s.avg_dwell_ms / 60000) * 100))}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px] text-[#6E6B68] pt-0.5">
+                        <span>{s.unique_users.toLocaleString()} users</span>
+                        <span>Dropoff: {s.abandon_rate_pct.toFixed(0)}%</span>
+                        {s.avg_rage_clicks > 0 && (
+                          <span className="text-red-600 font-semibold flex items-center gap-0.5">
+                            <Flame className="w-2.5 h-2.5" />
+                            {s.avg_rage_clicks} rage
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Friction & Rage Radar */}
+          <div className="bg-white rounded-[28px] border border-[#ECE7E1] p-6 shadow-[0_12px_28px_-8px_rgba(180,160,140,0.14)] space-y-4">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-600" />
+              <h3 className="text-sm font-bold text-[#1E1E22]">Active Friction Radar</h3>
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="p-3 bg-red-50/60 rounded-2xl border border-red-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Flame className="w-4 h-4 text-red-600" />
+                  <div>
+                    <span className="text-xs font-bold text-red-900 block">Rage Click Incidents</span>
+                    <span className="text-[10px] text-red-700">Rapid clicks within &lt;500ms</span>
+                  </div>
+                </div>
+                <span className="text-base font-bold font-mono text-red-700">{totalRageClicks}</span>
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <span className="font-stat text-sm font-bold text-[#1E1E22] block">
-                    {formatDuration(log.durationSeconds)}
-                  </span>
-                  <span className="text-[10px] font-stat text-[#449E74] block">
-                    {log.billable ? 'Billable' : 'Internal'}
-                  </span>
+              <div className="p-3 bg-amber-50/60 rounded-2xl border border-amber-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-amber-600" />
+                  <div>
+                    <span className="text-xs font-bold text-amber-900 block">Logged Errors</span>
+                    <span className="text-[10px] text-amber-700">Client script & API failures</span>
+                  </div>
                 </div>
+                <span className="text-base font-bold font-mono text-amber-700">{totalErrors}</span>
+              </div>
 
-                <button
-                  onClick={() => onDeleteLog(log.id)}
-                  className="w-8 h-8 rounded-full bg-white hover:bg-[#F06A42]/10 text-[#6E6B68] hover:text-[#F06A42] flex items-center justify-center transition-colors border border-[#E8E3DC]"
-                  aria-label="Delete time log entry"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+              <div className="p-3 bg-emerald-50/60 rounded-2xl border border-emerald-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <div>
+                    <span className="text-xs font-bold text-emerald-900 block">Pipeline Health</span>
+                    <span className="text-[10px] text-emerald-700">Ingestion collector status</span>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-emerald-800">Operational</span>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
