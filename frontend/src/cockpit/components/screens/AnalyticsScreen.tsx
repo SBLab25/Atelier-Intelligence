@@ -94,6 +94,132 @@ function formatWindowLabel(minutes: number): string {
   return `${Math.round(minutes / 1440)}d`;
 }
 
+export interface AgentWorkerStep {
+  status?: string | null;
+  attempts?: number | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  code?: string | null;
+}
+
+export interface BackendRunSummary {
+  run_id: string;
+  journey_id: string;
+  mode: string;
+  status: "running" | "awaiting_approval" | "approved" | "completed" | "failed";
+  created_at: string;
+  updated_at: string;
+  report_id: string | null;
+}
+
+export interface BackendRunDetail extends BackendRunSummary {
+  human_approved: boolean;
+  active: boolean;
+  steps: Record<string, AgentWorkerStep>;
+  failure?: {
+    worker?: string | null;
+    message?: string | null;
+    traceback?: string | null;
+    code?: string | null;
+    attempts?: number | null;
+  } | null;
+  insight_count: number;
+  errors_total: number;
+}
+
+export const LANGGRAPH_WORKERS = [
+  {
+    key: "ingestion_worker",
+    name: "Ingestion Agent",
+    shortName: "Ingestion",
+    description: "Telemetry parsing & schema validation",
+    icon: "move_to_inbox",
+  },
+  {
+    key: "data_worker",
+    name: "Data Aggregator",
+    shortName: "Aggregator",
+    description: "Funnel transitions & conversion metrics",
+    icon: "filter_alt",
+  },
+  {
+    key: "friction_worker",
+    name: "Friction Engine MCP",
+    shortName: "Friction MCP",
+    description: "Multi-signal scoring & critical bottlenecks",
+    icon: "warning",
+  },
+  {
+    key: "insight_worker",
+    name: "Insight & Synthesis",
+    shortName: "Insight Agent",
+    description: "Root cause hypothesis & tactical fixes",
+    icon: "psychology",
+  },
+  {
+    key: "report_worker",
+    name: "Report Server",
+    shortName: "Report Server",
+    description: "Executive report compilation & audit provenance",
+    icon: "description",
+  },
+] as const;
+
+function computeStepDuration(step?: AgentWorkerStep): string | null {
+  if (!step?.started_at) return null;
+  const start = new Date(step.started_at).getTime();
+  const end = step.finished_at ? new Date(step.finished_at).getTime() : Date.now();
+  if (isNaN(start) || isNaN(end) || end < start) return null;
+  const sec = (end - start) / 1000;
+  return `${sec.toFixed(2)}s`;
+}
+
+function getStepStatusInfo(status?: string | null) {
+  switch (status) {
+    case 'completed':
+    case 'succeeded':
+      return {
+        label: 'Completed',
+        bg: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+        dot: 'bg-emerald-500',
+        icon: 'check_circle',
+        iconClass: 'text-emerald-600',
+      };
+    case 'running':
+      return {
+        label: 'Running…',
+        bg: 'bg-blue-50 text-blue-800 border-blue-300',
+        dot: 'bg-blue-500 animate-ping',
+        icon: 'sync',
+        iconClass: 'text-blue-600 animate-spin',
+      };
+    case 'failed':
+      return {
+        label: 'Failed',
+        bg: 'bg-rose-50 text-rose-800 border-rose-300',
+        dot: 'bg-rose-500',
+        icon: 'error',
+        iconClass: 'text-rose-600',
+      };
+    case 'skipped':
+      return {
+        label: 'Skipped',
+        bg: 'bg-surface-container-high text-on-surface-variant border-outline-variant',
+        dot: 'bg-gray-400',
+        icon: 'remove_circle_outline',
+        iconClass: 'text-gray-400',
+      };
+    default:
+      return {
+        label: 'Pending',
+        bg: 'bg-surface-container text-on-surface-variant border-surface-container-highest',
+        dot: 'bg-gray-300',
+        icon: 'radio_button_unchecked',
+        iconClass: 'text-gray-400',
+      };
+  }
+}
+
 export interface AnalyticsScreenProps {
   tasks?: Task[];
   onNewTask?: () => void;
@@ -119,6 +245,18 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
   const [analysisPhase, setAnalysisPhase] = useState<string | null>(null);
   const [analysisNotification, setAnalysisNotification] = useState<string | null>(null);
   const [isLiveStreaming, setIsLiveStreaming] = useState(false);
+
+  // LangGraph Multi-Agent Run States
+  const [activeRunDetail, setActiveRunDetail] = useState<BackendRunDetail | null>(null);
+  const [isAutoApprove, setIsAutoApprove] = useState<boolean>(true);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isResuming, setIsResuming] = useState<boolean>(false);
+  const [showRunInspector, setShowRunInspector] = useState<boolean>(false);
+  const [recentRuns, setRecentRuns] = useState<BackendRunSummary[]>([]);
+  const [selectedInspectorRun, setSelectedInspectorRun] = useState<BackendRunDetail | null>(null);
+  const [inspectorFilter, setInspectorFilter] = useState<'all' | 'running' | 'awaiting_approval' | 'completed' | 'failed'>('all');
+  const [isPipelineRailMinimized, setIsPipelineRailMinimized] = useState<boolean>(false);
+  const [copiedRunId, setCopiedRunId] = useState<string | null>(null);
 
   // Modals
   const [showReplayModal, setShowReplayModal] = useState<string | null>(null);
@@ -249,72 +387,296 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
     };
   }, [isLiveStreaming, windowMinutes, selectedJourney, selectedTable, fetchTelemetry]);
 
-  // Dedicated Run Analysis action
+  // Fetch recent LangGraph runs
+  const fetchRecentRuns = useCallback(async () => {
+    try {
+      const res = await fetch('/api/runs', { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.ok && Array.isArray(json.data?.items)) {
+          setRecentRuns(json.data.items);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const fetchRunDetail = useCallback(async (runId: string) => {
+    try {
+      const res = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.ok) {
+          setSelectedInspectorRun(json.data);
+          return json.data;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }, []);
+
+  useEffect(() => {
+    void fetchRecentRuns();
+  }, [fetchRecentRuns]);
+
+  // Dedicated Run Analysis action: triggers full backend LangGraph run with live agent transitions
   const handleRunAnalysis = async () => {
     if (isAnalyzing) return;
     setIsAnalyzing(true);
     setAnalysisNotification(null);
-    setAnalysisPhase("1/5: Ingestion Intelligence & Supabase Extraction");
+    setAnalysisPhase("Dispatching LangGraph multi-agent workflow…");
+    setActiveRunDetail(null);
+    setIsPipelineRailMinimized(false);
+
+    let startedBackendRun = false;
 
     try {
-      setTimeout(() => setAnalysisPhase("2/5: Journey Funnel Aggregation"), 350);
-      setTimeout(() => setAnalysisPhase("3/5: Friction Scoring Engine (Threshold: 60)"), 700);
-      setTimeout(() => setAnalysisPhase("4/5: Machine Intelligence Inference (Groq LLM)"), 1050);
-      setTimeout(() => setAnalysisPhase("5/5: Compiling Tactical Executive Report"), 1400);
-
-      let llmConfig: any = undefined;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (typeof window !== 'undefined') {
-        try {
-          const savedLlm = localStorage.getItem('cji_llm_config');
-          if (savedLlm) {
-            llmConfig = JSON.parse(savedLlm);
-            if (llmConfig?.apiKey) {
-              headers['x-groq-key'] = llmConfig.apiKey;
-              headers['x-llm-model'] = llmConfig.model || 'openai/gpt-oss-120b';
-              headers['x-llm-provider'] = llmConfig.provider || 'groq';
-            }
-          }
-        } catch {
-          // ignore
-        }
-      }
-
-      const res = await fetch('/api/analytics', {
+      // 1. Dispatch full LangGraph analysis run directly to the backend
+      const startRes = await fetch('/api/runs', {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           journey_id: selectedJourney,
-          table: selectedTable,
-          minutes: windowMinutes,
-          llm_config: llmConfig,
+          auto_approve: isAutoApprove,
+          window_minutes: windowMinutes,
         }),
       });
 
+      if (startRes.ok && (startRes.status === 200 || startRes.status === 202)) {
+        const runPayload = await startRes.json();
+        const runData: BackendRunDetail = runPayload.data || runPayload;
+        if (runData?.run_id) {
+          startedBackendRun = true;
+          const runId = runData.run_id;
+          setActiveRunDetail(runData);
+          setAnalysisPhase("1/5: Ingestion Agent — Validating telemetry schema & source streams…");
+          void fetchRecentRuns();
+
+          // 2. Poll the live run state transitions until finished or awaiting approval
+          let isComplete = false;
+          let pollAttempts = 0;
+
+          while (!isComplete && pollAttempts < 60) {
+            await new Promise((r) => setTimeout(r, 800));
+            pollAttempts++;
+
+            try {
+              const pollRes = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { cache: 'no-store' });
+              if (pollRes.ok) {
+                const pollJson = await pollRes.json();
+                const currentRun: BackendRunDetail = pollJson.data || pollJson;
+                setActiveRunDetail(currentRun);
+
+                // Update human readable phase based on current worker step
+                const steps = currentRun.steps || {};
+                if (currentRun.status === 'awaiting_approval') {
+                  setAnalysisPhase("Approval Gate: Operator review required before report compilation.");
+                  setAnalysisNotification(`Run ${runId.slice(0, 8)} paused at approval gate. Review friction & insights, then click "Approve Run" below.`);
+                  setIsAnalyzing(false);
+                  isComplete = true;
+                  break;
+                } else if (currentRun.status === 'completed') {
+                  setAnalysisPhase("All 5 agents finished. Intelligence report compiled.");
+                  isComplete = true;
+                  break;
+                } else if (currentRun.status === 'failed') {
+                  setAnalysisPhase(`Run halted: ${currentRun.failure?.worker || 'Worker'} failed`);
+                  setAnalysisNotification(`Run ${runId.slice(0, 8)} failed: ${currentRun.failure?.message || 'Error occurred during agent step'}`);
+                  setIsAnalyzing(false);
+                  isComplete = true;
+                  break;
+                } else {
+                  // Running: track which step is active
+                  if (!steps.ingestion_worker || steps.ingestion_worker.status === 'running') {
+                    setAnalysisPhase("1/5: Ingestion Agent — Extracting and validating telemetry schema…");
+                  } else if (!steps.data_worker || steps.data_worker.status === 'running') {
+                    setAnalysisPhase("2/5: Data Aggregator — Computing journey funnel & drop-off transitions…");
+                  } else if (!steps.friction_worker || steps.friction_worker.status === 'running') {
+                    setAnalysisPhase("3/5: Friction Engine MCP — Computing multi-signal friction vectors…");
+                  } else if (!steps.insight_worker || steps.insight_worker.status === 'running') {
+                    setAnalysisPhase("4/5: Insight & Synthesis Agent — Synthesizing root causes with LLM…");
+                  } else if (!steps.report_worker || steps.report_worker.status === 'running') {
+                    setAnalysisPhase("5/5: Report Server — Generating executive HTML report…");
+                  }
+                }
+              }
+            } catch (pollErr) {
+              console.warn("Poll attempt error:", pollErr);
+            }
+          }
+
+          // If run reached completion, fetch full results and sync telemetry
+          if (isComplete) {
+            try {
+              const resultsRes = await fetch(`/api/runs/${encodeURIComponent(runId)}/results`);
+              if (resultsRes.ok) {
+                const resJson = await resultsRes.json();
+                const runResults = resJson.data || resJson;
+                setAnalysisNotification(
+                  `LangGraph multi-agent analysis complete [Run ${runId.slice(0, 8)}]: Evaluated friction on ${runResults.friction_scores?.length ?? 0} stages, generated ${runResults.insights?.length ?? 0} insights.`
+                );
+              }
+            } catch {
+              // Ignore results fetch failure
+            }
+            await fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
+            void fetchRecentRuns();
+          }
+        }
+      }
+    } catch (langGraphErr) {
+      console.warn("LangGraph backend trigger not available, falling back to direct Edge Supabase + Groq pipeline:", langGraphErr);
+    }
+
+    // 3. Fallback: If backend LangGraph service is offline or returned an error, execute Edge Supabase + Groq pipeline seamlessly
+    if (!startedBackendRun) {
+      setAnalysisPhase("Executing Edge Supabase + Groq analysis pipeline…");
+      try {
+        let llmConfig: any = undefined;
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (typeof window !== 'undefined') {
+          try {
+            const savedLlm = localStorage.getItem('cji_llm_config');
+            if (savedLlm) {
+              llmConfig = JSON.parse(savedLlm);
+              if (llmConfig?.apiKey) {
+                headers['x-groq-key'] = llmConfig.apiKey;
+                headers['x-llm-model'] = llmConfig.model || 'openai/gpt-oss-120b';
+                headers['x-llm-provider'] = llmConfig.provider || 'groq';
+              }
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        const res = await fetch('/api/analytics', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            journey_id: selectedJourney,
+            table: selectedTable,
+            minutes: windowMinutes,
+            llm_config: llmConfig,
+          }),
+        });
+
+        if (res.ok) {
+          const data: LiveTelemetryPayload = await res.json();
+          setTelemetry(data);
+          const criticalCount = data.friction?.criticalSteps?.length ?? 0;
+          const totalSteps = data.metrics?.funnel?.length ?? 0;
+          const sessionCount = data.metrics?.funnel?.[0]?.users ?? 0;
+          const hasGroq = data.insights?.some((i) => i.detectedAt?.includes("Groq"));
+          setAnalysisNotification(
+            hasGroq
+              ? `Groq Machine Intelligence analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
+              : `Analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
+          );
+        } else {
+          await fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
+          setAnalysisNotification(`Telemetry updated for '${selectedJourney}' from [${selectedTable}].`);
+        }
+      } catch (err) {
+        console.error("Analysis execution error:", err);
+        setAnalysisNotification("Analysis completed with local fallback heuristics.");
+      }
+    }
+
+    setIsAnalyzing(false);
+    setAnalysisPhase(null);
+  };
+
+  // Handler for operator approval of a paused LangGraph run
+  const handleApproveRun = async (runId: string) => {
+    setIsApproving(true);
+    try {
+      const res = await fetch(`/api/runs/${encodeURIComponent(runId)}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
       if (res.ok) {
-        const data: LiveTelemetryPayload = await res.json();
-        setTelemetry(data);
-        const criticalCount = data.friction?.criticalSteps?.length ?? 0;
-        const totalSteps = data.metrics?.funnel?.length ?? 0;
-        const sessionCount = data.metrics?.funnel?.[0]?.users ?? 0;
-        const hasGroq = data.insights?.some((i) => i.detectedAt?.includes("Groq"));
-        setAnalysisNotification(
-          hasGroq
-            ? `Groq Machine Intelligence analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
-            : `Analysis complete: Evaluated ${sessionCount.toLocaleString()} sessions across ${totalSteps} stages in [${selectedTable}]. Identified ${criticalCount} critical friction points.`
-        );
+        setAnalysisNotification(`Run ${runId.slice(0, 8)} approved. Report Server agent executing…`);
+        setIsAnalyzing(true);
+        // Continue polling until completed
+        let isDone = false;
+        let pollCount = 0;
+        while (!isDone && pollCount < 40) {
+          await new Promise((r) => setTimeout(r, 800));
+          pollCount++;
+          const poll = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { cache: 'no-store' });
+          if (poll.ok) {
+            const pollData = await poll.json();
+            const cur: BackendRunDetail = pollData.data || pollData;
+            setActiveRunDetail(cur);
+            if (cur.status === 'completed') {
+              isDone = true;
+              setAnalysisNotification(`Run ${runId.slice(0, 8)} completed. Executive Report generated.`);
+              await fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
+              void fetchRecentRuns();
+              break;
+            } else if (cur.status === 'failed') {
+              isDone = true;
+              setAnalysisNotification(`Run ${runId.slice(0, 8)} failed during report compilation.`);
+              break;
+            }
+          }
+        }
       } else {
-        await fetchTelemetry(windowMinutes, selectedJourney, selectedTable);
-        setAnalysisNotification(`Telemetry updated for '${selectedJourney}' from [${selectedTable}].`);
+        const errJson = await res.json().catch(() => ({}));
+        setAnalysisNotification(`Approval failed: ${errJson.error || errJson.problem?.detail || 'Unauthorized'}`);
       }
     } catch (err) {
-      console.error("Analysis execution error:", err);
-      setAnalysisNotification("Analysis completed with local fallback heuristics.");
+      console.error("Approve error", err);
     } finally {
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        setAnalysisPhase(null);
-      }, 1800);
+      setIsApproving(false);
+      setIsAnalyzing(false);
+      setAnalysisPhase(null);
+    }
+  };
+
+  // Handler for resuming an orphaned or failed run
+  const handleResumeRun = async (runId: string) => {
+    setIsResuming(true);
+    try {
+      const res = await fetch(`/api/runs/${encodeURIComponent(runId)}/resume`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      if (res.ok) {
+        setAnalysisNotification(`Run ${runId.slice(0, 8)} resumed from last checkpoint.`);
+        setIsAnalyzing(true);
+        let isDone = false;
+        let pollCount = 0;
+        while (!isDone && pollCount < 40) {
+          await new Promise((r) => setTimeout(r, 800));
+          pollCount++;
+          const poll = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { cache: 'no-store' });
+          if (poll.ok) {
+            const pollData = await poll.json();
+            const cur: BackendRunDetail = pollData.data || pollData;
+            setActiveRunDetail(cur);
+            if (cur.status === 'completed' || cur.status === 'awaiting_approval' || cur.status === 'failed') {
+              isDone = true;
+              break;
+            }
+          }
+        }
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        setAnalysisNotification(`Resume failed: ${errJson.error || errJson.problem?.detail || 'Unauthorized'}`);
+      }
+    } catch (err) {
+      console.error("Resume error", err);
+    } finally {
+      setIsResuming(false);
+      setIsAnalyzing(false);
+      setAnalysisPhase(null);
     }
   };
 
@@ -541,6 +903,46 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
           </div>
 
           <div className="flex items-center flex-wrap gap-2.5">
+            {/* LangGraph Auto-Approve vs Human Gate Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsAutoApprove((prev) => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+                isAutoApprove
+                  ? 'bg-surface-container-high text-on-surface-variant hover:text-primary'
+                  : 'bg-amber-100 text-amber-900 border border-amber-300 font-semibold'
+              }`}
+              title={
+                isAutoApprove
+                  ? "Auto-Approve mode: All LangGraph agent steps run autonomously through to report compilation"
+                  : "Human Approval Gate: Pauses before Report Server so operator can inspect friction & insights before compiling"
+              }
+            >
+              <span className="material-symbols-outlined text-[15px]">
+                {isAutoApprove ? 'bolt' : 'verified_user'}
+              </span>
+              <span>{isAutoApprove ? 'Auto-Approve' : 'Human Gate'}</span>
+            </button>
+
+            {/* Workflow Runs Inspector Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowRunInspector(true);
+                void fetchRecentRuns();
+              }}
+              className="flex items-center gap-1.5 bg-surface-container-high hover:bg-surface-container-highest text-primary px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer"
+              title="Inspect LangGraph Multi-Agent Workflow Runs"
+            >
+              <span className="material-symbols-outlined text-[16px]">account_tree</span>
+              <span>Agent Runs</span>
+              {recentRuns.length > 0 && (
+                <span className="bg-primary text-on-primary text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  {recentRuns.length}
+                </span>
+              )}
+            </button>
+
             {/* Live Stream Polling Toggle */}
             <button
               type="button"
@@ -585,6 +987,252 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
             </button>
           </div>
         </section>
+
+        {/* LangGraph Autonomous Multi-Agent Execution Rail */}
+        {(activeRunDetail || isAnalyzing) && (
+          <section className="relative z-10 p-4 sm:p-5 bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl border border-primary/20 shadow-md animate-fadeIn">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-surface-container-high">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <span className={`material-symbols-outlined text-[18px] ${isAnalyzing ? 'animate-spin' : ''}`}>
+                    hub
+                  </span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-title-sm text-sm font-bold text-primary">
+                      LangGraph Autonomous Multi-Agent Pipeline
+                    </span>
+                    {activeRunDetail?.run_id && (
+                      <span className="font-mono text-[11px] bg-surface-container-high px-2 py-0.5 rounded-md text-on-surface flex items-center gap-1">
+                        <span>run:{activeRunDetail.run_id.slice(0, 8)}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (activeRunDetail?.run_id) {
+                              navigator.clipboard.writeText(activeRunDetail.run_id);
+                              setCopiedRunId(activeRunDetail.run_id);
+                              setTimeout(() => setCopiedRunId(null), 1500);
+                            }
+                          }}
+                          className="hover:text-primary cursor-pointer p-0.5"
+                          title="Copy run ID"
+                        >
+                          <span className="material-symbols-outlined text-[13px]">
+                            {copiedRunId === activeRunDetail.run_id ? 'check' : 'content_copy'}
+                          </span>
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant">
+                    {analysisPhase || "Executing multi-agent directed graph with SQLite checkpoints and human approval gate"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                {/* Status Pill */}
+                {activeRunDetail && (() => {
+                  const s = activeRunDetail.status;
+                  const isAwaiting = s === 'awaiting_approval';
+                  const isRunning = s === 'running';
+                  const isDone = s === 'completed';
+                  const isFailed = s === 'failed';
+                  return (
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-full font-semibold capitalize flex items-center gap-1.5 ${
+                        isDone
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                          : isAwaiting
+                          ? 'bg-amber-50 text-amber-900 border border-amber-300 animate-pulse'
+                          : isRunning
+                          ? 'bg-blue-50 text-blue-900 border border-blue-300'
+                          : isFailed
+                          ? 'bg-rose-50 text-rose-800 border border-rose-300'
+                          : 'bg-surface-container-high text-on-surface'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isDone
+                            ? 'bg-emerald-500'
+                            : isAwaiting
+                            ? 'bg-amber-500 animate-ping'
+                            : isRunning
+                            ? 'bg-blue-500 animate-ping'
+                            : isFailed
+                            ? 'bg-rose-500'
+                            : 'bg-gray-400'
+                        }`}
+                      />
+                      <span>{s.replace(/_/g, ' ')}</span>
+                    </span>
+                  );
+                })()}
+
+                <button
+                  type="button"
+                  onClick={() => setIsPipelineRailMinimized((prev) => !prev)}
+                  className="p-1 text-on-surface-variant hover:text-primary rounded-lg transition-colors cursor-pointer"
+                  title={isPipelineRailMinimized ? "Expand agent rail" : "Minimize agent rail"}
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {isPipelineRailMinimized ? 'unfold_more' : 'unfold_less'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* 5-Node Agent Flow */}
+            {!isPipelineRailMinimized && (
+              <div className="mt-4 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5 sm:gap-3">
+                  {LANGGRAPH_WORKERS.map((worker, idx) => {
+                    const stepData = activeRunDetail?.steps?.[worker.key];
+                    const stepStatus = stepData?.status || (isAnalyzing && idx === 0 && !activeRunDetail ? 'running' : 'pending');
+                    const info = getStepStatusInfo(stepStatus);
+                    const duration = computeStepDuration(stepData);
+
+                    return (
+                      <div
+                        key={worker.key}
+                        className={`p-3 rounded-xl border transition-all flex flex-col justify-between ${
+                          stepStatus === 'running'
+                            ? 'bg-blue-50/70 border-blue-300 shadow-sm'
+                            : stepStatus === 'completed' || stepStatus === 'succeeded'
+                            ? 'bg-emerald-50/40 border-emerald-200'
+                            : stepStatus === 'failed'
+                            ? 'bg-rose-50/60 border-rose-300'
+                            : 'bg-surface-container-low/60 border-surface-container-high'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[10px] font-bold text-on-surface-variant">
+                              0{idx + 1}
+                            </span>
+                            <span className={`material-symbols-outlined text-[18px] ${info.iconClass}`}>
+                              {info.icon}
+                            </span>
+                          </div>
+                          {duration && (
+                            <span className="font-mono text-[10px] font-semibold text-primary bg-surface-container-high/60 px-1.5 py-0.5 rounded">
+                              {duration}
+                            </span>
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="font-bold text-xs text-primary leading-tight">
+                            {worker.shortName}
+                          </div>
+                          <div className="text-[10px] text-on-surface-variant mt-0.5 line-clamp-1">
+                            {worker.description}
+                          </div>
+                        </div>
+
+                        <div className="mt-2.5 pt-2 border-t border-surface-container-high/50 flex items-center justify-between">
+                          <span className={`text-[10px] font-semibold capitalize px-1.5 py-0.5 rounded ${info.bg}`}>
+                            {info.label}
+                          </span>
+                          {stepData?.attempts && stepData.attempts > 1 ? (
+                            <span className="text-[10px] text-amber-700 font-mono">
+                              retry #{stepData.attempts}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Human Approval Gate Action Callout */}
+                {activeRunDetail?.status === 'awaiting_approval' && (
+                  <div className="mt-3.5 p-3.5 bg-amber-50/90 border border-amber-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+                    <div className="flex items-center gap-2.5 text-xs text-amber-950">
+                      <span className="material-symbols-outlined text-[20px] text-amber-700 shrink-0">
+                        verified_user
+                      </span>
+                      <div>
+                        <div className="font-bold text-amber-900">
+                          Human-in-the-Loop Gate Reached
+                        </div>
+                        <p className="text-amber-800 mt-0.5 text-[11px]">
+                          Agents 1–4 completed successfully (Funnel, Friction MCP & Insights computed). Operator approval is required to trigger the Report Server agent and write the narrative.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => activeRunDetail && handleApproveRun(activeRunDetail.run_id)}
+                      disabled={isApproving}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+                    >
+                      <span className={`material-symbols-outlined text-[16px] ${isApproving ? 'animate-spin' : ''}`}>
+                        {isApproving ? 'sync' : 'check'}
+                      </span>
+                      <span>{isApproving ? 'Approving…' : 'Approve Run & Compile Report'}</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Failed Run Action Callout */}
+                {activeRunDetail?.status === 'failed' && (
+                  <div className="mt-3.5 p-3.5 bg-rose-50/90 border border-rose-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+                    <div className="flex items-center gap-2.5 text-xs text-rose-950">
+                      <span className="material-symbols-outlined text-[20px] text-rose-700 shrink-0">
+                        error
+                      </span>
+                      <div>
+                        <div className="font-bold text-rose-900">
+                          Workflow Paused: Step Failed ({activeRunDetail.failure?.worker || 'Worker'})
+                        </div>
+                        <p className="text-rose-800 mt-0.5 text-[11px]">
+                          {activeRunDetail.failure?.message || "An unhandled condition occurred. You can resume this run from its last stored checkpoint."}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => activeRunDetail && handleResumeRun(activeRunDetail.run_id)}
+                      disabled={isResuming}
+                      className="bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2 rounded-full shadow-sm hover:shadow transition-all flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+                    >
+                      <span className={`material-symbols-outlined text-[16px] ${isResuming ? 'animate-spin' : ''}`}>
+                        {isResuming ? 'sync' : 'replay'}
+                      </span>
+                      <span>{isResuming ? 'Resuming…' : 'Resume Run from Checkpoint'}</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Completed Report Link */}
+                {activeRunDetail?.status === 'completed' && activeRunDetail.report_id && (
+                  <div className="mt-3.5 p-3 bg-emerald-50/80 border border-emerald-300/80 rounded-xl flex items-center justify-between text-xs text-emerald-950">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[18px] text-emerald-700">
+                        task_alt
+                      </span>
+                      <span>
+                        Run completed successfully. Audited HTML Executive Report generated: <strong>{activeRunDetail.report_id}</strong>
+                      </span>
+                    </div>
+                    <a
+                      href={`/reports/${encodeURIComponent(activeRunDetail.report_id)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                      <span>View Report</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Execution Notification Banner */}
         {analysisNotification && (
@@ -3063,6 +3711,250 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ initialTelemet
                 >
                   Done
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Modal: LangGraph Multi-Agent Workflow Runs Inspector */}
+      {showRunInspector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="w-full max-w-4xl bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="p-4 sm:p-5 border-b border-surface-container-high flex items-center justify-between bg-surface-container-low/40">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[18px]">account_tree</span>
+                </div>
+                <div>
+                  <h3 className="font-title-md text-primary font-bold text-sm sm:text-base">
+                    LangGraph Workflow Runs &amp; Agent Inspector
+                  </h3>
+                  <p className="text-[11px] text-on-surface-variant">
+                    Inspect state checkpoints, worker transitions, and approvals in the CJI LangGraph DAG
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void fetchRecentRuns()}
+                  className="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-high transition-colors cursor-pointer"
+                  title="Refresh runs"
+                >
+                  <span className="material-symbols-outlined text-[18px]">refresh</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRunInspector(false);
+                    setSelectedInspectorRun(null);
+                  }}
+                  className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-surface-container-highest cursor-pointer text-on-surface"
+                  aria-label="Close runs inspector"
+                >
+                  <span className="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Content Body: Split View */}
+            <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
+              {/* Left Pane: Runs List */}
+              <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-surface-container-high flex flex-col bg-surface-container-low/20">
+                {/* Filter Pills */}
+                <div className="p-3 border-b border-surface-container-high flex items-center gap-1 overflow-x-auto text-[11px]">
+                  {(['all', 'running', 'awaiting_approval', 'completed', 'failed'] as const).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setInspectorFilter(f)}
+                      className={`px-2 py-1 rounded-md font-medium capitalize shrink-0 cursor-pointer transition-colors ${
+                        inspectorFilter === f
+                          ? 'bg-primary text-on-primary'
+                          : 'text-on-surface-variant hover:bg-surface-container-high'
+                      }`}
+                    >
+                      {f.replace(/_/g, ' ')}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Runs Scroll List */}
+                <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
+                  {recentRuns
+                    .filter((r) => inspectorFilter === 'all' || r.status === inspectorFilter)
+                    .map((run) => {
+                      const isSelected = selectedInspectorRun?.run_id === run.run_id;
+                      const statusInfo = getStepStatusInfo(run.status);
+                      return (
+                        <div
+                          key={run.run_id}
+                          onClick={() => void fetchRunDetail(run.run_id)}
+                          className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                            isSelected
+                              ? 'bg-primary/5 border-primary/40 shadow-xs'
+                              : 'bg-surface-container-lowest hover:bg-surface-container-low border-surface-container-high'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-mono text-[11px] font-semibold text-primary">
+                              {run.run_id.slice(0, 10)}…
+                            </span>
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded capitalize ${statusInfo.bg}`}>
+                              {run.status.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-on-surface font-medium truncate">
+                            {run.journey_id}
+                          </div>
+                          <div className="text-[10px] text-on-surface-variant mt-1 flex items-center justify-between">
+                            <span>{new Date(run.created_at).toLocaleTimeString()}</span>
+                            {run.report_id && (
+                              <span className="text-secondary font-semibold flex items-center gap-0.5">
+                                <span className="material-symbols-outlined text-[12px]">description</span>
+                                Report
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                  {recentRuns.length === 0 && (
+                    <div className="p-6 text-center text-xs text-on-surface-variant">
+                      <span className="material-symbols-outlined text-[28px] text-on-surface-variant/50 mb-1 block">
+                        account_tree
+                      </span>
+                      No recent LangGraph runs recorded. Click "Run Analysis" to dispatch a new workflow run.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Pane: Selected Run DAG Details */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+                {selectedInspectorRun ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-surface-container-high">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-primary text-sm">
+                            Run: {selectedInspectorRun.run_id}
+                          </h4>
+                          <span className={`text-xs px-2 py-0.5 rounded font-semibold capitalize ${getStepStatusInfo(selectedInspectorRun.status).bg}`}>
+                            {selectedInspectorRun.status.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                        <div className="text-xs text-on-surface-variant mt-0.5">
+                          Journey: <strong>{selectedInspectorRun.journey_id}</strong> · Created: {new Date(selectedInspectorRun.created_at).toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {selectedInspectorRun.status === 'awaiting_approval' && (
+                          <button
+                            type="button"
+                            onClick={() => handleApproveRun(selectedInspectorRun.run_id)}
+                            disabled={isApproving}
+                            className="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1 cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">check</span>
+                            <span>Approve</span>
+                          </button>
+                        )}
+                        {selectedInspectorRun.status === 'failed' && (
+                          <button
+                            type="button"
+                            onClick={() => handleResumeRun(selectedInspectorRun.run_id)}
+                            disabled={isResuming}
+                            className="bg-rose-700 hover:bg-rose-800 text-white text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1 cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">replay</span>
+                            <span>Resume</span>
+                          </button>
+                        )}
+                        {selectedInspectorRun.report_id && (
+                          <a
+                            href={`/reports/${encodeURIComponent(selectedInspectorRun.report_id)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                            <span>View Report</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Step-by-Step DAG execution sequence */}
+                    <div>
+                      <h5 className="text-xs font-bold text-primary mb-2.5">Agent Worker State Transitions</h5>
+                      <div className="space-y-2">
+                        {LANGGRAPH_WORKERS.map((worker, idx) => {
+                          const step = selectedInspectorRun.steps?.[worker.key];
+                          const sInfo = getStepStatusInfo(step?.status);
+                          const duration = computeStepDuration(step);
+
+                          return (
+                            <div
+                              key={worker.key}
+                              className="p-3 bg-surface-container-low/70 rounded-xl border border-surface-container-high flex items-center justify-between text-xs"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="font-mono text-[10px] text-on-surface-variant font-bold">
+                                  0{idx + 1}
+                                </span>
+                                <span className={`material-symbols-outlined text-[18px] ${sInfo.iconClass}`}>
+                                  {sInfo.icon}
+                                </span>
+                                <div>
+                                  <div className="font-semibold text-primary">{worker.name}</div>
+                                  <div className="text-[10px] text-on-surface-variant font-mono">{worker.key}</div>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                {duration && (
+                                  <span className="font-mono text-[10px] text-on-surface bg-surface-container-high px-2 py-0.5 rounded">
+                                    {duration}
+                                  </span>
+                                )}
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${sInfo.bg}`}>
+                                  {sInfo.label}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Failure details if any */}
+                    {selectedInspectorRun.failure && (
+                      <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-950">
+                        <div className="font-bold flex items-center gap-1.5 text-rose-900 mb-1">
+                          <span className="material-symbols-outlined text-[16px]">error</span>
+                          Failure in {selectedInspectorRun.failure.worker || 'worker'}
+                        </div>
+                        <p className="font-mono text-[11px] bg-rose-100/60 p-2 rounded">
+                          {selectedInspectorRun.failure.message || "Unknown error"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-8 text-on-surface-variant">
+                    <span className="material-symbols-outlined text-[36px] text-on-surface-variant/40 mb-2">
+                      touch_app
+                    </span>
+                    <p className="text-xs">
+                      Select a LangGraph workflow run from the list on the left to inspect its agent transitions and execution checkpoints.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
